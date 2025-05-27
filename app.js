@@ -29,10 +29,8 @@ class TennisMatchApp {
 		this.renderMatchHistory();
 		this.updateStats();
 	}
-
 	// モバイル機能のセットアップ
 	setupMobileFeatures() {
-		this.setupPullToRefresh();
 		this.setupSwipeGestures();
 		this.setupHapticFeedback();
 		this.setupInstallPrompt();
@@ -41,76 +39,6 @@ class TennisMatchApp {
 		this.setupFocusManagement();
 		this.registerServiceWorker();
 	}
-
-	// プルトゥリフレッシュ機能
-	setupPullToRefresh() {
-		let startY = 0;
-		let currentY = 0;
-		let isPulling = false;
-		const pullThreshold = 100;
-		
-		const refreshIndicator = document.createElement('div');
-		refreshIndicator.className = 'pull-refresh-indicator';
-		refreshIndicator.innerHTML = '↓ 引っ張って更新';
-		document.body.appendChild(refreshIndicator);
-
-		document.addEventListener('touchstart', (e) => {
-			if (window.scrollY === 0) {
-				startY = e.touches[0].clientY;
-				isPulling = false;
-			}
-		}, { passive: true });
-
-		document.addEventListener('touchmove', (e) => {
-			if (window.scrollY === 0 && startY > 0) {
-				currentY = e.touches[0].clientY;
-				const pullDistance = currentY - startY;
-
-				if (pullDistance > 0) {
-					isPulling = true;
-					const progress = Math.min(pullDistance / pullThreshold, 1);
-					
-					refreshIndicator.style.transform = `translateY(${Math.min(pullDistance * 0.5, 50)}px)`;
-					refreshIndicator.style.opacity = progress;
-					
-					if (pullDistance > pullThreshold) {
-						refreshIndicator.innerHTML = '↑ 離して更新';
-						refreshIndicator.classList.add('ready');
-					} else {
-						refreshIndicator.innerHTML = '↓ 引っ張って更新';
-						refreshIndicator.classList.remove('ready');
-					}
-				}
-			}
-		}, { passive: true });
-
-		document.addEventListener('touchend', () => {
-			if (isPulling && currentY - startY > pullThreshold) {
-				this.performRefresh();
-			}
-			
-			refreshIndicator.style.transform = 'translateY(-100%)';
-			refreshIndicator.style.opacity = '0';
-			refreshIndicator.classList.remove('ready');
-			startY = 0;
-			isPulling = false;
-		}, { passive: true });
-	}
-
-	// 更新実行
-	performRefresh() {
-		this.triggerHapticFeedback('light');
-		this.showNotification('データを更新しています...', 'info');
-		
-		// アニメーション付きで更新
-		setTimeout(() => {
-			this.updateStats();
-			this.renderTeamSelection();
-			this.updateTeamDisplayNames();
-			this.showNotification('更新完了', 'success');
-		}, 1000);
-	}
-
 	// スワイプジェスチャー
 	setupSwipeGestures() {
 		const tabContainer = document.querySelector('.tabs');
@@ -204,7 +132,6 @@ class TennisMatchApp {
 			}
 		}
 	}
-
 	// PWAインストールプロンプト
 	setupInstallPrompt() {
 		let deferredPrompt;
@@ -213,11 +140,17 @@ class TennisMatchApp {
 			e.preventDefault();
 			deferredPrompt = e;
 			
+			// 既存のインストールボタンがあるかチェック
+			const existingBtn = document.querySelector('.install-btn');
+			if (existingBtn) {
+				existingBtn.remove();
+			}
+			
 			// インストールボタンを表示
 			const installBtn = document.createElement('button');
 			installBtn.className = 'install-btn';
 			installBtn.innerHTML = '📱 アプリをインストール';
-			installBtn.onclick = () => this.showInstallPrompt(deferredPrompt);
+			installBtn.onclick = () => this.showInstallPrompt(deferredPrompt, installBtn);
 			
 			const header = document.querySelector('header .header-controls');
 			if (header) {
@@ -238,11 +171,16 @@ class TennisMatchApp {
 	}
 
 	// インストールプロンプト表示
-	async showInstallPrompt(deferredPrompt) {
+	async showInstallPrompt(deferredPrompt, installBtn) {
 		if (!deferredPrompt) return;
 
 		const result = await deferredPrompt.prompt();
-		if (result.outcome === 'accepted') {
+		if (result.outcome === 'dismissed') {
+			// キャンセルされた場合はボタンを削除
+			if (installBtn) {
+				installBtn.remove();
+			}
+		} else if (result.outcome === 'accepted') {
 			this.triggerHapticFeedback('success');
 		}
 		deferredPrompt = null;

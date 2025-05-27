@@ -718,29 +718,6 @@ th {
    モバイル機能のスタイル
    =========================================== */
 
-/* プルトゥリフレッシュインジケーター */
-.pull-refresh-indicator {
-	position: fixed;
-	top: -60px;
-	left: 50%;
-	transform: translateX(-50%);
-	background: rgba(76, 175, 80, 0.9);
-	color: white;
-	padding: 10px 20px;
-	border-radius: 20px;
-	font-size: 14px;
-	font-weight: 600;
-	z-index: 1000;
-	transition: all 0.3s ease;
-	backdrop-filter: blur(10px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	opacity: 0;
-}
-
-.pull-refresh-indicator.ready {
-	background: rgba(33, 150, 243, 0.9);
-}
-
 /* インストールボタン */
 .install-btn {
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -837,15 +814,7 @@ th {
 	.install-btn {
 		font-size: 11px;
 		padding: 6px 10px;
-		margin-left: 5px;
-	}
-
-	/* プルトゥリフレッシュのモバイル調整 */
-	.pull-refresh-indicator {
-		font-size: 12px;
-		padding: 8px 16px;
-		top: -50px;
-	}
+		margin-left: 5px;	}
 }
 
 /* アニメーション */
