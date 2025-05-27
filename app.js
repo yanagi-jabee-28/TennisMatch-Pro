@@ -28,12 +28,10 @@ class TennisMatchApp {
 		this.renderRounds();
 		this.renderMatchHistory();
 		this.updateStats();
-	}
-	// モバイル機能のセットアップ
+	}	// モバイル機能のセットアップ
 	setupMobileFeatures() {
 		this.setupSwipeGestures();
 		this.setupHapticFeedback();
-		this.setupInstallPrompt();
 		this.setupOrientationChange();
 		this.setupDoubleTapPrevention();
 		this.setupFocusManagement();
@@ -130,61 +128,7 @@ class TennisMatchApp {
 					navigator.vibrate([100, 50, 100]);
 					break;
 			}
-		}
-	}
-	// PWAインストールプロンプト
-	setupInstallPrompt() {
-		let deferredPrompt;
-
-		window.addEventListener('beforeinstallprompt', (e) => {
-			e.preventDefault();
-			deferredPrompt = e;
-			
-			// 既存のインストールボタンがあるかチェック
-			const existingBtn = document.querySelector('.install-btn');
-			if (existingBtn) {
-				existingBtn.remove();
-			}
-			
-			// インストールボタンを表示
-			const installBtn = document.createElement('button');
-			installBtn.className = 'install-btn';
-			installBtn.innerHTML = '📱 アプリをインストール';
-			installBtn.onclick = () => this.showInstallPrompt(deferredPrompt, installBtn);
-			
-			const header = document.querySelector('header .header-controls');
-			if (header) {
-				header.appendChild(installBtn);
-			}
-		});
-
-		window.addEventListener('appinstalled', () => {
-			this.showNotification('アプリがインストールされました！', 'success');
-			this.triggerHapticFeedback('success');
-			
-			// インストールボタンを削除
-			const installBtn = document.querySelector('.install-btn');
-			if (installBtn) {
-				installBtn.remove();
-			}
-		});
-	}
-
-	// インストールプロンプト表示
-	async showInstallPrompt(deferredPrompt, installBtn) {
-		if (!deferredPrompt) return;
-
-		const result = await deferredPrompt.prompt();
-		if (result.outcome === 'dismissed') {
-			// キャンセルされた場合はボタンを削除
-			if (installBtn) {
-				installBtn.remove();
-			}
-		} else if (result.outcome === 'accepted') {
-			this.triggerHapticFeedback('success');
-		}
-		deferredPrompt = null;
-	}
+		}	}
 
 	// イベントリスナー設定
 	setupEventListeners() {

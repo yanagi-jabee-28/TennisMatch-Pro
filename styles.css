@@ -718,30 +718,6 @@ th {
    モバイル機能のスタイル
    =========================================== */
 
-/* インストールボタン */
-.install-btn {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	color: white;
-	border: none;
-	padding: 8px 12px;
-	border-radius: 20px;
-	font-size: 12px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-	margin-left: 10px;
-}
-
-.install-btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.install-btn:active {
-	transform: translateY(0);
-}
-
 /* スワイプヒント */
 .swipe-hint {
 	display: none;
@@ -807,14 +783,7 @@ th {
 
 	/* スワイプヒントを表示 */
 	.tabs .swipe-hint {
-		display: block;
-	}
-
-	/* インストールボタンのモバイル調整 */
-	.install-btn {
-		font-size: 11px;
-		padding: 6px 10px;
-		margin-left: 5px;	}
+		display: block;	}
 }
 
 /* アニメーション */
