@@ -35,7 +35,17 @@ class TennisMatchApp {
 		this.setupOrientationChange();
 		this.setupDoubleTapPrevention();
 		this.setupFocusManagement();
-		this.registerServiceWorker();
+		this.unregisterServiceWorker(); // 既存のServiceWorkerを削除
+		this.blockInstallPrompt(); // PWAインストールプロンプトを阻止
+	}
+
+	// PWAインストールプロンプトを阻止
+	blockInstallPrompt() {
+		window.addEventListener('beforeinstallprompt', (e) => {
+			// インストールプロンプトを表示させない
+			e.preventDefault();
+			return false;
+		});
 	}
 	// スワイプジェスチャー
 	setupSwipeGestures() {
@@ -1304,18 +1314,28 @@ class TennisMatchApp {
 				}
 			});
 		});
-	}
-
-	// サービスワーカー登録（オフライン対応）
-	registerServiceWorker() {
+	}	// サービスワーカー登録解除とキャッシュ削除（PWA機能を無効化）
+	async unregisterServiceWorker() {
 		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.register('sw.js')
-				.then(registration => {
-					console.log('Service Worker registered:', registration);
-				})
-				.catch(error => {
-					console.log('Service Worker registration failed:', error);
-				});
+			try {
+				// ServiceWorkerの登録解除
+				const registrations = await navigator.serviceWorker.getRegistrations();
+				for (let registration of registrations) {
+					await registration.unregister();
+					console.log('Service Worker unregistered:', registration);
+				}
+				
+				// キャッシュの削除
+				if ('caches' in window) {
+					const cacheNames = await caches.keys();
+					for (let cacheName of cacheNames) {
+						await caches.delete(cacheName);
+						console.log('Cache deleted:', cacheName);
+					}
+				}
+			} catch (error) {
+				console.log('Service Worker unregistration or cache deletion failed:', error);
+			}
 		}
 	}
 }
