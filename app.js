@@ -37,6 +37,47 @@ class TennisMatchApp {
 		this.setupFocusManagement();
 		this.unregisterServiceWorker(); // 既存のServiceWorkerを削除
 		this.blockInstallPrompt(); // PWAインストールプロンプトを阻止
+		this.disablePullToRefresh(); // プルトゥリフレッシュを無効化
+	}
+
+	// プルトゥリフレッシュを無効化
+	disablePullToRefresh() {
+		// bodyのスタイルでoverscroll-behaviorを設定
+		document.body.style.overscrollBehavior = 'none';
+		document.documentElement.style.overscrollBehavior = 'none';
+		
+		// touchstartとtouchmoveイベントで制御
+		let startY = 0;
+		let isScrolling = false;
+
+		document.addEventListener('touchstart', (e) => {
+			startY = e.touches[0].clientY;
+			isScrolling = false;
+		}, { passive: false });
+
+		document.addEventListener('touchmove', (e) => {
+			const currentY = e.touches[0].clientY;
+			const diff = currentY - startY;
+			
+			// ページの一番上で下方向にスワイプしようとした場合
+			if (window.scrollY === 0 && diff > 0) {
+				e.preventDefault();
+				return false;
+			}
+			
+			// 一番下で上方向にスワイプしようとした場合
+			if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight && diff < 0) {
+				e.preventDefault();
+				return false;
+			}
+		}, { passive: false });
+
+		// 追加でhistory.pushStateでナビゲーションも制御
+		const originalPushState = history.pushState;
+		history.pushState = function(...args) {
+			// プルトゥリフレッシュによるページ遷移を防ぐ
+			return originalPushState.apply(history, args);
+		};
 	}
 
 	// PWAインストールプロンプトを阻止

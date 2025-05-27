@@ -5,6 +5,12 @@
 	padding: 0;
 }
 
+html {
+	/* プルトゥリフレッシュを無効化 */
+	overscroll-behavior: none;
+	-webkit-overflow-scrolling: touch;
+}
+
 body {
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	line-height: 1.6;
@@ -14,6 +20,9 @@ body {
 	-webkit-text-size-adjust: 100%;
 	-ms-text-size-adjust: 100%;
 	touch-action: manipulation;
+	/* プルトゥリフレッシュを無効化 */
+	overscroll-behavior-y: contain;
+	-webkit-overflow-scrolling: touch;
 }
 
 #app {
