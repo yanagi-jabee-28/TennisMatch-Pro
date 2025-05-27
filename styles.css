@@ -108,11 +108,17 @@ section h2 {
 }
 
 .setting-container select {
-	padding: 8px 12px;
+	padding: 8px 30px 8px 12px; /* 右側に矢印用のスペースを確保 */
 	border: 2px solid #ddd;
 	border-radius: 5px;
 	font-size: 14px;
 	transition: border-color 0.3s;
+	appearance: none; /* ブラウザデフォルトの矢印を無効化 */
+	background: white;
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
 }
 
 .setting-container select:focus {
@@ -369,22 +375,32 @@ th {
 	line-height: 1.4;
 }
 
-.winner-select,
-.loser-score {
+.winner-select {
 	width: 100%;
-	padding: 6px;
+	padding: 6px 30px 6px 8px; /* 右側に矢印用のスペースを確保 */
 	border: 1px solid #ddd;
 	border-radius: 4px;
 	font-size: 0.85rem;
 	/* モバイル対応 */
 	min-height: 44px; /* タッチしやすいサイズ */
 	box-sizing: border-box;
+	appearance: none; /* ブラウザデフォルトの矢印を無効化 */
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
 }
 
 .loser-score {
 	width: 60px;
+	padding: 6px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 0.85rem;
 	text-align: center;
 	min-width: 60px;
+	min-height: 44px;
+	box-sizing: border-box;
 }
 
 .score-display {
@@ -1055,7 +1071,7 @@ th {
 }
 
 .filter-select {
-	padding: 8px 12px;
+	padding: 8px 30px 8px 12px; /* 右側に矢印用のスペースを確保 */
 	border: 2px solid #ddd;
 	border-radius: 6px;
 	font-size: 0.9rem;
@@ -1064,6 +1080,11 @@ th {
 	transition: border-color 0.3s;
 	/* モバイル対応 */
 	min-height: 44px;
+	appearance: none; /* ブラウザデフォルトの矢印を無効化 */
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
 }
 
 /* モバイル専用検索・フィルタ調整 */
@@ -1275,6 +1296,20 @@ body.dark-mode {
 	border-bottom-color: #66d9ff;
 }
 
+.dark-mode .setting-container select {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e1e6eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
+}
+
+.dark-mode .setting-container select:focus {
+	border-color: #66d9ff;
+}
+
 .dark-mode header {
 	background: linear-gradient(135deg, #1e3a8a, #1e40af);
 }
@@ -1427,6 +1462,10 @@ body.dark-mode {
 	background: #1a2332;
 	border-color: #2a3441;
 	color: #e1e6eb;
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e1e6eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
 }
 
 .dark-mode .winner-select:focus {
@@ -1448,6 +1487,13 @@ body.dark-mode {
 	background: #1a2332;
 	border-color: #2a3441;
 	color: #e1e6eb;
+}
+
+.dark-mode .filter-select {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e1e6eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
 }
 
 .dark-mode .search-input:focus,
