@@ -345,48 +345,6 @@ class TennisMatchApp {
 			}
 			this.updateStats();
 		});
-		
-		// 勝者選択ボタンのイベント（動的に追加される要素なのでdelegateを使用）
-		document.addEventListener('click', (e) => {
-			if (e.target.classList.contains('winner-btn')) {
-				const matchIndex = e.target.dataset.match;
-				const team = e.target.dataset.team;
-				const hiddenInput = document.querySelector(`.winner-select[data-match="${matchIndex}"]`);
-				
-				// 選択状態の更新
-				document.querySelectorAll(`.winner-btn[data-match="${matchIndex}"]`).forEach(btn => {
-					btn.removeAttribute('data-selected');
-				});
-				
-				// 同じボタンをクリックした場合は選択解除
-				if (hiddenInput.value === team) {
-					hiddenInput.value = '';
-					// アニメーション効果を追加
-					e.target.classList.add('btn-deselected');
-					setTimeout(() => {
-						e.target.classList.remove('btn-deselected');
-					}, 300);
-				} else {
-					e.target.setAttribute('data-selected', 'true');
-					hiddenInput.value = team;
-					// アニメーション効果を追加
-					e.target.classList.add('btn-selected');
-					setTimeout(() => {
-						e.target.classList.remove('btn-selected');
-					}, 300);
-				}
-				
-				// 敗者のスコア入力欄を自動的にフォーカス
-				if (hiddenInput.value) {
-					const loserScoreInput = document.querySelector(`.loser-score[data-match="${matchIndex}"]`);
-					if (loserScoreInput) {
-						loserScoreInput.focus();
-					}
-				}
-				
-				this.updateStats();
-			}
-		});
 
 		// チームリセットボタン
 		document.getElementById('resetTeamsBtn').addEventListener('click', () => {
@@ -538,18 +496,7 @@ class TennisMatchApp {
 			const winnerSelect = document.querySelector(`.winner-select[data-match="${index}"]`);
 			const loserScoreInput = document.querySelector(`.loser-score[data-match="${index}"]`);
 
-			if (winnerSelect) {
-				winnerSelect.value = result.winner || '';
-				
-				// ボタンの選択状態も更新
-				document.querySelectorAll(`.winner-btn[data-match="${index}"]`).forEach(btn => {
-					btn.removeAttribute('data-selected');
-					if (btn.dataset.team === result.winner) {
-						btn.setAttribute('data-selected', 'true');
-					}
-				});
-			}
-			
+			if (winnerSelect) winnerSelect.value = result.winner || '';
 			if (loserScoreInput) loserScoreInput.value = result.loserScore || '';
 		});
 	}    // 結果エクスポート
@@ -901,11 +848,11 @@ class TennisMatchApp {
                 <tr>
                     <td class="court-info">コート${match.court}</td>
                     <td class="match-vs" data-match="${globalIndex}">${match.teams[0]} vs ${match.teams[1]}</td>                    <td>
-                        <div class="winner-buttons" data-match="${globalIndex}">
-                            <button class="winner-btn" data-match="${globalIndex}" data-team="${match.teams[0]}" ${this.matchResults[globalIndex]?.winner === match.teams[0] ? 'data-selected="true"' : ''}>${match.teams[0].replace('チーム', '')}</button>
-                            <button class="winner-btn" data-match="${globalIndex}" data-team="${match.teams[1]}" ${this.matchResults[globalIndex]?.winner === match.teams[1] ? 'data-selected="true"' : ''}>${match.teams[1].replace('チーム', '')}</button>
-                            <input type="hidden" class="winner-select" data-match="${globalIndex}" value="${this.matchResults[globalIndex]?.winner || ''}">
-                        </div>
+                        <select class="winner-select" data-match="${globalIndex}">
+                            <option value="">--</option>
+                            <option value="${match.teams[0]}">${match.teams[0].replace('チーム', '')}</option>
+                            <option value="${match.teams[1]}">${match.teams[1].replace('チーム', '')}</option>
+                        </select>
                     </td>
                     <td>
                         <input type="number" class="loser-score" data-match="${globalIndex}" min="0" placeholder="0">
