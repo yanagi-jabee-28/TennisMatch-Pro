@@ -743,21 +743,6 @@ th {
    モバイル機能のスタイル
    =========================================== */
 
-/* スワイプヒント */
-.swipe-hint {
-	display: none;
-	text-align: center;
-	font-size: 12px;
-	color: #666;
-	margin-top: 10px;
-	animation: fadeInOut 2s infinite;
-}
-
-@keyframes fadeInOut {
-	0%, 100% { opacity: 0.3; }
-	50% { opacity: 1; }
-}
-
 /* タッチフィードバック強化 */
 .touch-feedback {
 	position: relative;
@@ -806,9 +791,6 @@ th {
 		filter: brightness(0.9);
 	}
 
-	/* スワイプヒントを表示 */
-	.tabs .swipe-hint {
-		display: block;	}
 }
 
 /* アニメーション */

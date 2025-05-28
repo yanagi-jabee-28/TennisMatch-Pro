@@ -4,18 +4,10 @@ class TennisMatchApp {
 		this.teamAssignments = {};
 		this.selectedTeam = null;
 		this.matchResults = [];
-
 		// チーム割り当てを初期化
 		CONFIG.TEAM_NAMES.forEach(team => {
 			this.teamAssignments[team] = [];
 		});
-
-		// モバイル機能のための変数
-		this.pullToRefreshEnabled = false;
-		this.swipeThreshold = 50;
-		this.touchStartX = 0;
-		this.touchStartY = 0;
-		this.isVerticalScroll = false;
 
 		this.init();
 	}
@@ -30,7 +22,6 @@ class TennisMatchApp {
 		this.updateStats();
 	}	// モバイル機能のセットアップ
 	setupMobileFeatures() {
-		this.setupSwipeGestures();
 		this.setupHapticFeedback();
 		this.setupOrientationChange();
 		this.setupDoubleTapPrevention();
@@ -86,58 +77,7 @@ class TennisMatchApp {
 			// インストールプロンプトを表示させない
 			e.preventDefault();
 			return false;
-		});
-	}
-	// スワイプジェスチャー
-	setupSwipeGestures() {
-		const tabContainer = document.querySelector('.tabs');
-		if (!tabContainer) return;
-
-		tabContainer.addEventListener('touchstart', (e) => {
-			this.touchStartX = e.touches[0].clientX;
-			this.touchStartY = e.touches[0].clientY;
-			this.isVerticalScroll = false;
-		}, { passive: true });
-
-		tabContainer.addEventListener('touchmove', (e) => {
-			const currentX = e.touches[0].clientX;
-			const currentY = e.touches[0].clientY;
-			const deltaX = Math.abs(currentX - this.touchStartX);
-			const deltaY = Math.abs(currentY - this.touchStartY);
-
-			// 縦スクロールの判定
-			if (deltaY > deltaX && deltaY > 10) {
-				this.isVerticalScroll = true;
-			}
-		}, { passive: true });
-		tabContainer.addEventListener('touchend', (e) => {
-			if (this.isVerticalScroll) return;
-
-			const touchEndX = e.changedTouches[0].clientX;
-			const deltaX = touchEndX - this.touchStartX;
-			const absDeltaX = Math.abs(deltaX);
-
-			if (absDeltaX > this.swipeThreshold) {
-				const currentTab = document.querySelector('.tab-btn.active');
-				const tabs = Array.from(document.querySelectorAll('.tab-btn'));
-				const currentIndex = tabs.indexOf(currentTab);
-
-				let targetIndex;
-				if (deltaX > 0 && currentIndex > 0) {
-					// 右スワイプ（前のタブ）
-					targetIndex = currentIndex - 1;
-				} else if (deltaX < 0 && currentIndex < tabs.length - 1) {
-					// 左スワイプ（次のタブ）
-					targetIndex = currentIndex + 1;
-				}
-
-				if (targetIndex !== undefined) {
-					this.triggerHapticFeedback('light');
-					this.switchTab(tabs[targetIndex].dataset.tab);
-				}
-			}
-		}, { passive: true });
-	}
+		});	}
 
 	// ハプティックフィードバック
 	setupHapticFeedback() {
