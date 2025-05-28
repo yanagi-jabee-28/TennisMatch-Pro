@@ -432,6 +432,66 @@ section h2 {
 	background: #f1f8e9;
 }
 
+.member-count-badge {
+	display: inline-block;
+	background: #4CAF50;
+	color: white;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 0.8rem;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+.assignment-status {
+	margin: 10px 0;
+	padding: 10px;
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+	height: 10px;
+	background: #e0e0e0;
+	border-radius: 5px;
+	overflow: hidden;
+	margin-bottom: 5px;
+}
+
+.progress-fill {
+	height: 100%;
+	background: linear-gradient(90deg, #4CAF50, #8BC34A);
+	border-radius: 5px;
+	transition: width 0.5s ease-out;
+}
+
+.status-text {
+	font-size: 0.9rem;
+	color: #666;
+	text-align: right;
+}
+
+.instruction-text {
+	margin-bottom: 15px;
+	padding: 10px;
+	background: #fff;
+	border-radius: 8px;
+	color: #666;
+	font-size: 0.95rem;
+	line-height: 1.4;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.no-members {
+	padding: 15px;
+	text-align: center;
+	background: #e8f5e9;
+	border-radius: 8px;
+	color: #388E3C;
+	font-weight: 500;
+}
+
 .available-member {
 	display: inline-block;
 	background: #fff3e0;
@@ -442,29 +502,6 @@ section h2 {
 	border: 1px solid #ffcc02;
 	font-size: 0.9rem;
 	transition: all 0.2s ease;
-}
-
-.available-member:hover {
-	background: #ffe0b2;
-	transform: translateY(-1px);
-}
-
-.reset-btn {
-	display: block;
-	margin: 20px auto;
-	padding: 12px 24px;
-	background: #f44336;
-	color: white;
-	border: none;
-	border-radius: 6px;
-	cursor: pointer;
-	font-size: 1rem;
-	font-weight: 600;
-	transition: background 0.3s;
-}
-
-.reset-btn:hover {
-	background: #da190b;
 }
 
 /* ラウンド */
@@ -560,38 +597,75 @@ th {
 	line-height: 1.4;
 }
 
-.winner-select {
-	width: 100%;
-	padding: 6px 30px 6px 8px; /* 右側に矢印用のスペースを確保 */
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	font-size: 0.85rem;
-	/* モバイル対応 */
-	min-height: 44px; /* タッチしやすいサイズ */
-	box-sizing: border-box;
-	appearance: none; /* ブラウザデフォルトの矢印を無効化 */
-	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
-	background-repeat: no-repeat;
-	background-position: right 8px center;
-	background-size: 16px;
+/* チーム対戦表示の強化スタイル */
+.team-vs-display {
+    flex: 1;
+    padding: 5px;
+    text-align: center;
 }
 
-.loser-score {
-	width: 60px;
-	padding: 6px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	font-size: 0.85rem;
-	text-align: center;
-	min-width: 60px;
-	min-height: 44px;
-	box-sizing: border-box;
+.team-name {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    font-size: 0.95rem;
 }
 
-.score-display {
-	font-weight: 600;
-	color: #2c5530;
-	text-align: center;
+.team-members {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.4;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.team-member-chip {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin: 1px 2px;
+    display: inline-block;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.vs-separator {
+    font-weight: bold;
+    color: #ff5722;
+    margin: 0 5px;
+    align-self: center;
+    font-size: 0.9rem;
+}
+
+.match-vs {
+    display: flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 5px 0;
+}
+
+.no-member-info {
+    font-style: italic;
+    color: #999;
+    font-size: 0.75rem;
+}
+
+/* モバイル表示の調整 */
+@media screen and (max-width: 480px) {
+    .team-member-chip {
+        padding: 2px 4px;
+        font-size: 0.7rem;
+    }
+    
+    .team-name {
+        font-size: 0.85rem;
+    }
+    
+    .vs-separator {
+        font-size: 0.8rem;
+        margin: 0 2px;
+    }
 }
 
 /* タブ */
@@ -1791,4 +1865,63 @@ body.dark-mode {
 	table {
 		font-size: 10px;
 	}
+}
+
+/* 試合履歴テーブルの強化表示 */
+.match-teams-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.match-team-info {
+    display: flex;
+    flex-direction: column;
+    padding: 3px;
+}
+
+.match-team-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.match-team-members {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.match-vs-text {
+    font-weight: bold;
+    color: #ff5722;
+    font-size: 0.8rem;
+    text-align: center;
+    margin: 2px 0;
+}
+
+.history-no-members {
+    font-style: italic;
+    color: #999;
+    font-size: 0.75rem;
+}
+
+.history-team-member {
+    color: #333;
+    background: #f5f5f5;
+    padding: 1px 3px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    display: inline-block;
+    margin: 1px 0;
+}
+
+/* モバイル対応 */
+@media screen and (max-width: 768px) {
+    .match-team-name {
+        font-size: 0.85rem;
+    }
+    
+    .match-team-members {
+        font-size: 0.7rem;
+    }
 }

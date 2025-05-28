@@ -1,16 +1,23 @@
 // アプリケーションクラス
 class TennisMatchApp {
 	constructor() {
-		this.teamAssignments = {};
 		this.selectedTeam = null;
 		this.matchResults = [];
-		// チーム割り当てを初期化
-		CONFIG.TEAM_NAMES.forEach(team => {
-			this.teamAssignments[team] = [];
-		});
+		
+		// チーム割り当てを初期化（デフォルト割り当てを使用）
+		if (CONFIG.DEFAULT_TEAM_ASSIGNMENTS) {
+			// デフォルトのチーム割り当てを使用
+			this.teamAssignments = JSON.parse(JSON.stringify(CONFIG.DEFAULT_TEAM_ASSIGNMENTS));
+		} else {
+			// 旧バージョン互換：空のチーム割り当てで初期化
+			this.teamAssignments = {};
+			CONFIG.TEAM_NAMES.forEach(team => {
+				this.teamAssignments[team] = [];
+			});
+		}
 
 		this.init();
-	}	// 初期化
+	}// 初期化
 	init() {
 		this.loadSettingsFromCookie();
 		this.setupEventListeners();
@@ -737,7 +744,6 @@ class TennisMatchApp {
 
 		return card;
 	}
-
 	// 未割り当てメンバーコンテナ作成
 	createAvailableMembersContainer() {
 		const container = document.createElement('div');
@@ -745,6 +751,8 @@ class TennisMatchApp {
 
 		const assignedMembers = Object.values(this.teamAssignments).flat();
 		const availableMembers = CONFIG.MEMBERS.filter(member => !assignedMembers.includes(member));
+		const assignedCount = assignedMembers.length;
+		const totalCount = CONFIG.MEMBERS.length;
 
 		const instructionText = this.selectedTeam
 			? `<strong style="color: #4CAF50;">${this.selectedTeam}</strong> が選択されています。メンバーをクリックして追加してください。`
@@ -755,9 +763,17 @@ class TennisMatchApp {
 		).join('');
 
 		container.innerHTML = `
-            <h3>未割り当てメンバー</h3>
-            <div style="margin-bottom: 15px; color: #666;">${instructionText}</div>
-            <div class="available-members">${memberElements}</div>
+            <h3>未割り当てメンバー <span class="member-count-badge">${availableMembers.length}人</span></h3>
+            <div class="assignment-status">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${Math.round(assignedCount / totalCount * 100)}%;"></div>
+                </div>
+                <div class="status-text">チーム割り当て済み: ${assignedCount}/${totalCount}</div>
+            </div>
+            <div class="instruction-text">${instructionText}</div>
+            <div class="available-members">
+                ${availableMembers.length > 0 ? memberElements : '<div class="no-members">全メンバーがチームに割り当てられています</div>'}
+            </div>
         `;
 
 		return container;
@@ -787,16 +803,22 @@ class TennisMatchApp {
 		this.renderTeamSelection();
 		this.updateTeamDisplayNames();
 	}
-
 	// チーム分けリセット
 	resetTeams() {
-		if (confirm('チーム分けをリセットしますか？')) {
-			CONFIG.TEAM_NAMES.forEach(team => {
-				this.teamAssignments[team] = [];
-			});
+		if (confirm('チーム分けをデフォルト構成にリセットしますか？')) {
+			if (CONFIG.DEFAULT_TEAM_ASSIGNMENTS) {
+				// デフォルトのチーム割り当てに戻す
+				this.teamAssignments = JSON.parse(JSON.stringify(CONFIG.DEFAULT_TEAM_ASSIGNMENTS));
+			} else {
+				// 旧バージョン互換：全てのチームを空にする
+				CONFIG.TEAM_NAMES.forEach(team => {
+					this.teamAssignments[team] = [];
+				});
+			}
 			this.selectedTeam = null;
 			this.renderTeamSelection();
 			this.updateTeamDisplayNames();
+			this.showNotification('チーム分けをデフォルト構成にリセットしました', 'info');
 		}
 	}
 
@@ -878,7 +900,6 @@ class TennisMatchApp {
 		}
 		return index + matchIndex;
 	}
-
 	// 試合履歴テーブルをレンダリング
 	renderMatchHistory() {
 		const tbody = document.querySelector('#matchHistoryTable tbody');
@@ -888,9 +909,26 @@ class TennisMatchApp {
 			roundData.matches.forEach((match, matchIndex) => {
 				const globalIndex = this.getGlobalMatchIndex(roundData.round, matchIndex);
 				const row = document.createElement('tr');
+				
+				// チームメンバー情報の表示用HTML
+				const team1MembersInfo = this.getTeamMembersInfoHTML(match.teams[0]);
+				const team2MembersInfo = this.getTeamMembersInfoHTML(match.teams[1]);
+				
 				row.innerHTML = `
                     <td>ラウンド${roundData.round}</td>
-                    <td>${match.teams[0]} vs ${match.teams[1]}</td>
+                    <td>
+                        <div class="match-teams-info">
+                            <div class="match-team-info">
+                                <div class="match-team-name">${match.teams[0]}</div>
+                                <div class="match-team-members">${team1MembersInfo}</div>
+                            </div>
+                            <div class="match-vs-text">vs</div>
+                            <div class="match-team-info">
+                                <div class="match-team-name">${match.teams[1]}</div>
+                                <div class="match-team-members">${team2MembersInfo}</div>
+                            </div>
+                        </div>
+                    </td>
                     <td class="match-result" data-match="${globalIndex}">--</td>
                     <td class="match-winner" data-match="${globalIndex}">--</td>
                     <td class="match-loser" data-match="${globalIndex}">--</td>
@@ -899,7 +937,18 @@ class TennisMatchApp {
 			});
 		});
 	}
-	// チーム表示名を更新
+	
+	// チームメンバー情報のHTML取得
+	getTeamMembersInfoHTML(teamName) {
+		const members = this.teamAssignments[teamName];
+		if (!members || members.length === 0) {
+			return '<span class="history-no-members">メンバー未設定</span>';
+		}
+		
+		return members.map(member => 
+			`<span class="history-team-member">${member}</span>`
+		).join(', ');
+	}// チーム表示名を更新
 	updateTeamDisplayNames() {
 		// わずかな遅延を追加してDOMが確実に更新された後に実行
 		setTimeout(() => {
@@ -907,9 +956,22 @@ class TennisMatchApp {
 				const matchIndex = parseInt(element.dataset.match);
 				const match = this.getMatchByGlobalIndex(matchIndex);
 				if (match) {
+					// より読みやすい表示形式に変更
 					const team1Display = this.getTeamDisplayName(match.teams[0]);
 					const team2Display = this.getTeamDisplayName(match.teams[1]);
-					element.textContent = `${team1Display} vs ${team2Display}`;
+					
+					// HTML要素を使って構造化された表示にする
+					element.innerHTML = `
+						<div class="team-vs-display">
+							<div class="team-name">${match.teams[0]}</div>
+							<div class="team-members">${this.getFormattedTeamMembers(match.teams[0])}</div>
+						</div>
+						<div class="vs-separator">VS</div>
+						<div class="team-vs-display">
+							<div class="team-name">${match.teams[1]}</div>
+							<div class="team-members">${this.getFormattedTeamMembers(match.teams[1])}</div>
+						</div>
+					`;
 				}
 			});
 		}, 0);
@@ -919,6 +981,18 @@ class TennisMatchApp {
 	getTeamDisplayName(teamName) {
 		const members = this.teamAssignments[teamName];
 		return members.length > 0 ? `${teamName} (${members.join(', ')})` : teamName;
+	}
+	
+	// チームメンバーの整形済み文字列を取得
+	getFormattedTeamMembers(teamName) {
+		const members = this.teamAssignments[teamName];
+		if (!members || members.length === 0) {
+			return '<span class="no-member-info">メンバー未設定</span>';
+		}
+		
+		return members.map(member => 
+			`<span class="team-member-chip">${member}</span>`
+		).join(' ');
 	}
 
 	// グローバルインデックスから試合情報取得
