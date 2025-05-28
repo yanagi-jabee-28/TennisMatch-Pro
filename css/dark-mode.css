@@ -1,7 +1,7 @@
 /* ダークモード関連のスタイル */
 body.dark-mode {
-  background-color: #222;
-  color: #f0f0f0;
+	background: #0f1419;
+	color: #e1e6eb;
 }
 
 /* ダークモードでのCookie同意バナー */
@@ -27,4 +27,346 @@ body.dark-mode .settings-description {
 /* ダークモードでのトグルスイッチ */
 body.dark-mode input:checked + .toggle-slider {
 	background-color: #4CAF50;
+}
+
+/* 以下、styles.cssから移動したダークモードのスタイル */
+
+.dark-mode section {
+	background: #1a2332;
+	color: #e1e6eb;
+	border: 1px solid #2a3441;
+}
+
+.dark-mode section h2 {
+	color: #66d9ff;
+	border-bottom-color: #66d9ff;
+}
+
+.dark-mode .setting-container select {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e1e6eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
+}
+
+.dark-mode .setting-container select:focus {
+	border-color: #66d9ff;
+}
+
+.dark-mode header {
+	background: linear-gradient(135deg, #1e3a8a, #1e40af);
+}
+
+.dark-mode .team-card {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+}
+
+.dark-mode .team-card.selected {
+	background: #0f2419;
+	border-color: #00ff87;
+	box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.dark-mode .team-header {
+	color: #e1e6eb;
+}
+
+.dark-mode .team-card.selected .team-header {
+	color: #00ff87;
+}
+
+.dark-mode .member-list {
+	background: #0d1117;
+	border-color: #2a3441;
+}
+
+.dark-mode .member-item {
+	background: #1e293b;
+	color: #e1e6eb;
+}
+
+.dark-mode .member-item:hover {
+	background: #334155;
+}
+
+.dark-mode .available-members-container {
+	background: #0f1419;
+	border-color: #66d9ff;
+}
+
+.dark-mode .available-member {
+	background: #1e293b;
+	border-color: #66d9ff;
+	color: #e1e6eb;
+}
+
+.dark-mode .available-member:hover {
+	background: #334155;
+}
+
+.dark-mode .selection-instruction {
+	background: #0f2419;
+	border-left-color: #00ff87;
+	color: #e1e6eb;
+}
+
+.dark-mode table {
+	background: #1a2332;
+	border-color: #2a3441;
+}
+
+.dark-mode th {
+	background: #0d1117;
+	color: #66d9ff;
+	border-color: #2a3441;
+}
+
+.dark-mode td {
+	border-color: #2a3441;
+	color: #e1e6eb;
+}
+
+.dark-mode tr:nth-child(even) {
+	background-color: rgba(42, 52, 65, 0.3);
+}
+
+.dark-mode tr:hover {
+	background-color: rgba(102, 217, 255, 0.1);
+}
+
+.dark-mode .summary-card {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+}
+
+.dark-mode .summary-card h4 {
+	color: #66d9ff;
+}
+
+.dark-mode .summary-value {
+	color: #00ff87;
+}
+
+.dark-mode .team-stats-card {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+}
+
+.dark-mode .team-stats-header {
+	color: #66d9ff;
+}
+
+.dark-mode .stat-item {
+	background: #0d1117;
+	color: #e1e6eb;
+}
+
+.dark-mode .stat-label {
+	color: #9ca3af;
+}
+
+.dark-mode .stat-value {
+	color: #00ff87;
+}
+
+.dark-mode .match-detail-item {
+	background: #0d1117;
+	color: #e1e6eb;
+}
+
+.dark-mode .match-detail-item.win {
+	border-left-color: #00ff87;
+}
+
+.dark-mode .match-detail-item.lose {
+	border-left-color: #ff6b6b;
+}
+
+.dark-mode .round-container {
+	background: #1a2332;
+	border-color: #2a3441;
+}
+
+.dark-mode .round-header {
+	background: #0d1117;
+	color: #66d9ff;
+}
+
+.dark-mode .match-container {
+	background: #0d1117;
+	border-color: #2a3441;
+}
+
+.dark-mode .winner-select {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e1e6eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
+}
+
+.dark-mode .winner-select:focus {
+	border-color: #66d9ff;
+}
+
+.dark-mode .loser-score {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+}
+
+.dark-mode .loser-score:focus {
+	border-color: #66d9ff;
+}
+
+.dark-mode .search-input,
+.dark-mode .filter-select {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+}
+
+.dark-mode .filter-select {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e1e6eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
+}
+
+.dark-mode .search-input:focus,
+.dark-mode .filter-select:focus {
+	border-color: #66d9ff;
+}
+
+.dark-mode .tab-btn {
+	color: #9ca3af;
+}
+
+.dark-mode .tab-btn.active {
+	color: #66d9ff;
+	border-bottom-color: #66d9ff;
+}
+
+.dark-mode .tab-btn:hover {
+	color: #66d9ff;
+}
+
+.dark-mode .progress-bar {
+	background: #2a3441;
+}
+
+.dark-mode .progress-fill {
+	background: linear-gradient(90deg, #00ff87, #66d9ff);
+}
+
+.dark-mode .progress-text {
+	color: #e1e6eb;
+}
+
+.dark-mode .chart-container {
+	background: #1a2332;
+	border-color: #2a3441;
+}
+
+.dark-mode .chart-container h4 {
+	color: #66d9ff;
+}
+
+.dark-mode .detailed-stats {
+	background: #1a2332;
+	border-color: #2a3441;
+}
+
+.dark-mode .stat-row {
+	border-bottom-color: #2a3441;
+}
+
+.dark-mode .stat-row .stat-label {
+	color: #9ca3af;
+}
+
+.dark-mode .stat-row .stat-value {
+	color: #00ff87;
+}
+
+.dark-mode .modal-content {
+	background: #1a2332;
+	color: #e1e6eb;
+	border: 1px solid #2a3441;
+}
+
+.dark-mode .modal-close {
+	color: #9ca3af;
+}
+
+.dark-mode .modal-close:hover {
+	color: #e1e6eb;
+}
+
+.dark-mode .header-controls button {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+}
+
+.dark-mode .header-controls button:hover {
+	background: #334155;
+	border-color: #66d9ff;
+}
+
+.dark-mode .setting-container select {
+	background: #1a2332;
+	border-color: #2a3441;
+	color: #e1e6eb;
+}
+
+.dark-mode .setting-container select:focus {
+	border-color: #66d9ff;
+}
+
+.dark-mode .setting-container label {
+	color: #e1e6eb;
+}
+
+/* 試合履歴テーブル関連のダークモードスタイル */
+.dark-mode .match-teams-info {
+    border-color: #2a3441;
+    background: #1a2332;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.dark-mode .match-team-info {
+    background: #0d1117;
+}
+
+.dark-mode .match-team-name {
+    color: #e1e6eb;
+}
+
+.dark-mode .match-team-members {
+    color: #9ca3af;
+}
+
+.dark-mode .match-vs-text {
+    color: #ff7a59;
+    background: #2d1713;
+}
+
+.dark-mode .history-team-member {
+    color: #e1e6eb;
+    background: #1e293b;
+    border-color: #334155;
+}
+
+.dark-mode .history-no-members {
+    color: #777;
 }
