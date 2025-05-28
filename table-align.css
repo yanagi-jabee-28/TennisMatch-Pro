@@ -125,7 +125,27 @@ td:nth-child(3) {
   padding: 0;
 }
 
-/* 対戦情報全体のレイアウト調整 */
+/* 勝者selectと負けチーム点数inputの幅調整 */
+td select,
+td input[type="number"],
+td input[type="text"] {
+  width: 60px;
+  min-width: 40px;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-size: 1rem;
+  padding: 2px 4px;
+}
+
+/* 点数入力欄はさらに小さく */
+td input[type="number"] {
+  width: 48px;
+  min-width: 32px;
+  max-width: 80px;
+  text-align: center;
+  font-size: 1rem;
+}
+
 @media (max-width: 768px) {
   table {
     min-width: 520px;
@@ -145,6 +165,19 @@ td:nth-child(3) {
   .team-member-chip {
     font-size: 0.6rem;
     max-width: 60px;
+  }
+  td select,
+  td input[type="number"],
+  td input[type="text"] {
+    width: 44px;
+    min-width: 28px;
+    font-size: 0.95rem;
+    padding: 1px 2px;
+  }
+  td input[type="number"] {
+    width: 36px;
+    min-width: 24px;
+    font-size: 0.95rem;
   }
 }
 
@@ -172,6 +205,19 @@ td:nth-child(3) {
   }
   .match-vs {
     gap: 0 2px;
+  }
+  td select,
+  td input[type="number"],
+  td input[type="text"] {
+    width: 36px;
+    min-width: 20px;
+    font-size: 0.9rem;
+    padding: 0 1px;
+  }
+  td input[type="number"] {
+    width: 28px;
+    min-width: 16px;
+    font-size: 0.9rem;
   }
 }
 
