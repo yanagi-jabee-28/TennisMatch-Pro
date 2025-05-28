@@ -1,0 +1,73 @@
+/* チーム選択関連のスタイル */
+#teamSelectionContainer {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+/* モバイル専用チーム選択調整 */
+@media screen and (max-width: 768px) {
+	#teamSelectionContainer {
+		grid-template-columns: 1fr;
+		gap: 15px;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	#teamSelectionContainer {
+		gap: 10px;
+	}
+}
+
+.selection-instruction {
+	grid-column: 1 / -1;
+	background: #e8f5e8;
+	padding: 15px;
+	border-radius: 8px;
+	border-left: 4px solid #4CAF50;
+}
+
+.team-card {
+	border: 2px solid #ddd;
+	padding: 15px;
+	border-radius: 10px;
+	background: white;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	min-height: 100px;
+	/* モバイル対応 */
+	touch-action: manipulation;
+}
+
+.team-card:hover {
+	border-color: #4CAF50;
+	box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+}
+
+.team-card.selected {
+	border-color: #4CAF50;
+	background: #f1f8e9;
+	box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+/* モバイル専用チームカード調整 */
+@media screen and (max-width: 480px) {
+	.team-card {
+		min-height: 80px;
+		padding: 12px;
+		border-radius: 8px;
+	}
+}
+
+.team-header {
+	font-weight: 600;
+	font-size: 1.1rem;
+	margin-bottom: 10px;
+	text-align: center;
+	color: #333;
+}
+
+.team-card.selected .team-header {
+	color: #4CAF50;
+}
