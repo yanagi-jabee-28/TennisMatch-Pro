@@ -1,0 +1,85 @@
+/* テーブル対戦表示の位置揃え用追加スタイル */
+.vs-separator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+  height: 40px;
+  line-height: 1;
+  margin: 0 auto;
+  padding: 0;
+}
+
+table .match-vs {
+  table-layout: fixed;
+  width: 100%;
+  min-height: 60px;
+}
+
+td .match-vs {
+  margin: 0 auto;
+  display: table !important;
+}
+
+.team-vs-display {
+  width: 100%;
+  min-width: 120px;
+  margin: 0 auto;
+  vertical-align: middle;
+}
+
+.team-name {
+  margin: 4px auto;
+  font-size: 1rem;
+  padding: 3px 0;
+}
+
+/* VS表示を強調 */
+.vs {
+  font-weight: bold;
+  color: #ff5722;
+  font-size: 2rem;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+}
+
+/* テーブルセル内の配置調整 */
+td:nth-child(3) {
+  width: 200px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* テーブル内の中央配置の強化 */
+table {
+  table-layout: fixed;
+}
+
+th, td {
+  vertical-align: middle;
+}
+
+/* 対戦表示セル */
+td:nth-child(3) {
+  padding: 0;
+}
+
+/* 対戦情報全体のレイアウト調整 */
+@media (max-width: 768px) {
+  td:nth-child(3) {
+    width: 160px;
+  }
+  
+  .vs-separator {
+    height: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  td:nth-child(3) {
+    width: 140px;
+  }
+}

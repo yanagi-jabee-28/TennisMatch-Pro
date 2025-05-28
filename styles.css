@@ -606,6 +606,7 @@ th {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-width: 120px;
 }
 
 .team-name {
@@ -637,10 +638,13 @@ th {
 .vs-separator {
     font-weight: bold;
     color: #ff5722;
-    font-size: 1.8rem !important;
+    font-size: 2rem !important;
     margin: 0 10px;
     align-self: center;
     text-align: center;
+    display: block;
+    width: 100%;
+    line-height: 1;
 }
 
 .match-vs {
@@ -649,6 +653,7 @@ th {
     justify-content: center;
     text-align: center;
     padding: 8px 0;
+    width: 100%;
 }
 
 .no-member-info {
