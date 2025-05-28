@@ -1,0 +1,30 @@
+/* ダークモード関連のスタイル */
+body.dark-mode {
+  background-color: #222;
+  color: #f0f0f0;
+}
+
+/* ダークモードでのCookie同意バナー */
+body.dark-mode .cookie-consent-banner {
+	background-color: rgba(30, 30, 30, 0.95);
+	color: #fff;
+}
+
+/* ダークモードでの設定パネル */
+body.dark-mode .settings-panel {
+	background-color: #2a2a2a;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .settings-option {
+	border-bottom: 1px solid #444;
+}
+
+body.dark-mode .settings-description {
+	color: #aaa;
+}
+
+/* ダークモードでのトグルスイッチ */
+body.dark-mode input:checked + .toggle-slider {
+	background-color: #4CAF50;
+}

@@ -1,0 +1,63 @@
+/* チーム名とVSの表示スタイル */
+
+/* 試合履歴テーブルのVS */
+.match-vs-text {
+  font-size: 1.5rem !important;
+  font-weight: bold;
+  color: #ff5722;
+  text-align: center;
+  display: block;
+  margin: 5px auto;
+}
+
+/* チーム対戦表示内のVS */
+.vs-separator {
+  font-weight: bold;
+  color: #ff5722;
+  font-size: 1.8rem !important;
+  margin: 0 10px;
+  align-self: center;
+  text-align: center;
+}
+
+/* チーム対戦表示のコンテナ */
+.team-vs-display {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* チーム対戦表示の全体テーブルセル */
+.match-vs {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* チーム情報コンテナ */
+.match-teams-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+
+/* モバイル表示の調整 */
+@media screen and (max-width: 480px) {
+  .vs-separator {
+    font-size: 1.6rem !important;
+    margin: 0 5px;
+  }
+  
+  .match-vs-text {
+    font-size: 1.3rem !important;
+  }
+}

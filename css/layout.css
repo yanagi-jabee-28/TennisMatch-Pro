@@ -1,0 +1,25 @@
+/* レイアウト関連のスタイル */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.col {
+  flex: 1;
+  padding: 0 15px;
+}
+
+/* レスポンシブレイアウト調整 */
+@media screen and (max-width: 768px) {
+  .row {
+    flex-direction: column;
+  }
+}
