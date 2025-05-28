@@ -691,18 +691,20 @@ class TennisMatchApp {
 			});
 		});
 	}
-
 	// チーム表示名を更新
 	updateTeamDisplayNames() {
-		document.querySelectorAll('.match-vs').forEach(element => {
-			const matchIndex = parseInt(element.dataset.match);
-			const match = this.getMatchByGlobalIndex(matchIndex);
-			if (match) {
-				const team1Display = this.getTeamDisplayName(match.teams[0]);
-				const team2Display = this.getTeamDisplayName(match.teams[1]);
-				element.textContent = `${team1Display} vs ${team2Display}`;
-			}
-		});
+		// わずかな遅延を追加してDOMが確実に更新された後に実行
+		setTimeout(() => {
+			document.querySelectorAll('.match-vs').forEach(element => {
+				const matchIndex = parseInt(element.dataset.match);
+				const match = this.getMatchByGlobalIndex(matchIndex);
+				if (match) {
+					const team1Display = this.getTeamDisplayName(match.teams[0]);
+					const team2Display = this.getTeamDisplayName(match.teams[1]);
+					element.textContent = `${team1Display} vs ${team2Display}`;
+				}
+			});
+		}, 0);
 	}
 
 	// チーム表示名取得
@@ -1175,7 +1177,9 @@ class TennisMatchApp {
 			}
 		};
 		reader.readAsText(file);
-	}    // データインポート実行
+	}
+	
+	// データインポート実行
 	importData(data) {
 		if (confirm('現在のデータを上書きしますか？')) {
 			console.log('データインポート開始:', data);
@@ -1184,19 +1188,24 @@ class TennisMatchApp {
 			if (data.teamAssignments) {
 				this.teamAssignments = data.teamAssignments;
 				this.renderTeamSelection();
-				this.updateTeamDisplayNames();
-			}			// 試合ポイント設定を復元
+			}
+			
+			// 試合ポイント設定を復元
 			const matchPointElement = document.getElementById('matchPointSetting');
 			if (data.matchPoint) {
 				matchPointElement.value = data.matchPoint;
 			} else {
 				// デフォルト値を設定（CONFIGから取得）
 				matchPointElement.value = CONFIG.DEFAULT_MATCH_POINT || 10;
-			}
-
-			// UI要素を先に再描画
+			}			// UI要素を再描画
 			this.renderRounds();
 			this.renderMatchHistory();
+			
+			// チーム表示名を更新（UI要素の再描画後に実行）
+			// わずかな遅延を追加して確実にDOMが更新された後に処理
+			setTimeout(() => {
+				this.updateTeamDisplayNames();
+			}, 50);
 
 			// 試合結果を復元（UI要素の再描画後に実行）
 			if (data.matchResults && data.matchResults.length > 0) {
