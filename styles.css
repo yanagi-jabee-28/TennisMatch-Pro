@@ -631,8 +631,9 @@ th {
     border-radius: 10px;
     margin: 1px 2px;
     display: inline-block;
-    font-size: 0.75rem;
-    white-space: nowrap;
+    font-size: 0.7rem;
+    white-space: normal;
+    word-break: break-all;
 }
 
 .vs-separator {

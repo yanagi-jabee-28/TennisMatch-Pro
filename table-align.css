@@ -15,6 +15,7 @@ table .match-vs {
   table-layout: fixed;
   width: 100%;
   min-height: 60px;
+  word-break: break-word;
 }
 
 td .match-vs {
@@ -27,12 +28,16 @@ td .match-vs {
   min-width: 120px;
   margin: 0 auto;
   vertical-align: middle;
+  overflow: hidden;
 }
 
 .team-name {
   margin: 4px auto;
-  font-size: 1rem;
+  font-size: 0.9rem;
   padding: 3px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* VS表示を強調 */
@@ -47,10 +52,12 @@ td .match-vs {
 }
 
 /* テーブルセル内の配置調整 */
-td:nth-child(3) {
-  width: 200px;
+td:nth-child(2) {
+  width: 280px;
   text-align: center;
   vertical-align: middle;
+  word-break: break-word;
+  overflow: hidden;
 }
 
 /* テーブル内の中央配置の強化 */
@@ -69,17 +76,35 @@ td:nth-child(3) {
 
 /* 対戦情報全体のレイアウト調整 */
 @media (max-width: 768px) {
-  td:nth-child(3) {
-    width: 160px;
+  td:nth-child(2) {
+    width: 230px;
   }
   
   .vs-separator {
     height: 30px;
   }
+  
+  .team-member-chip {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+  }
+  
+  .team-name {
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 480px) {
-  td:nth-child(3) {
-    width: 140px;
+  td:nth-child(2) {
+    width: 180px;
+  }
+  
+  .team-member-chip {
+    font-size: 0.6rem;
+    padding: 1px 3px;
+  }
+  
+  .team-name {
+    font-size: 0.8rem;
   }
 }
