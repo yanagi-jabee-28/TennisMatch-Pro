@@ -1,0 +1,389 @@
+/* テーブル関連のスタイル */
+
+/* 基本テーブルスタイル */
+table {
+	width: 100%;
+	min-width: 600px;
+	border-collapse: collapse;
+	font-size: 0.9rem;
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 12px 8px;
+	text-align: left;
+}
+
+th {
+	background: #f8f9fa;
+	font-weight: 600;
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	/* モバイル対応 */
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+
+.court-info {
+	font-weight: 600;
+	color: #4CAF50;
+}
+
+.table-container {
+	overflow-x: auto;
+	margin-bottom: 20px;
+	border-radius: 8px;
+}
+
+/* 結果表示 */
+.match-result {
+	font-weight: 600;
+	text-align: center;
+}
+
+.match-winner, .match-loser {
+	font-weight: 500;
+}
+
+/* スクロールヒント */
+.scroll-hint {
+	display: none;
+	text-align: center;
+	font-size: 0.8rem;
+	color: #999;
+	padding: 5px;
+	background: rgba(76, 175, 80, 0.1);
+	border-radius: 4px;
+	margin: 10px 0;
+}
+
+/* 試合履歴テーブルの強化表示 */
+.match-teams-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 5px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #fff;
+    margin: 5px 0;
+}
+
+.match-team-info {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    text-align: center;
+    background: #f9f9f9;
+    border-radius: 6px;
+    margin: 2px 0;
+}
+
+.match-team-name {
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    padding: 3px 0;
+}
+
+.match-team-members {
+    font-size: 0.75rem;
+    color: #666;
+    text-align: center;
+}
+
+/* タブ関連のスタイル */
+.results-tabs {
+	display: flex;
+	border-bottom: 2px solid #eee;
+	margin-bottom: 20px;
+	overflow-x: auto;
+	white-space: nowrap;
+}
+
+.tab-btn {
+	padding: 12px 20px;
+	background: none;
+	border: none;
+	font-weight: 500;
+	color: #666;
+	cursor: pointer;
+	position: relative;
+	font-size: 0.9rem;
+}
+
+.tab-btn.active {
+	color: #4CAF50;
+}
+
+.tab-btn.active::after {
+	content: '';
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: #4CAF50;
+}
+
+.tab-content {
+	display: none;
+}
+
+.tab-content.active {
+	display: block;
+}
+
+/* チーム統計カード */
+.team-stats-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 20px;
+}
+
+.team-stats-card {
+	border: 1px solid #ddd;
+	padding: 20px;
+	border-radius: 10px;
+	background: white;
+}
+
+.team-stats-header {
+	font-size: 1.2rem;
+	font-weight: 600;
+	margin-bottom: 15px;
+	color: #333;
+	text-align: center;
+}
+
+.stats-summary {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 10px;
+	margin-bottom: 15px;
+}
+
+.stat-item {
+	text-align: center;
+	padding: 10px;
+	background: #f8f9fa;
+	border-radius: 5px;
+}
+
+.stat-label {
+	font-size: 0.8rem;
+	color: #666;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.stat-value {
+	font-size: 1.4rem;
+	font-weight: 600;
+	color: #333;
+}
+
+.match-details {
+	border-top: 1px solid #eee;
+	padding-top: 15px;
+}
+
+/* 詳細分析 */
+.analytics-container {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.analytics-summary {
+	margin-bottom: 20px;
+}
+
+.summary-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 15px;
+}
+
+.summary-card {
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+	text-align: center;
+}
+
+.summary-card h4 {
+	font-size: 0.9rem;
+	color: #555;
+	margin-bottom: 10px;
+}
+
+.summary-value {
+	font-size: 1.8rem;
+	font-weight: 600;
+	color: #333;
+}
+
+.analytics-charts {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+	gap: 20px;
+}
+
+.chart-container {
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.chart-container h4 {
+	text-align: center;
+	margin-bottom: 15px;
+	color: #333;
+}
+
+.chart {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.chart-bar {
+	display: flex;
+	align-items: center;
+	height: 30px;
+	gap: 8px;
+}
+
+.chart-label {
+	width: 80px;
+	text-align: right;
+	font-weight: 500;
+	font-size: 0.85rem;
+	color: #333;
+}
+
+.chart-bar-container {
+	flex: 1;
+	height: 20px;
+	background: #eee;
+	border-radius: 10px;
+	position: relative;
+	overflow: hidden;
+}
+
+.chart-bar-fill {
+	height: 100%;
+	background: linear-gradient(90deg, #4CAF50, #8BC34A);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-size: 0.7rem;
+	font-weight: 600;
+	border-radius: 10px;
+}
+
+.chart-value {
+	width: 50px;
+	text-align: left;
+	font-weight: 600;
+	font-size: 0.85rem;
+	color: #333;
+}
+
+.analytics-details {
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.analytics-details h4 {
+	margin-bottom: 15px;
+	color: #333;
+	text-align: center;
+}
+
+.detailed-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 15px;
+}
+
+.stat-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 8px 10px;
+	background: #f9f9f9;
+	border-radius: 5px;
+}
+
+.match-detail-item {
+	margin-bottom: 10px;
+	padding: 10px;
+	background: #f9f9f9;
+	border-radius: 6px;
+	font-size: 0.85rem;
+}
+
+.match-detail-item.win {
+	border-left: 3px solid #4CAF50;
+}
+
+.match-detail-item.lose {
+	border-left: 3px solid #f44336;
+}
+
+/* モバイル対応 */
+@media screen and (max-width: 768px) {
+	table {
+		min-width: 500px;
+	}
+  
+	.scroll-hint {
+		display: block;
+	}
+  
+	.analytics-charts {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	table {
+		font-size: 0.75rem;
+		min-width: 480px;
+	}
+
+	th, td {
+		padding: 6px 3px;
+	}
+	
+	.progress-text {
+		font-size: 0.8rem;
+	}
+
+	.summary-cards {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+
+	.summary-card {
+		padding: 15px;
+	}
+
+	.chart-label {
+		width: 60px;
+		font-size: 0.75rem;
+	}
+
+	.chart-bar-container {
+		margin: 0 5px;
+	}
+}
