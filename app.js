@@ -153,24 +153,33 @@ class TennisMatchApp {
 			matchPointElement.value = CONFIG.DEFAULT_MATCH_POINT || 10;
 		}
 	}
-	
-	// 設定パネルのレンダリング
+		// 設定パネルのレンダリング
 	renderSettingsPanel() {
 		// マッチポイント設定セクションの後に設定パネルを追加
 		const settingsSection = document.querySelector('.settings-section');
 		if (!settingsSection) return;
 		
+		const consentStatus = checkCookieConsent();
+		console.log('設定パネル表示時のCookie同意状態:', consentStatus);
+		
+		// 設定値を取得（同意状態にかかわらず表示のみ）
+		const autoSaveEnabled = getCookie('autosaveEnabled') === 'true';
+		const autoLoadEnabled = getCookie('autoloadEnabled') === 'true';
+		
 		const settingsPanel = document.createElement('div');
 		settingsPanel.className = 'settings-panel';
 		settingsPanel.innerHTML = `
 			<h3>アプリケーション設定</h3>
+			<div class="cookie-status" style="margin-bottom: 10px; padding: 5px; border-radius: 4px; background-color: ${consentStatus ? '#e8f5e9' : '#ffebee'}; color: ${consentStatus ? '#2e7d32' : '#c62828'};">
+				Cookie同意状態: ${consentStatus ? '同意済み ✓' : '未同意 ×'}
+			</div>
 			<div class="settings-option">
 				<div>
 					<div class="settings-label">自動保存</div>
 					<div class="settings-description">30秒ごとにデータを自動保存します</div>
 				</div>
 				<label class="toggle-switch">
-					<input type="checkbox" id="autoSaveToggle" ${getCookie('autosaveEnabled') === 'true' ? 'checked' : ''}>
+					<input type="checkbox" id="autoSaveToggle" ${autoSaveEnabled ? 'checked' : ''}>
 					<span class="toggle-slider"></span>
 				</label>
 			</div>
@@ -180,19 +189,24 @@ class TennisMatchApp {
 					<div class="settings-description">ページを開くときに前回のデータを復元します</div>
 				</div>
 				<label class="toggle-switch">
-					<input type="checkbox" id="autoLoadToggle" ${getCookie('autoloadEnabled') === 'true' ? 'checked' : ''}>
+					<input type="checkbox" id="autoLoadToggle" ${autoLoadEnabled ? 'checked' : ''}>
 					<span class="toggle-slider"></span>
 				</label>
 			</div>
 		`;
 		
 		settingsSection.appendChild(settingsPanel);
-		
-		// イベントリスナーを設定
+				// イベントリスナーを設定
 		document.getElementById('autoSaveToggle').addEventListener('change', (e) => {
-			if (!checkCookieConsent()) {
-				this.showNotification('Cookie使用に同意していないため、設定を保存できません。', 'error');
+			const consentStatus = checkCookieConsent();
+			console.log('自動保存設定変更時のCookie同意状態:', consentStatus);
+			
+			if (!consentStatus) {
+				this.showNotification('Cookie使用に同意していないため、設定を保存できません。「同意する」ボタンをクリックしてください。', 'error');
 				e.target.checked = false;
+				
+				// 同意バナーを明示的に再表示
+				showCookieConsentBanner();
 				return;
 			}
 			setCookie('autosaveEnabled', e.target.checked.toString(), 90);
@@ -200,9 +214,15 @@ class TennisMatchApp {
 		});
 		
 		document.getElementById('autoLoadToggle').addEventListener('change', (e) => {
-			if (!checkCookieConsent()) {
-				this.showNotification('Cookie使用に同意していないため、設定を保存できません。', 'error');
+			const consentStatus = checkCookieConsent();
+			console.log('自動読み込み設定変更時のCookie同意状態:', consentStatus);
+			
+			if (!consentStatus) {
+				this.showNotification('Cookie使用に同意していないため、設定を保存できません。「同意する」ボタンをクリックしてください。', 'error');
 				e.target.checked = false;
+				
+				// 同意バナーを明示的に再表示
+				showCookieConsentBanner();
 				return;
 			}
 			setCookie('autoloadEnabled', e.target.checked.toString(), 90);
