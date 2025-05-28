@@ -127,6 +127,9 @@ td:nth-child(3) {
 
 /* 対戦情報全体のレイアウト調整 */
 @media (max-width: 768px) {
+  table {
+    min-width: 520px;
+  }
   td:nth-child(2) {
     width: 180px;
     min-width: 80px;
@@ -146,6 +149,9 @@ td:nth-child(3) {
 }
 
 @media (max-width: 480px) {
+  table {
+    min-width: 420px;
+  }
   td:nth-child(2) {
     width: 120px;
     min-width: 60px;
@@ -167,4 +173,17 @@ td:nth-child(3) {
   .match-vs {
     gap: 0 2px;
   }
+}
+
+/* 横スクロール対応 */
+.table-container {
+  overflow-x: auto !important;
+  width: 100%;
+  min-width: 0;
+}
+
+table {
+  min-width: 600px;
+  width: 100%;
+  table-layout: fixed;
 }
