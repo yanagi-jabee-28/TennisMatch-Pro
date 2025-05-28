@@ -13,8 +13,18 @@
 			overscroll-behavior: none !important;
 			-webkit-overflow-scrolling: touch !important;
 		}
-	</style>
-	<title>硬式テニス 対戦表</title>
+	</style>	<title>硬式テニス 対戦表</title>
+	<!-- 分割されたCSSファイル -->
+	<link rel="stylesheet" href="css/base.css">
+	<link rel="stylesheet" href="css/layout.css">
+	<link rel="stylesheet" href="css/tables.css">
+	<link rel="stylesheet" href="css/team-selection.css">
+	<link rel="stylesheet" href="css/team-stats.css">
+	<link rel="stylesheet" href="css/matches-vs.css">
+	<link rel="stylesheet" href="css/responsive.css">
+	<link rel="stylesheet" href="css/dark-mode.css">
+	<link rel="stylesheet" href="css/print.css">
+	<!-- 従来のスタイルシート (後で削除予定) -->
 	<link rel="stylesheet" href="styles.css">
 </head>
 
@@ -161,9 +171,15 @@
 				</div>
 			</section>
 		</main>
-	</div>
+	</div>	<!-- 分割されたJavaScriptファイル -->
 	<script src="config.js"></script>
 	<script src="cookie-utils.js"></script>
+	<script src="js/ui.js"></script>
+	<script src="js/team-selection.js"></script>
+	<script src="js/matches.js"></script>
+	<script src="js/stats.js"></script>
+	<script src="js/main.js"></script>
+	<!-- 従来のJavaScriptファイル（後で削除予定） -->
 	<script src="app.js"></script>
 </body>
 

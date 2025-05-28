@@ -1,0 +1,278 @@
+/* レスポンシブデザイン関連のスタイル */
+
+/* モバイル専用スライドインアニメーション */
+@media screen and (max-width: 768px) {
+  @keyframes slideIn {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  #app {
+    padding: 10px;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-controls {
+    margin-top: 10px;
+  }
+
+  .header-controls button {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+
+  section {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+
+  #teamSelectionContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .team-card {
+    margin-bottom: 10px;
+  }
+
+  .team-header {
+    font-size: 1.1rem;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
+
+  th,
+  td {
+    padding: 8px 10px;
+  }
+
+  .scroll-hint {
+    display: block;
+  }
+
+  #teamStatsContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .results-tabs {
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+
+  .search-container {
+    flex-direction: column;
+  }
+
+  .filter-controls {
+    width: 100%;
+  }
+
+  .analytics-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .chart-container {
+    padding: 15px;
+  }
+
+  .chart {
+    min-height: 200px;
+  }
+
+  .notification {
+    padding: 12px 15px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    font-size: 0.9rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+/* モバイル専用ヘッダーコントロール調整 */
+@media screen and (max-width: 480px) {
+  header h1 {
+    font-size: 1.3rem;
+  }
+
+  .header-controls {
+    gap: 5px;
+    margin-top: 10px;
+  }
+  
+  .header-controls button {
+    padding: 10px 12px;
+    font-size: 1.2rem;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 8px;
+  }
+
+  .setting-container {
+    flex-direction: column;
+  }
+  
+  table {
+    font-size: 0.8rem;
+  }
+
+  th,
+  td {
+    padding: 6px 8px;
+  }
+
+  .team-header {
+    font-size: 1rem;
+  }
+
+  .member-item,
+  .available-member {
+    padding: 5px 8px;
+  }
+
+  .progress-text {
+    font-size: 0.8rem;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .summary-card {
+    padding: 15px;
+  }
+
+  .chart-label {
+    width: 60px;
+    font-size: 0.75rem;
+  }
+
+  .chart-bar-container {
+    margin: 0 5px;
+  }
+}
+
+/* モバイル専用タブ調整 */
+@media screen and (max-width: 480px) {
+  .results-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 5px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-btn {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+}
+
+/* モバイル専用検索・フィルタ調整 */
+@media screen and (max-width: 768px) {
+  .search-container {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .search-input {
+    min-width: 0;
+    width: 100%;
+    font-size: 16px; /* iOS ズーム防止 */
+  }
+  
+  .filter-controls {
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .filter-select {
+    flex: 1;
+    font-size: 16px; /* iOS ズーム防止 */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .filter-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+
+  /* モバイル専用通知調整 */
+  .notification {
+    right: 5px;
+    left: 5px;
+    top: 5px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+
+  /* モバイル専用モーダル調整 */
+  .modal-content {
+    margin: 5% auto;
+    padding: 15px;
+    width: 98%;
+    max-height: 90vh;
+    border-radius: 8px;
+  }
+}
+
+/* モバイル専用の改善されたスクロール */
+@supports (-webkit-overflow-scrolling: touch) {
+  .table-container,
+  .tabs-container,
+  .team-selection-container {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+}
+
+/* モバイル専用のボタンスタイル */
+@media screen and (max-width: 768px) {
+  button, .tab-btn, .team-card, .member-item, .available-member {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: all 0.15s ease;
+  }
+
+  button:active, .tab-btn:active, .team-card:active, 
+  .member-item:active, .available-member:active {
+    transform: scale(0.95);
+    filter: brightness(0.9);
+  }
+}
