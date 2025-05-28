@@ -10,24 +10,204 @@ class TennisMatchApp {
 		});
 
 		this.init();
-	}
-	// 初期化
+	}	// 初期化
 	init() {
+		this.loadSettingsFromCookie();
 		this.setupEventListeners();
 		this.setupMobileFeatures();
-		this.initializeMatchPoint();
-		this.renderTeamSelection();
+		this.initializeMatchPoint();		this.renderTeamSelection();
 		this.renderRounds();
 		this.renderMatchHistory();
 		this.updateStats();
+		this.setupAutosave();
+		this.setupPageUnloadHandler();
+		
+		// 設定パネルの追加
+		this.renderSettingsPanel();
+	}
+	
+	// Cookie から設定を読み込む
+	loadSettingsFromCookie() {
+		if (!checkCookieConsent()) {
+			return; // Cookie使用に同意していない場合は何もしない
+		}
+		
+		// ダークモード設定の復元
+		const darkModeSetting = getCookie('darkMode');
+		if (darkModeSetting === 'true') {
+			document.body.classList.add('dark-mode');
+			// ダークモードトグルボタンのテキストを更新
+			const darkModeToggle = document.getElementById('darkModeToggle');
+			if (darkModeToggle) {
+				darkModeToggle.textContent = '☀️';
+			}
+		}
+		
+		// 自動読み込みの処理
+		const autoloadEnabled = getCookie('autoloadEnabled');
+		if (autoloadEnabled === 'true') {
+			const savedData = getJSONFromCookie('tennisMatchData');
+			if (savedData) {
+				// 確認なしで自動復元する
+				console.log('Cookieからデータを自動読み込み中...');
+				setTimeout(() => {
+					this.importData(savedData, true);
+				}, 500);
+			}
+		}
+	}
+
+	// 自動保存機能のセットアップ
+	setupAutosave() {
+		// 30秒ごとに自動保存
+		this.autosaveInterval = setInterval(() => {
+			if (!checkCookieConsent()) return; // 同意がない場合は自動保存しない
+			
+			const autoSaveEnabled = getCookie('autosaveEnabled');
+			if (autoSaveEnabled === 'true') {
+				this.autosaveDataToCookie();
+			}
+		}, 30000); // 30秒
+	}
+
+	// データをCookieに自動保存
+	autosaveDataToCookie() {
+		const currentResults = this.collectCurrentResults();
+		const data = {
+			teamAssignments: this.teamAssignments,
+			matchResults: currentResults,
+			matchPoint: parseInt(document.getElementById('matchPointSetting').value) || CONFIG.DEFAULT_MATCH_POINT || 10,
+			timestamp: new Date().toLocaleString('ja-JP'),
+			version: '1.0'
+		};
+				if (saveJSONToCookie('tennisMatchData', data, 7)) { // 7日間保存
+			console.log('データが自動保存されました - ' + new Date().toLocaleString('ja-JP'));
+		}
+	}
+	// ページアンロード時の処理をセットアップ
+	setupPageUnloadHandler() {
+		// ページを離れる前にデータを保存
+		window.addEventListener('beforeunload', (e) => {
+			if (!checkCookieConsent()) return;
+			
+			// 自動保存インターバルをクリア
+			if (this.autosaveInterval) {
+				clearInterval(this.autosaveInterval);
+			}
+			
+			// 現在のデータを緊急保存
+			this.autosaveDataToCookie();
+			
+			// データが変更されている場合は確認ダイアログを表示
+			const hasUnsavedChanges = this.hasUnsavedChanges();
+			if (hasUnsavedChanges) {
+				e.preventDefault();
+				e.returnValue = ''; // ブラウザの標準メッセージを表示
+			}
+		});
+		
+		// ページが隠れた時（タブ切り替えなど）にもデータを保存
+		document.addEventListener('visibilitychange', () => {
+			if (document.hidden && checkCookieConsent()) {
+				this.autosaveDataToCookie();
+			}
+		});
+		
+		// ユーザーアクティビティが検知された時に最後のアクティビティ時刻を記録
+		['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+			document.addEventListener(event, () => {
+				this.lastActivityTime = Date.now();
+			}, { passive: true });
+		});
+	}
+
+	// 未保存の変更があるかチェック
+	hasUnsavedChanges() {
+		const lastSavedData = getJSONFromCookie('tennisMatchData');
+		if (!lastSavedData) return true; // 一度も保存されていない場合は変更ありとする
+		
+		const currentData = {
+			teamAssignments: this.teamAssignments,
+			matchResults: this.collectCurrentResults(),
+			matchPoint: parseInt(document.getElementById('matchPointSetting').value) || CONFIG.DEFAULT_MATCH_POINT || 10
+		};
+		
+		// 簡単な比較（厳密ではないが、基本的な変更を検知）
+		return JSON.stringify(currentData) !== JSON.stringify({
+			teamAssignments: lastSavedData.teamAssignments,
+			matchResults: lastSavedData.matchResults,
+			matchPoint: lastSavedData.matchPoint
+		});
 	}
 
 	// マッチポイント初期化
 	initializeMatchPoint() {
 		const matchPointElement = document.getElementById('matchPointSetting');
-		if (matchPointElement && !matchPointElement.value) {
+		const savedMatchPoint = getCookie('matchPoint');
+		
+		if (savedMatchPoint && checkCookieConsent()) {
+			// Cookie から復元
+			matchPointElement.value = savedMatchPoint;
+		} else if (matchPointElement && !matchPointElement.value) {
+			// デフォルト値を設定
 			matchPointElement.value = CONFIG.DEFAULT_MATCH_POINT || 10;
 		}
+	}
+	
+	// 設定パネルのレンダリング
+	renderSettingsPanel() {
+		// マッチポイント設定セクションの後に設定パネルを追加
+		const settingsSection = document.querySelector('.settings-section');
+		if (!settingsSection) return;
+		
+		const settingsPanel = document.createElement('div');
+		settingsPanel.className = 'settings-panel';
+		settingsPanel.innerHTML = `
+			<h3>アプリケーション設定</h3>
+			<div class="settings-option">
+				<div>
+					<div class="settings-label">自動保存</div>
+					<div class="settings-description">30秒ごとにデータを自動保存します</div>
+				</div>
+				<label class="toggle-switch">
+					<input type="checkbox" id="autoSaveToggle" ${getCookie('autosaveEnabled') === 'true' ? 'checked' : ''}>
+					<span class="toggle-slider"></span>
+				</label>
+			</div>
+			<div class="settings-option">
+				<div>
+					<div class="settings-label">自動読み込み</div>
+					<div class="settings-description">ページを開くときに前回のデータを復元します</div>
+				</div>
+				<label class="toggle-switch">
+					<input type="checkbox" id="autoLoadToggle" ${getCookie('autoloadEnabled') === 'true' ? 'checked' : ''}>
+					<span class="toggle-slider"></span>
+				</label>
+			</div>
+		`;
+		
+		settingsSection.appendChild(settingsPanel);
+		
+		// イベントリスナーを設定
+		document.getElementById('autoSaveToggle').addEventListener('change', (e) => {
+			if (!checkCookieConsent()) {
+				this.showNotification('Cookie使用に同意していないため、設定を保存できません。', 'error');
+				e.target.checked = false;
+				return;
+			}
+			setCookie('autosaveEnabled', e.target.checked.toString(), 90);
+			this.showNotification(`自動保存が${e.target.checked ? '有効' : '無効'}になりました`, 'info');
+		});
+		
+		document.getElementById('autoLoadToggle').addEventListener('change', (e) => {
+			if (!checkCookieConsent()) {
+				this.showNotification('Cookie使用に同意していないため、設定を保存できません。', 'error');
+				e.target.checked = false;
+				return;
+			}
+			setCookie('autoloadEnabled', e.target.checked.toString(), 90);
+			this.showNotification(`自動読み込みが${e.target.checked ? '有効' : '無効'}になりました`, 'info');
+		});
 	}// モバイル機能のセットアップ
 	setupMobileFeatures() {
 		this.setupHapticFeedback();
@@ -130,9 +310,12 @@ class TennisMatchApp {
 		}	}
 
 	// イベントリスナー設定
-	setupEventListeners() {
-		// マッチポイント変更
-		document.getElementById('matchPointSetting').addEventListener('change', () => {
+	setupEventListeners() {		// マッチポイント変更
+		document.getElementById('matchPointSetting').addEventListener('change', (e) => {
+			// Cookieに設定を保存
+			if (checkCookieConsent()) {
+				setCookie('matchPoint', e.target.value, 90); // 90日間保存
+			}
 			this.updateStats();
 		});
 
@@ -157,14 +340,19 @@ class TennisMatchApp {
 		// キーボードショートカット
 		this.setupKeyboardShortcuts();
 	}    // ヘッダーコントロール設定
-	setupHeaderControls() {
-		// ダークモード切り替え
+	setupHeaderControls() {		// ダークモード切り替え
 		const darkModeToggle = document.getElementById('darkModeToggle');
 		if (darkModeToggle) {
 			darkModeToggle.addEventListener('click', () => {
 				document.body.classList.toggle('dark-mode');
 				const isDark = document.body.classList.contains('dark-mode');
 				darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+				
+				// Cookieに設定を保存
+				if (checkCookieConsent()) {
+					setCookie('darkMode', isDark.toString(), 90); // 90日間保存
+				}
+				
 				this.showNotification(isDark ? 'ダークモードを有効にしました' : 'ライトモードに切り替えました', 'info');
 			});
 		}
@@ -1178,10 +1366,10 @@ class TennisMatchApp {
 		};
 		reader.readAsText(file);
 	}
-	
-	// データインポート実行
-	importData(data) {
-		if (confirm('現在のデータを上書きしますか？')) {
+		// データインポート実行
+	importData(data, isAutoLoad = false) {
+		const shouldProceed = isAutoLoad || confirm('現在のデータを上書きしますか？');
+		if (shouldProceed) {
 			console.log('データインポート開始:', data);
 
 			// チーム分けを復元
