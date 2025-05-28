@@ -11,16 +11,24 @@ class TennisMatchApp {
 
 		this.init();
 	}
-
 	// 初期化
 	init() {
 		this.setupEventListeners();
 		this.setupMobileFeatures();
+		this.initializeMatchPoint();
 		this.renderTeamSelection();
 		this.renderRounds();
 		this.renderMatchHistory();
 		this.updateStats();
-	}	// モバイル機能のセットアップ
+	}
+
+	// マッチポイント初期化
+	initializeMatchPoint() {
+		const matchPointElement = document.getElementById('matchPointSetting');
+		if (matchPointElement && !matchPointElement.value) {
+			matchPointElement.value = CONFIG.DEFAULT_MATCH_POINT || 10;
+		}
+	}// モバイル機能のセットアップ
 	setupMobileFeatures() {
 		this.setupHapticFeedback();
 		this.setupOrientationChange();
@@ -1128,11 +1136,10 @@ class TennisMatchApp {
 	// データを保存
 	saveData() {
 		const currentResults = this.collectCurrentResults();
-
 		const data = {
 			teamAssignments: this.teamAssignments,
 			matchResults: currentResults,
-			matchPoint: parseInt(document.getElementById('matchPointSetting').value),
+			matchPoint: parseInt(document.getElementById('matchPointSetting').value) || CONFIG.DEFAULT_MATCH_POINT || 10,
 			timestamp: new Date().toLocaleString('ja-JP'),
 			version: '1.0'
 		};
@@ -1178,11 +1185,13 @@ class TennisMatchApp {
 				this.teamAssignments = data.teamAssignments;
 				this.renderTeamSelection();
 				this.updateTeamDisplayNames();
-			}
-
-			// 試合ポイント設定を復元
+			}			// 試合ポイント設定を復元
+			const matchPointElement = document.getElementById('matchPointSetting');
 			if (data.matchPoint) {
-				document.getElementById('matchPointSetting').value = data.matchPoint;
+				matchPointElement.value = data.matchPoint;
+			} else {
+				// デフォルト値を設定（CONFIGから取得）
+				matchPointElement.value = CONFIG.DEFAULT_MATCH_POINT || 10;
 			}
 
 			// UI要素を先に再描画
