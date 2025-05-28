@@ -575,12 +575,16 @@ class TennisMatchApp {
 		exportText += `・総試合数: ${totalMatches}\n`;
 		exportText += `・完了試合: ${completedMatches}\n`;
 		exportText += `・進行率: ${Math.round((completedMatches / totalMatches) * 100)}%\n`;
-
 		// 最高勝利チーム
 		const maxWins = Math.max(...stats.map(s => s.wins));
 		if (maxWins > 0) {
-			const topTeams = stats.filter(s => s.wins === maxWins)
-				.map((_, i) => CONFIG.TEAM_NAMES[stats.findIndex(s => s.wins === maxWins)]);
+			// 最多勝利のチームを正しく取得（重複を避ける）
+			const topTeams = [];
+			stats.forEach((stat, index) => {
+				if (stat.wins === maxWins) {
+					topTeams.push(CONFIG.TEAM_NAMES[index]);
+				}
+			});
 			exportText += `・現在首位: ${topTeams.join(', ')} (${maxWins}勝)\n`;
 		}
 
@@ -1249,47 +1253,74 @@ class TennisMatchApp {
 		// 詳細統計を更新
 		this.updateDetailedStats(teamStats, totalMatches, completedMatches);
 	}
-
 	// 勝率チャートを更新
 	updateWinRateChart(teamStats) {
 		const chartContainer = document.getElementById('winRateChart');
 		chartContainer.innerHTML = '';
-
-		teamStats.forEach((stats, index) => {
+		
+		// チーム統計データに勝率を追加してソート
+		const teamsWithWinRate = teamStats.map((stats, index) => {
 			const totalGames = stats.wins + stats.losses;
 			const winRate = totalGames > 0 ? (stats.wins / totalGames) * 100 : 0;
-
+			return {
+				teamName: CONFIG.TEAM_NAMES[index],
+				stats: stats,
+				winRate: winRate,
+				index: index
+			};
+		});
+		
+		// 勝率の高い順にソート
+		teamsWithWinRate.sort((a, b) => b.winRate - a.winRate);
+		
+		// ソートされた順番でチャートを生成
+		teamsWithWinRate.forEach(team => {
 			const chartBar = document.createElement('div');
 			chartBar.className = 'chart-bar';
 			chartBar.innerHTML = `
-                <div class="chart-label">${CONFIG.TEAM_NAMES[index]}</div>
+                <div class="chart-label">${team.teamName}</div>
                 <div class="chart-bar-container">
-                    <div class="chart-bar-fill" style="width: ${winRate}%">
-                        ${winRate > 20 ? Math.round(winRate) + '%' : ''}
+                    <div class="chart-bar-fill" style="width: ${team.winRate}%">
+                        ${team.winRate > 20 ? Math.round(team.winRate) + '%' : ''}
                     </div>
                 </div>
-                <div class="chart-value">${Math.round(winRate)}%</div>
+                <div class="chart-value">${Math.round(team.winRate)}%</div>
             `;
 			chartContainer.appendChild(chartBar);
 		});
 	}
-
 	// 得失点チャートを更新
 	updateScoreChart(teamStats) {
 		const chartContainer = document.getElementById('scoreChart');
 		chartContainer.innerHTML = '';
 
-		const maxPointDiff = Math.max(...teamStats.map(stats => Math.abs(stats.pointsFor - stats.pointsAgainst)));
-
-		teamStats.forEach((stats, index) => {
+		// 各チームの得失点差を計算
+		const teamsWithPointDiff = teamStats.map((stats, index) => {
 			const pointDiff = stats.pointsFor - stats.pointsAgainst;
+			return {
+				teamName: CONFIG.TEAM_NAMES[index],
+				stats: stats,
+				pointDiff: pointDiff,
+				index: index
+			};
+		});
+		
+		// 得失点差の高い順にソート
+		teamsWithPointDiff.sort((a, b) => b.pointDiff - a.pointDiff);
+		
+		// 最大得失点差の絶対値を計算 (ソート後でも全チームを考慮する)
+		const maxPointDiff = Math.max(...teamStats.map(stats => Math.abs(stats.pointsFor - stats.pointsAgainst)));
+		
+		// ソートされた順番でチャートを生成
+		teamsWithPointDiff.forEach(team => {
+			const pointDiff = team.pointDiff;
 			const percentage = maxPointDiff > 0 ? Math.abs(pointDiff) / maxPointDiff * 100 : 0;
 			const isPositive = pointDiff >= 0;
 
 			const chartBar = document.createElement('div');
 			chartBar.className = 'chart-bar';
 			chartBar.innerHTML = `
-                <div class="chart-label">${CONFIG.TEAM_NAMES[index]}</div>
+                <div class="chart-label">${team.teamName}</div>
                 <div class="chart-bar-container">
                     <div class="chart-bar-fill" style="width: ${percentage}%; background: ${isPositive ? 'linear-gradient(90deg, #4CAF50, #66BB6A)' : 'linear-gradient(90deg, #f44336, #e57373)'}">
                         ${percentage > 20 ? (pointDiff > 0 ? '+' : '') + pointDiff : ''}
@@ -1300,7 +1331,6 @@ class TennisMatchApp {
 			chartContainer.appendChild(chartBar);
 		});
 	}
-
 	// 詳細統計を更新
 	updateDetailedStats(teamStats, totalMatches, completedMatches) {
 		const container = document.getElementById('detailedStats');
@@ -1308,13 +1338,20 @@ class TennisMatchApp {
 
 		// 最も勝利の多いチーム
 		const maxWins = Math.max(...teamStats.map(stats => stats.wins));
-		const topTeams = teamStats.filter(stats => stats.wins === maxWins);
-		const topTeamNames = topTeams.map((_, index) =>
-			CONFIG.TEAM_NAMES[teamStats.findIndex(stats => stats.wins === maxWins)]
-		);        // 平均得点（チーム1試合あたり）
+		
+		// 最多勝利のチーム名を正しく表示（重複を避ける）
+		const topTeamNames = [];
+		teamStats.forEach((stat, index) => {
+			if (stat.wins === maxWins) {
+				topTeamNames.push(CONFIG.TEAM_NAMES[index]);
+			}
+		});
+				// 平均得点（チーム1試合あたり）
 		const totalTeamGames = teamStats.reduce((sum, stats) => sum + stats.wins + stats.losses, 0);
 		const avgPointsFor = totalTeamGames > 0 ? teamStats.reduce((sum, stats) => sum + stats.pointsFor, 0) / totalTeamGames : 0;
-		const avgPointsAgainst = totalTeamGames > 0 ? teamStats.reduce((sum, stats) => sum + stats.pointsAgainst, 0) / totalTeamGames : 0; const statsData = [
+		const avgPointsAgainst = totalTeamGames > 0 ? teamStats.reduce((sum, stats) => sum + stats.pointsAgainst, 0) / totalTeamGames : 0; 
+		
+		const statsData = [
 			{ label: '進行状況', value: `${completedMatches}/${totalMatches} 試合完了` },
 			{ label: '最多勝利チーム', value: maxWins > 0 ? `${topTeamNames.join(', ')} (${maxWins}勝)` : 'まだありません' },
 			{ label: '1試合平均得点', value: Math.round(avgPointsFor * 10) / 10 },
