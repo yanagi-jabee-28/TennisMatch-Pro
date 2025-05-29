@@ -89,26 +89,12 @@ function generateMatchSchedule() {
                 </div>
                 <input type="hidden" class="team-value" value="${match.team1}" data-round="${roundData.id}" data-court="${court}" data-position="team1">
                 <input type="hidden" class="team-value" value="${match.team2}" data-round="${roundData.id}" data-court="${court}" data-position="team2">
-              </div>
-              <div class="score-input-container" data-round="${roundData.id}" data-court="${court}">
+              </div>              <div class="score-input-container" data-round="${roundData.id}" data-court="${court}">
                 <div class="structured-score-input">
                   <div class="set-score">
-                    <label>1セット:</label>
                     <input type="number" min="0" max="99" class="set-input" data-set="1" data-team="1" placeholder="0" value="${getSetScore(match.score, 1, 1)}">
                     <span>-</span>
                     <input type="number" min="0" max="99" class="set-input" data-set="1" data-team="2" placeholder="0" value="${getSetScore(match.score, 1, 2)}">
-                  </div>
-                  <div class="set-score">
-                    <label>2セット:</label>
-                    <input type="number" min="0" max="99" class="set-input" data-set="2" data-team="1" placeholder="0" value="${getSetScore(match.score, 2, 1)}">
-                    <span>-</span>
-                    <input type="number" min="0" max="99" class="set-input" data-set="2" data-team="2" placeholder="0" value="${getSetScore(match.score, 2, 2)}">
-                  </div>
-                  <div class="set-score">
-                    <label>3セット:</label>
-                    <input type="number" min="0" max="99" class="set-input" data-set="3" data-team="1" placeholder="0" value="${getSetScore(match.score, 3, 1)}">
-                    <span>-</span>
-                    <input type="number" min="0" max="99" class="set-input" data-set="3" data-team="2" placeholder="0" value="${getSetScore(match.score, 3, 2)}">
                   </div>
                   <input type="hidden" class="score-input" placeholder="スコア" value="${match.score || ''}" data-round="${roundData.id}" data-court="${court}">
                 </div>
@@ -168,16 +154,13 @@ function updateRoundNavigation() {
   currentRoundDisplay.textContent = `${currentRound} / ${allMatchesData.length}`;
 }
 
-// セットスコアを取得（スコア文字列から特定のセットと特定のチームのスコアを抽出）
+// セットスコアを取得（スコア文字列から特定のチームのスコアを抽出）
 function getSetScore(scoreString, setNumber, teamNumber) {
   if (!scoreString) return '';
   
   try {
-    // "21-19, 18-21, 21-15" などの形式を想定
-    const sets = scoreString.split(',').map(s => s.trim());
-    if (sets.length < setNumber) return '';
-    
-    const setScore = sets[setNumber - 1].split('-');
+    // "21-19" の形式を想定
+    const setScore = scoreString.split('-');
     return teamNumber === 1 ? setScore[0] : setScore[1];
   } catch (e) {
     return '';
@@ -189,19 +172,12 @@ function recordStructuredScore(round, court) {
   const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
   if (!container) return;
   
-  // 各セット入力を取得
+  // セット入力を取得
   const set1Team1 = container.querySelector('.set-input[data-set="1"][data-team="1"]').value || '0';
   const set1Team2 = container.querySelector('.set-input[data-set="1"][data-team="2"]').value || '0';
-  const set2Team1 = container.querySelector('.set-input[data-set="2"][data-team="1"]').value || '0';
-  const set2Team2 = container.querySelector('.set-input[data-set="2"][data-team="2"]').value || '0';
-  const set3Team1 = container.querySelector('.set-input[data-set="3"][data-team="1"]').value || '';
-  const set3Team2 = container.querySelector('.set-input[data-set="3"][data-team="2"]').value || '';
   
   // スコアフォーマットを構築
-  let scoreFormat = `${set1Team1}-${set1Team2}, ${set2Team1}-${set2Team2}`;
-  if (set3Team1 && set3Team2) {
-    scoreFormat += `, ${set3Team1}-${set3Team2}`;
-  }
+  let scoreFormat = `${set1Team1}-${set1Team2}`;
   
   // 隠しスコア入力に値をセット
   const scoreInput = container.querySelector('.score-input');
@@ -283,21 +259,13 @@ function calculateMatchResult(score, isTeam1) {
   if (!score) return { text: '結果なし', class: '' };
   
   try {
-    const sets = score.split(',').map(s => s.trim());
-    let team1Wins = 0;
-    let team2Wins = 0;
+    const [score1, score2] = score.split('-').map(Number);
     
-    sets.forEach(set => {
-      const [score1, score2] = set.split('-').map(Number);
-      if (score1 > score2) team1Wins++;
-      else if (score2 > score1) team2Wins++;
-    });
-    
-    if (team1Wins === team2Wins) {
+    if (score1 === score2) {
       return { text: '引き分け', class: 'draw' };
     }
     
-    const won = isTeam1 ? team1Wins > team2Wins : team2Wins > team1Wins;
+    const won = isTeam1 ? score1 > score2 : score2 > score1;
     return won 
       ? { text: '勝利', class: 'win' }
       : { text: '敗北', class: 'lose' };
