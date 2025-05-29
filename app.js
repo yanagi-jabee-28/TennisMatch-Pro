@@ -188,9 +188,7 @@ function createMatchTable() {
     });
 }
 
-// モーダルの要素
-const scoreModal = document.getElementById('score-modal');
-let currentMatchData = null;
+// モーダルの要素（DOM読み込み時に初期化されます）
 
 // モーダルを開く関数
 function openScoreModal(rowTeamId, colTeamId, matchId) {
@@ -228,37 +226,76 @@ function closeScoreModal() {
     currentMatchData = null;
 }
 
-// チームメンバー編集用のモーダル要素
-const teamEditModal = document.getElementById('team-edit-modal');
+// モーダル要素と関連データ（DOM読み込み時に初期化）
+let scoreModal;
+let teamEditModal;
+let currentMatchData = null;
 let currentEditTeamId = null;
 let tempTeamMembers = [];
 
+// DOMが読み込まれた後にモーダル要素を初期化する関数
+function initializeModalElements() {
+    console.log('モーダル要素を初期化します');
+    
+    // スコア入力用モーダル
+    scoreModal = document.getElementById('score-modal');
+    if (!scoreModal) console.error('スコア入力モーダルが見つかりません');
+    else console.log('スコアモーダルを初期化しました');
+    
+    // チームメンバー編集用モーダル
+    teamEditModal = document.getElementById('team-edit-modal');
+    if (!teamEditModal) console.error('チームメンバー編集モーダルが見つかりません');
+    else console.log('チームメンバー編集モーダルを初期化しました');
+}
+
 // チームメンバー編集用モーダルを開く
 function openTeamEditModal(teamId) {
+    console.log(`チーム${teamId}の編集モーダルを開きます`);
     currentEditTeamId = teamId;
     
     // モーダルのタイトルを設定
-    document.getElementById('team-edit-modal-title').textContent = `チーム${teamId} メンバー編集`;
-    document.getElementById('edit-team-id').textContent = `チーム${teamId}`;
+    const modalTitle = document.getElementById('team-edit-modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = `チーム${teamId} メンバー編集`;
+    }
+    
+    const teamIdElement = document.getElementById('edit-team-id');
+    if (teamIdElement) {
+        teamIdElement.textContent = `チーム${teamId}`;
+    }
     
     // 現在のチームメンバーを取得
     const team = appState.teams.find(t => t.id === teamId);
-    if (!team) return;
+    if (!team) {
+        console.error(`チームID ${teamId} が見つかりません`);
+        return;
+    }
     
     // 一時的なメンバーリストにコピー
     tempTeamMembers = [...team.members];
+    console.log('メンバーリストをコピーしました:', tempTeamMembers);
     
     // メンバーリストを表示
     renderMembersList();
     
     // モーダルを表示
-    teamEditModal.style.display = 'block';
+    if (teamEditModal) {
+        teamEditModal.style.display = 'block';
+    } else {
+        console.error('チーム編集モーダル要素が見つかりません');
+    }
 }
 
 // メンバーリストをレンダリング
 function renderMembersList() {
     const membersList = document.getElementById('edit-members-list');
+    if (!membersList) {
+        console.error('メンバーリスト要素が見つかりません');
+        return;
+    }
+    
     membersList.innerHTML = '';
+    console.log('メンバーリストを描画します:', tempTeamMembers);
     
     tempTeamMembers.forEach((member, index) => {
         const li = document.createElement('li');
@@ -271,17 +308,34 @@ function renderMembersList() {
         
         // 削除ボタンにイベントリスナーを追加
         const removeBtn = li.querySelector('.remove-member-btn');
-        removeBtn.addEventListener('click', () => {
-            tempTeamMembers.splice(index, 1);
-            renderMembersList();
-        });
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                tempTeamMembers.splice(index, 1);
+                renderMembersList();
+            });
+        }
     });
 }
 
 // チームメンバーの変更を保存
 function saveTeamMembers() {
-    if (currentEditTeamId === null || tempTeamMembers.length === 0) {
+    console.log('チームメンバーの保存を試みます', currentEditTeamId, tempTeamMembers);
+    
+    if (currentEditTeamId === null) {
+        console.error('現在編集中のチームIDがnullです');
+        alert('編集するチームが選択されていません');
+        return;
+    }
+    
+    if (tempTeamMembers.length === 0) {
         alert('メンバーを少なくとも1人は登録してください');
+        return;
+    }
+    
+    // メンバーの重複チェック
+    const uniqueMembers = [...new Set(tempTeamMembers)];
+    if (uniqueMembers.length !== tempTeamMembers.length) {
+        alert('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
         return;
     }
     
@@ -289,9 +343,15 @@ function saveTeamMembers() {
     const teamIndex = appState.teams.findIndex(t => t.id === currentEditTeamId);
     if (teamIndex !== -1) {
         appState.teams[teamIndex].members = [...tempTeamMembers];
+        console.log(`チーム${currentEditTeamId}のメンバーを更新しました:`, appState.teams[teamIndex].members);
         
         // ローカルストレージに保存
-        saveTeamMembers();
+        try {
+            localStorage.setItem('tennisCustomTeams', JSON.stringify(appState.teams));
+            console.log('メンバー情報をローカルストレージに保存しました');
+        } catch (e) {
+            console.error('ローカルストレージへの保存に失敗しました:', e);
+        }
         
         // UI更新
         renderTeams();
@@ -300,12 +360,18 @@ function saveTeamMembers() {
         closeTeamEditModal();
         
         alert('チームメンバーを更新しました！');
+    } else {
+        console.error(`チームID ${currentEditTeamId} が見つかりません`);
+        alert('チーム情報の更新に失敗しました');
     }
 }
 
 // チームメンバー編集モーダルを閉じる
 function closeTeamEditModal() {
-    teamEditModal.style.display = 'none';
+    if (teamEditModal) {
+        teamEditModal.style.display = 'none';
+        console.log('チーム編集モーダルを閉じました');
+    }
     currentEditTeamId = null;
     tempTeamMembers = [];
 }
@@ -313,12 +379,26 @@ function closeTeamEditModal() {
 // 新しいメンバーを追加
 function addNewMember() {
     const newMemberInput = document.getElementById('new-member-name');
+    if (!newMemberInput) {
+        console.error('新しいメンバー入力フィールドが見つかりません');
+        return;
+    }
+    
     const newMemberName = newMemberInput.value.trim();
     
     if (newMemberName) {
+        // 重複チェック
+        if (tempTeamMembers.includes(newMemberName)) {
+            alert('同じ名前のメンバーが既に存在します');
+            return;
+        }
+        
         tempTeamMembers.push(newMemberName);
+        console.log(`新しいメンバー "${newMemberName}" を追加しました`);
         newMemberInput.value = '';
         renderMembersList();
+    } else {
+        alert('メンバー名を入力してください');
     }
 }
 
@@ -375,18 +455,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // チームメンバー編集モーダルのイベントリスナーを初期化
 function initializeTeamEditListeners() {
+    console.log('チームメンバー編集モーダルのイベントリスナーを初期化します');
+    
     // モーダルの保存ボタンのクリックイベント
-    document.getElementById('save-team-btn').addEventListener('click', saveTeamMembers);
+    const saveTeamBtn = document.getElementById('save-team-btn');
+    if (saveTeamBtn) {
+        saveTeamBtn.addEventListener('click', saveTeamMembers);
+        console.log('保存ボタンのリスナーを設定しました');
+    }
     
     // キャンセルボタンのクリックイベント
-    document.getElementById('cancel-team-btn').addEventListener('click', closeTeamEditModal);
+    const cancelTeamBtn = document.getElementById('cancel-team-btn');
+    if (cancelTeamBtn) {
+        cancelTeamBtn.addEventListener('click', closeTeamEditModal);
+        console.log('キャンセルボタンのリスナーを設定しました');
+    }
     
-    // 閉じるボタン（×）のクリックイベント
-    document.querySelectorAll('.close-modal').forEach(closeBtn => {
-        if (closeBtn.closest('#team-edit-modal')) {
-            closeBtn.addEventListener('click', closeTeamEditModal);
-        }
-    });
+    // 閉じるボタン（×）のクリックイベント - チームメンバー編集モーダル内の閉じるボタンを特定
+    const closeModalBtn = document.querySelector('#team-edit-modal .close-modal');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeTeamEditModal);
+        console.log('閉じるボタンのリスナーを設定しました');
+    }
     
     // モーダル外をクリックした時に閉じる
     window.addEventListener('click', function(event) {
@@ -396,15 +486,23 @@ function initializeTeamEditListeners() {
     });
     
     // 新しいメンバーを追加するボタンのクリックイベント
-    document.getElementById('add-member-btn').addEventListener('click', addNewMember);
+    const addMemberBtn = document.getElementById('add-member-btn');
+    if (addMemberBtn) {
+        addMemberBtn.addEventListener('click', addNewMember);
+        console.log('追加ボタンのリスナーを設定しました');
+    }
     
     // エンターキーでも新しいメンバーを追加できるように
-    document.getElementById('new-member-name').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addNewMember();
-        }
-    });
+    const newMemberInput = document.getElementById('new-member-name');
+    if (newMemberInput) {
+        newMemberInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addNewMember();
+            }
+        });
+        console.log('新しいメンバー入力欄のリスナーを設定しました');
+    }
 }
 
 // セルクリック時の処理
@@ -465,9 +563,9 @@ function processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score
   }
 
 // チームIDからチーム番号を取得する関数（現在は未使用）
-function getTeamNameById(teamId) {
-    return `${teamId}`;
-}
+// function getTeamNameById(teamId) {
+//     return `${teamId}`;
+// }
 
 // チーム選択フォームを初期化
 function initializeResultForm() {
@@ -733,7 +831,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // チームメンバー編集用のモーダルのイベントリスナー設定
     initializeTeamEditListeners();
+    initializeModalElements(); // モーダル要素の初期化を追加
+    
+    // リセットボタンのイベントリスナーを追加
+    const resetButton = document.getElementById('reset-teams-btn');
+    if (resetButton) {
+        resetButton.addEventListener('click', resetToOriginalTeams);
+    }
 });
+
+// オリジナルのチーム構成にリセットする機能
+function resetToOriginalTeams() {
+    if (confirm('すべてのチームをオリジナルの構成にリセットしますか？この操作は元に戻せません。')) {
+        // オリジナルのチーム構成をコピー
+        appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
+        
+        // ローカルストレージから現在のカスタム設定を削除
+        try {
+            localStorage.removeItem('tennisCustomTeams');
+            console.log('カスタムチーム設定をローカルストレージから削除しました');
+        } catch (e) {
+            console.error('ローカルストレージからの削除に失敗しました:', e);
+        }
+        
+        // UI更新
+        renderTeams();
+        alert('すべてのチームをオリジナルの構成にリセットしました');
+    }
+}
 
 // 試合分析データをエクスポートする関数
 function exportMatchAnalysis() {
@@ -890,138 +1015,7 @@ function downloadCSV(csvContent, filename) {
     alert('試合分析データをダウンロードしました！');
 }
 
-// チームメンバーを編集するモーダルを開く関数
-function openTeamEditModal(teamId) {
-    const team = appState.teams.find(t => t.id === teamId);
-    if (!team) return;
-    
-    // モーダルのタイトルを設定
-    document.getElementById('team-edit-modal-title').textContent = `チーム${teamId}のメンバー編集`;
-    
-    // メンバー一覧を表示
-    const membersList = document.getElementById('team-members-list');
-    membersList.innerHTML = '';
-    
-    team.members.forEach((member, index) => {
-        const memberItem = document.createElement('li');
-        memberItem.className = 'member-item';
-        memberItem.innerHTML = `
-            <input type="text" class="member-name" value="${member}" data-index="${index}" />
-            <button class="remove-member-btn" data-index="${index}">削除</button>
-        `;
-        
-        membersList.appendChild(memberItem);
-    });
-    
-    // メンバー追加ボタンの設定
-    document.getElementById('add-member-btn').onclick = () => {
-        const newMemberName = document.getElementById('new-member-name').value.trim();
-        if (newMemberName) {
-            team.members.push(newMemberName);
-            document.getElementById('new-member-name').value = '';
-            renderTeams();
-            openTeamEditModal(teamId); // モーダルを再表示
-        } else {
-            alert('メンバー名を入力してください');
-        }
-    };
-    
-    // モーダルの保存ボタン
-    document.getElementById('save-team-btn').onclick = () => {
-        const updatedMembers = Array.from(document.querySelectorAll('.member-name')).map(input => input.value.trim()).filter(name => name);
-        
-        if (updatedMembers.length === 0) {
-            alert('少なくとも1人のメンバーを残してください');
-            return;
-        }
-        
-        // チーム情報を更新
-        const teamIndex = appState.teams.findIndex(t => t.id === teamId);
-        appState.teams[teamIndex].members = updatedMembers;
-        
-        // オリジナルのチーム構成も更新
-        appState.originalTeams[teamIndex].members = updatedMembers;
-        
-        saveSettings();
-        renderTeams();
-        closeTeamEditModal();
-    };
-    
-    // モーダルを表示
-    document.getElementById('team-edit-modal').style.display = 'block';
-}
+// チームメンバーを編集するモーダルは既に定義されているので、ここでは削除
 
-// チームメンバー編集モーダルを閉じる関数
-function closeTeamEditModal() {
-    document.getElementById('team-edit-modal').style.display = 'none';
-}
-
-// ページ読み込み時の初期化処理
-document.addEventListener('DOMContentLoaded', async () => {
-    const config = await loadConfig();
-    if (!config) {
-        alert('設定ファイルの読み込みに失敗しました。ページを再読み込みしてください。');
-        return;
-    }
-    
-    appState.teams = config.teams;
-    appState.originalTeams = JSON.parse(JSON.stringify(config.teams)); // ディープコピー
-    
-    // 設定ファイルから初期設定を読み込み
-    if (config.matchSettings) {
-        appState.settings.matchPoint = config.matchSettings.matchPoint || 7;
-    }
-    
-    // 保存された設定と試合結果を読み込む
-    loadSettings();
-    loadMatchResults();
-    loadTeamMembers();
-    
-    // UI初期化
-    renderTeams();
-    createMatchTable();
-    initializeResultForm();
-    initializeSettingsForm();
-    calculateStandings();
-    
-    // エクスポートボタンのイベントリスナーを追加
-    document.getElementById('export-results-btn').addEventListener('click', exportMatchAnalysis);
-});
-
-// チームメンバーの変更を監視して保存する
-document.getElementById('save-settings-btn').addEventListener('click', () => {
-    appState.teams.forEach((team, index) => {
-        const originalMembers = appState.originalTeams[index].members;
-        const currentMembers = team.members;
-        
-        // メンバーが変更されているかチェック
-        if (JSON.stringify(originalMembers) !== JSON.stringify(currentMembers)) {
-            const confirmMessage = `チーム${team.id}のメンバーが変更されています。保存しますか？`;
-            if (confirm(confirmMessage)) {
-                // メンバーが変更されていれば保存
-                appState.originalTeams[index].members = currentMembers;
-            } else {
-                // キャンセルされた場合は元に戻す
-                team.members = JSON.parse(JSON.stringify(originalMembers));
-                renderTeams();
-            }
-        }
-    });
-});
-
-// メンバー削除ボタンの動作
-document.addEventListener('click', function(event) {
-    if (!event.target.classList.contains('remove-member-btn')) return;
-    
-    const index = event.target.dataset.index;
-    const teamId = parseInt(event.target.closest('.team-card').querySelector('.edit-team-btn').dataset.teamId);
-    const team = appState.teams.find(t => t.id === teamId);
-    
-    if (team && team.members.length > 1) {
-        // メンバーが1人以上いる場合は削除を許可
-        team.members.splice(index, 1);
-        renderTeams();
-    } else {
-        alert('少なくとも1人のメンバーを残してください');
-    }
-});
+// 重複するDOMContentLoaded処理を削除しました。
+// 上記の813行目付近にある同様の処理が実行されます。
