@@ -133,44 +133,65 @@ function handleCellClick(event) {
     const colTeamId = parseInt(cell.dataset.colTeamId);
     const matchId = cell.dataset.matchId;
     
-    // スコア入力モードダイアログを表示
-    const scoreInput = prompt(`${getTeamNameById(rowTeamId)}の勝利として記録します。\n${getTeamNameById(rowTeamId)}のスコア (1-7):`);
+    const rowTeamName = getTeamNameById(rowTeamId);
+    const colTeamName = getTeamNameById(colTeamId);
+    
+    // 行側のチーム（クリックされたセルの行）のスコア入力
+    const team1ScoreInput = prompt(`${rowTeamName}の点数を入力してください (0-7):`);
     
     // キャンセルが押された場合
-    if (scoreInput === null) return;
+    if (team1ScoreInput === null) return;
     
     // 入力値のバリデーション
-    const winnerScore = parseInt(scoreInput);
-    if (isNaN(winnerScore) || winnerScore < 1 || winnerScore > 7) {
-        alert('スコアは1から7の間で入力してください');
+    const team1Score = parseInt(team1ScoreInput);
+    if (isNaN(team1Score) || team1Score < 0 || team1Score > 7) {
+        alert('スコアは0から7の間で入力してください');
         return;
     }
     
-    // 敗者のスコア入力
-    const loserScoreInput = prompt(`${getTeamNameById(colTeamId)}のスコア (0-${winnerScore-1}):`);
+    // 列側のチーム（対戦相手）のスコア入力
+    const team2ScoreInput = prompt(`${colTeamName}の点数を入力してください (0-7):`);
     
     // キャンセルが押された場合
-    if (loserScoreInput === null) return;
+    if (team2ScoreInput === null) return;
     
     // 入力値のバリデーション
-    const loserScore = parseInt(loserScoreInput);
-    if (isNaN(loserScore) || loserScore < 0 || loserScore >= winnerScore) {
-        alert(`敗者のスコアは0から${winnerScore-1}の間で入力してください`);
+    const team2Score = parseInt(team2ScoreInput);
+    if (isNaN(team2Score) || team2Score < 0 || team2Score > 7) {
+        alert('スコアは0から7の間で入力してください');
         return;
     }
     
-    // 小さいチームIDが先になるように調整
+    // 同点の場合は確認
+    if (team1Score === team2Score) {
+        if (!confirm('同点の場合、タイブレークなどで決着をつける必要があります。このまま記録しますか？')) {
+            return;
+        }
+    }
+    
+    // 勝者を決定
+    let winner;
+    if (team1Score > team2Score) {
+        winner = rowTeamId;
+    } else if (team2Score > team1Score) {
+        winner = colTeamId;
+    } else {
+        // 同点の場合はnullまたは特別な処理
+        winner = null; // または引き分けを表す特別な値
+    }
+    
+    // 小さいチームIDが先になるように調整（データの一貫性のため）
     const firstTeamId = Math.min(rowTeamId, colTeamId);
     const secondTeamId = Math.max(rowTeamId, colTeamId);
     
-    // スコアも勝者に合わせて調整
+    // スコアも正しい順序で保存
     let scoreTeam1, scoreTeam2;
     if (firstTeamId === rowTeamId) {
-        scoreTeam1 = winnerScore;
-        scoreTeam2 = loserScore;
+        scoreTeam1 = team1Score;
+        scoreTeam2 = team2Score;
     } else {
-        scoreTeam1 = loserScore;
-        scoreTeam2 = winnerScore;
+        scoreTeam1 = team2Score;
+        scoreTeam2 = team1Score;
     }
     
     // 試合結果を保存
@@ -179,7 +200,7 @@ function handleCellClick(event) {
         team2: secondTeamId,
         scoreTeam1: scoreTeam1,
         scoreTeam2: scoreTeam2,
-        winner: rowTeamId
+        winner: winner
     };
     
     // ローカルストレージに保存
@@ -291,6 +312,8 @@ function calculateStandings() {
             teamName: team.name,
             wins: 0,
             losses: 0,
+            draws: 0,
+            totalScore: 0,
             winRate: 0
         };
     });
@@ -298,23 +321,42 @@ function calculateStandings() {
     // 試合結果から勝敗を集計
     Object.values(appState.matches).forEach(match => {
         if (match.winner) {
+            // 勝者が存在する場合
             teamStats[match.winner].wins++;
             
             // 負けたチームを特定
             const loserId = match.winner === match.team1 ? match.team2 : match.team1;
             teamStats[loserId].losses++;
+            
+            // スコアも加算
+            if (match.team1 === match.winner) {
+                teamStats[match.team1].totalScore += match.scoreTeam1;
+                teamStats[match.team2].totalScore += match.scoreTeam2;
+            } else {
+                teamStats[match.team1].totalScore += match.scoreTeam1;
+                teamStats[match.team2].totalScore += match.scoreTeam2;
+            }
+        } else {
+            // 引き分けの場合
+            teamStats[match.team1].draws++;
+            teamStats[match.team2].draws++;
+            
+            // スコアを加算
+            teamStats[match.team1].totalScore += match.scoreTeam1;
+            teamStats[match.team2].totalScore += match.scoreTeam2;
         }
     });
     
     // 勝率を計算
     Object.values(teamStats).forEach(stats => {
-        const totalMatches = stats.wins + stats.losses;
+        const totalMatches = stats.wins + stats.losses + stats.draws;
         stats.winRate = totalMatches > 0 ? Math.round((stats.wins / totalMatches) * 1000) / 1000 : 0;
     });
     
-    // 順位付け（勝利数 → 勝率の順）
+    // 順位付け（勝利数 → 得点合計 → 勝率の順）
     appState.standings = Object.values(teamStats).sort((a, b) => {
         if (b.wins !== a.wins) return b.wins - a.wins;
+        if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
         return b.winRate - a.winRate;
     });
     
@@ -335,6 +377,8 @@ function renderStandings() {
             <td>${team.teamName}</td>
             <td>${team.wins}</td>
             <td>${team.losses}</td>
+            <td>${team.draws > 0 ? team.draws : '-'}</td>
+            <td>${team.totalScore}</td>
             <td>${(team.winRate * 100).toFixed(1)}%</td>
         `;
         
