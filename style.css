@@ -39,16 +39,16 @@ body {
 }
 
 .container {
-  max-width: 1600px;
-  min-width: 340px;
-  margin: var(--spacing-3xl) auto;
+  max-width: 1400px;
+  min-width: 320px;
+  margin: var(--spacing-xl) auto;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: var(--spacing-lg);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: var(--spacing-3xl) var(--spacing-2xl);
+  padding: var(--spacing-2xl) var(--spacing-xl);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 98vw;
+  width: 95vw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -176,20 +176,20 @@ button[type="submit"]:active {
 .team-match-container {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
   background: rgba(255, 255, 255, 0.7);
-  padding: 32px;
+  padding: 24px 16px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   align-items: center;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
 .team-match-container h2 {
   text-align: center;
-  margin-bottom: var(--spacing-3xl);
+  margin-bottom: var(--spacing-xl);
   color: #2d3748;
   font-size: var(--font-3xl);
   font-weight: 700;
@@ -208,7 +208,7 @@ button[type="submit"]:active {
 .round-container {
   background: rgba(255, 255, 255, 0.6);
   border-radius: 16px;
-  padding: 24px;
+  padding: 24px 16px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.4);
   width: 100%;
@@ -257,9 +257,9 @@ button[type="submit"]:active {
   padding: 28px 20px 24px 20px;
   border-radius: 16px;
   border: 2px solid #e2e8f0;
-  min-width: 280px;
-  max-width: 420px;
   width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
@@ -297,7 +297,7 @@ button[type="submit"]:active {
 .team-selector .team-display {
   flex: 1;
   min-width: 200px;
-  max-width: 280px;
+  max-width: 320px;
   padding: var(--spacing-md) var(--spacing-lg);
   border: 2px solid #e2e8f0;
   border-radius: var(--spacing-sm);
@@ -306,6 +306,8 @@ button[type="submit"]:active {
   text-align: center;
   font-weight: 600;
   color: #2d3748;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .team-selector .vs {
@@ -326,11 +328,13 @@ button[type="submit"]:active {
 
 .score-input-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
   width: 100%;
   justify-content: center;
-  flex-wrap: wrap;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 .team-row {
@@ -404,7 +408,8 @@ button[type="submit"]:active {
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
-  min-width: 80px;
+  min-width: 120px;
+  margin: var(--spacing-sm) auto;
 }
 
 .record-btn:hover {
@@ -616,23 +621,30 @@ button[type="submit"]:active {
   flex-direction: column;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto var(--spacing-sm);
 }
 
 .set-score {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .set-score label {
   width: 60px;
   font-size: var(--font-sm);
   color: #4a5568;
+  text-align: right;
 }
 
 .set-input {
-  width: 40px;
-  height: 30px;
+  width: 45px;
+  height: 32px;
   padding: 2px 4px;
   text-align: center;
   border: 1px solid #cbd5e0;
@@ -641,6 +653,7 @@ button[type="submit"]:active {
 
 .set-score span {
   font-weight: 600;
+  padding: 0 4px;
 }
 
 /* チームディスプレイの改善 */
@@ -774,25 +787,32 @@ button[type="submit"]:active {
 /* レスポンシブ改善 */
 @media (max-width: 768px) {
   .container {
-    padding: var(--spacing-xl) var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-md);
+    width: 98vw;
+    margin: var(--spacing-md) auto;
   }
   
   .match-courts-horizontal {
     flex-direction: column;
+    gap: 24px;
   }
   
   .court {
     width: 100%;
+    max-width: 340px;
+    padding: 20px 12px;
   }
   
   .team-selector {
     flex-direction: column;
+    gap: 10px;
   }
   
   .vs {
-    margin: var(--spacing-sm) 0;
+    margin: var(--spacing-xs) 0;
   }
-    .schedule-header {
+  
+  .schedule-header {
     flex-direction: column;
     align-items: center;
   }
@@ -800,6 +820,27 @@ button[type="submit"]:active {
   .modal-content {
     width: 95%;
     margin: 5% auto;
+  }
+  
+  .team-match-container {
+    padding: 16px 12px;
+  }
+  
+  .round-container {
+    padding: 16px 10px;
+  }
+  
+  .structured-score-input {
+    max-width: 260px;
+  }
+  
+  .set-score label {
+    width: 50px;
+    font-size: var(--font-xs);
+  }
+  
+  .set-input {
+    width: 40px;
   }
 }
 
