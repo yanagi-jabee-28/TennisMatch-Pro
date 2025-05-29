@@ -543,6 +543,17 @@ select, input {
     margin-right: 4px;
 }
 
+/* 得失点差の表示スタイル */
+.positive-diff {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.negative-diff {
+    color: var(--error-color);
+    font-weight: bold;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     main {

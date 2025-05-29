@@ -691,6 +691,8 @@ function calculateStandings() {
             losses: 0,
             draws: 0,
             totalScore: 0,
+            totalConceded: 0, // 失点の合計を追加
+            scoreDifference: 0, // 得失点差を追加
             winRate: 0
         };
     });
@@ -705,34 +707,42 @@ function calculateStandings() {
             const loserId = match.winner === match.team1 ? match.team2 : match.team1;
             teamStats[loserId].losses++;
             
-            // スコアも加算
+            // スコアも加算（得点と失点両方を記録）
             if (match.team1 === match.winner) {
                 teamStats[match.team1].totalScore += match.scoreTeam1;
+                teamStats[match.team1].totalConceded += match.scoreTeam2;
                 teamStats[match.team2].totalScore += match.scoreTeam2;
+                teamStats[match.team2].totalConceded += match.scoreTeam1;
             } else {
                 teamStats[match.team1].totalScore += match.scoreTeam1;
+                teamStats[match.team1].totalConceded += match.scoreTeam2;
                 teamStats[match.team2].totalScore += match.scoreTeam2;
+                teamStats[match.team2].totalConceded += match.scoreTeam1;
             }
         } else {
             // 引き分けの場合
             teamStats[match.team1].draws++;
             teamStats[match.team2].draws++;
             
-            // スコアを加算
+            // スコアを加算（得点と失点両方を記録）
             teamStats[match.team1].totalScore += match.scoreTeam1;
+            teamStats[match.team1].totalConceded += match.scoreTeam2;
             teamStats[match.team2].totalScore += match.scoreTeam2;
+            teamStats[match.team2].totalConceded += match.scoreTeam1;
         }
     });
     
-    // 勝率を計算
+    // 勝率と得失点差を計算
     Object.values(teamStats).forEach(stats => {
         const totalMatches = stats.wins + stats.losses + stats.draws;
         stats.winRate = totalMatches > 0 ? Math.round((stats.wins / totalMatches) * 1000) / 1000 : 0;
+        stats.scoreDifference = stats.totalScore - stats.totalConceded; // 得失点差を計算
     });
     
-    // 順位付け（勝利数 → 得点合計 → 勝率の順）
+    // 順位付け（勝利数 → 得失点差 → 得点合計 → 勝率の順）
     appState.standings = Object.values(teamStats).sort((a, b) => {
         if (b.wins !== a.wins) return b.wins - a.wins;
+        if (b.scoreDifference !== a.scoreDifference) return b.scoreDifference - a.scoreDifference; // 得失点差で比較
         if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
         return b.winRate - a.winRate;
     });
@@ -749,6 +759,11 @@ function renderStandings() {
     appState.standings.forEach((team, index) => {
         const row = document.createElement('tr');
         
+        // 得失点差を表示する列を追加
+        const scoreDifferenceClass = team.scoreDifference > 0 ? 'positive-diff' : 
+                                     team.scoreDifference < 0 ? 'negative-diff' : '';
+        const scoreDifferenceDisplay = team.scoreDifference > 0 ? `+${team.scoreDifference}` : team.scoreDifference;
+        
         row.innerHTML = `
             <td>${index + 1}</td>
             <td>${team.teamId}</td>
@@ -756,6 +771,7 @@ function renderStandings() {
             <td>${team.losses}</td>
             <td>${team.draws > 0 ? team.draws : '-'}</td>
             <td>${team.totalScore}</td>
+            <td class="${scoreDifferenceClass}">${scoreDifferenceDisplay}</td>
             <td>${(team.winRate * 100).toFixed(1)}%</td>
         `;
         
@@ -918,13 +934,13 @@ function exportMatchAnalysis() {
         
         csvContent += `チーム${match.team1},チーム${match.team2},${match.scoreTeam1},${match.scoreTeam2},${winnerDisplay},${drawDisplay}\n`;
     });
-    
-    // 2. 順位表データのエクスポート
+      // 2. 順位表データのエクスポート
     csvContent += '\n# 順位表データ\n';
-    csvContent += '順位,チーム,勝利数,敗北数,引分,得点,勝率\n';
+    csvContent += '順位,チーム,勝利数,敗北数,引分,得点,得失点差,勝率\n';
     
     appState.standings.forEach((team, index) => {
-        csvContent += `${index + 1},チーム${team.teamId},${team.wins},${team.losses},${team.draws},${team.totalScore},${(team.winRate * 100).toFixed(1)}%\n`;
+        const scoreDifferenceDisplay = team.scoreDifference > 0 ? `+${team.scoreDifference}` : team.scoreDifference;
+        csvContent += `${index + 1},チーム${team.teamId},${team.wins},${team.losses},${team.draws},${team.totalScore},${scoreDifferenceDisplay},${(team.winRate * 100).toFixed(1)}%\n`;
     });
     
     // 3. 対戦分析データの追加
