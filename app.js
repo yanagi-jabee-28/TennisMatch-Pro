@@ -17,10 +17,21 @@ fetch('players.json')
 function addMatch(match) {
   const list = document.getElementById('matchList');
   const li = document.createElement('li');
-  li.innerHTML = `<span>${match.player1} vs ${match.player2}｜スコア: ${match.score}</span>`;
+  li.innerHTML = `
+    <div class="match-info">
+      <div class="match-players">${match.player1} vs ${match.player2}</div>
+      <div class="match-score">スコア: ${match.score}</div>
+    </div>
+  `;
   li.style.opacity = 0;
+  li.style.transform = 'translateY(-20px)';
   list.insertBefore(li, list.firstChild);
-  setTimeout(() => { li.style.transition = 'opacity 0.5s'; li.style.opacity = 1; }, 10);
+  
+  setTimeout(() => { 
+    li.style.transition = 'all 0.5s ease';
+    li.style.opacity = 1;
+    li.style.transform = 'translateY(0)';
+  }, 10);
 }
 
 document.getElementById('matchForm').addEventListener('submit', function(e) {
