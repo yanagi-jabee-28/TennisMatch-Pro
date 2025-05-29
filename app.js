@@ -135,32 +135,36 @@ function shuffleArray(array) {
   return array;
 }
 
-// チーム戦の結果を記録
-function recordTeamMatch(courtNum) {
-  const team1Id = document.getElementById(`team1-court${courtNum}`).value;
-  const team2Id = document.getElementById(`team2-court${courtNum}`).value;
-  const score = document.getElementById(`score-court${courtNum}`).value.trim();
+// 試合スコアを記録する
+function recordMatchScore(round, court) {
+  const scoreInput = document.querySelector(`.score-input[data-round="${round}"][data-court="${court}"]`);
+  const score = scoreInput.value.trim();
   
-  if (!team1Id || !team2Id || !score) {
-    alert('チームとスコアを入力してください');
+  if (!score) {
+    alert('スコアを入力してください');
     return;
   }
   
-  const team1 = teams.find(t => t.id == team1Id);
-  const team2 = teams.find(t => t.id == team2Id);
+  // allMatchesDataから該当する試合データを取得
+  const roundData = allMatchesData[round - 1];
+  const matchData = roundData.matches[court - 1];
   
   const match = {
-    court: courtNum,
-    team1: team1.name,
-    team2: team2.name,
+    round: round,
+    court: court,
+    team1: matchData.team1,
+    team2: matchData.team2,
     score: score,
     timestamp: new Date().toLocaleString('ja-JP')
   };
   
+  // スコアをJSONデータに記録
+  matchData.score = score;
+  
   addTeamMatch(match);
   
   // フォームをクリア
-  document.getElementById(`score-court${courtNum}`).value = '';
+  scoreInput.value = '';
 }
 
 // チーム戦の結果をリストに追加
@@ -169,7 +173,7 @@ function addTeamMatch(match) {
   const li = document.createElement('li');
   li.innerHTML = `
     <div class="match-info">
-      <div class="match-players">コート${match.court}: ${match.team1} vs ${match.team2}</div>
+      <div class="match-players">R${match.round} コート${match.court}: ${match.team1} vs ${match.team2}</div>
       <div class="match-score">スコア: ${match.score} | ${match.timestamp}</div>
     </div>
   `;
@@ -185,9 +189,6 @@ function addTeamMatch(match) {
   
   teamMatchHistory.push(match);
 }
-
-// 次のラウンド生成ボタンのイベント
-document.getElementById('generateRound').addEventListener('click', generateNewRound);
 
 // 個人戦用の既存コード
 function addMatch(match) {

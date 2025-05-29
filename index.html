@@ -42,63 +42,171 @@
         <button type="submit">試合を登録</button>
       </form>
       <ul id="matchList"></ul>
-    </div>
-
-    <!-- チーム戦タブ -->
+    </div>    <!-- チーム戦タブ -->
     <div id="team-tab" class="tab-content">
       <div class="team-match-container">
-        <h2>現在のラウンド</h2>
-
-        <!-- 試合表（縦に配置） -->
-        <div class="match-courts-vertical">
-          <div class="court">
-            <h3>コート 1</h3>
-            <div id="court1" class="court-match">
-              <div class="team-row">
-                <select id="team1-court1" class="team-select">
-                  <option value="">チーム選択</option>
-                </select>
-                <span class="vs">vs</span>
-                <select id="team2-court1" class="team-select">
-                  <option value="">チーム選択</option>
-                </select>
+        <h2>全試合スケジュール</h2>
+        
+        <!-- 全ラウンドの表示（縦に配置） -->
+        <div id="all-rounds">
+          <!-- ラウンド1 -->
+          <div class="round-container">
+            <h3 class="round-title">ラウンド 1</h3>
+            <div class="match-courts-horizontal">
+              <div class="court">
+                <h4>コート 1</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム1 vs チーム2</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="1" data-court="1">
+                    <button class="record-btn" onclick="recordMatchScore(1, 1)">記録</button>
+                  </div>
+                </div>
               </div>
-              <div class="score-row">
-                <input type="text" id="score-court1" placeholder="スコア" class="score-input">
-                <button onclick="recordTeamMatch(1)" class="record-btn">記録</button>
+              <div class="court">
+                <h4>コート 2</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム3 vs チーム4</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="1" data-court="2">
+                    <button class="record-btn" onclick="recordMatchScore(1, 2)">記録</button>
+                  </div>
+                </div>
               </div>
+            </div>
+            <div class="resting-team">
+              <span class="resting-label">休憩:</span>
+              <span class="resting-team-name">チーム5</span>
             </div>
           </div>
           
-          <div class="court">
-            <h3>コート 2</h3>
-            <div id="court2" class="court-match">
-              <div class="team-row">
-                <select id="team1-court2" class="team-select">
-                  <option value="">チーム選択</option>
-                </select>
-                <span class="vs">vs</span>
-                <select id="team2-court2" class="team-select">
-                  <option value="">チーム選択</option>
-                </select>
+          <!-- ラウンド2 -->
+          <div class="round-container">
+            <h3 class="round-title">ラウンド 2</h3>
+            <div class="match-courts-horizontal">
+              <div class="court">
+                <h4>コート 1</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム1 vs チーム3</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="2" data-court="1">
+                    <button class="record-btn" onclick="recordMatchScore(2, 1)">記録</button>
+                  </div>
+                </div>
               </div>
-              <div class="score-row">
-                <input type="text" id="score-court2" placeholder="スコア" class="score-input">
-                <button onclick="recordTeamMatch(2)" class="record-btn">記録</button>
+              <div class="court">
+                <h4>コート 2</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム2 vs チーム5</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="2" data-court="2">
+                    <button class="record-btn" onclick="recordMatchScore(2, 2)">記録</button>
+                  </div>
+                </div>
               </div>
+            </div>
+            <div class="resting-team">
+              <span class="resting-label">休憩:</span>
+              <span class="resting-team-name">チーム4</span>
             </div>
           </div>
           
-          <div class="resting-team">
-            <h3>休憩チーム</h3>
-            <div id="restingTeam" class="resting-display">自動で決定されます</div>
+          <!-- ラウンド3 -->
+          <div class="round-container">
+            <h3 class="round-title">ラウンド 3</h3>
+            <div class="match-courts-horizontal">
+              <div class="court">
+                <h4>コート 1</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム1 vs チーム4</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="3" data-court="1">
+                    <button class="record-btn" onclick="recordMatchScore(3, 1)">記録</button>
+                  </div>
+                </div>
+              </div>
+              <div class="court">
+                <h4>コート 2</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム3 vs チーム5</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="3" data-court="2">
+                    <button class="record-btn" onclick="recordMatchScore(3, 2)">記録</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="resting-team">
+              <span class="resting-label">休憩:</span>
+              <span class="resting-team-name">チーム2</span>
+            </div>
+          </div>
+          
+          <!-- ラウンド4 -->
+          <div class="round-container">
+            <h3 class="round-title">ラウンド 4</h3>
+            <div class="match-courts-horizontal">
+              <div class="court">
+                <h4>コート 1</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム1 vs チーム5</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="4" data-court="1">
+                    <button class="record-btn" onclick="recordMatchScore(4, 1)">記録</button>
+                  </div>
+                </div>
+              </div>
+              <div class="court">
+                <h4>コート 2</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム2 vs チーム4</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="4" data-court="2">
+                    <button class="record-btn" onclick="recordMatchScore(4, 2)">記録</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="resting-team">
+              <span class="resting-label">休憩:</span>
+              <span class="resting-team-name">チーム3</span>
+            </div>
+          </div>
+          
+          <!-- ラウンド5 -->
+          <div class="round-container">
+            <h3 class="round-title">ラウンド 5</h3>
+            <div class="match-courts-horizontal">
+              <div class="court">
+                <h4>コート 1</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム2 vs チーム3</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="5" data-court="1">
+                    <button class="record-btn" onclick="recordMatchScore(5, 1)">記録</button>
+                  </div>
+                </div>
+              </div>
+              <div class="court">
+                <h4>コート 2</h4>
+                <div class="team-match">
+                  <div class="team-pair">チーム4 vs チーム5</div>
+                  <div class="score-input-container">
+                    <input type="text" class="score-input" placeholder="スコア" data-round="5" data-court="2">
+                    <button class="record-btn" onclick="recordMatchScore(5, 2)">記録</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="resting-team">
+              <span class="resting-label">休憩:</span>
+              <span class="resting-team-name">チーム1</span>
+            </div>
           </div>
         </div>
         
-        <button id="generateRound" class="generate-btn">次のラウンドを生成</button>
-        
         <div class="team-results">
-          <h3>過去のマッチ</h3>
+          <h3>試合結果</h3>
           <ul id="teamMatchHistory"></ul>
         </div>
       </div>
