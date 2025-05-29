@@ -26,11 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
       button.classList.add('active');
     });
   });
-  // 初期ラウンド表示（前のラウンドと次のラウンドのボタン設定）
+    // 初期ラウンド表示（前のラウンドと次のラウンドのボタン設定）
   setupRoundNavigation();
-  
-  // スコア入力欄の自動更新を設定
-  setupAutoUpdate();
 });
 
 // チームと試合情報を読み込み
@@ -186,9 +183,6 @@ function recordStructuredScore(round, court) {
   const scoreInput = container.querySelector('.score-input');
   scoreInput.value = scoreFormat;
   
-  // 更新ステータス要素を取得
-  const updateStatus = container.querySelector('.update-status');
-  
   // 従来の記録関数を呼び出す
   recordMatchScore(round, court);
 }
@@ -317,7 +311,6 @@ function recordMatchScore(round, court) {
   matchData.team2 = team2;
   matchData.score = score;
   
-  // 新しいマッチデータ
   const match = {
     round: round,
     court: court,
@@ -326,9 +319,7 @@ function recordMatchScore(round, court) {
     score: score,
     timestamp: new Date().toLocaleString('ja-JP')
   };
-  
-  // 既存の試合データを確認し、同じ対戦カードがあれば更新、なければ追加
-  updateTeamMatch(match);
+    addTeamMatch(match);
   
   // 成功メッセージ（アラートの代わりに視覚的フィードバックを表示）
   showSuccessIndicator(round, court);
@@ -359,18 +350,9 @@ function loadMatchResults() {
     }
     
     if (savedHistory) {
-      // 履歴を読み込む
-      const rawHistory = JSON.parse(savedHistory);
-      
-      // 重複データをクリーンアップ
-      teamMatchHistory = removeDuplicateMatches(rawHistory);
-      
+      teamMatchHistory = JSON.parse(savedHistory);
       // 保存された履歴を表示
-      const list = document.getElementById('teamMatchHistory');
-      if (list) list.innerHTML = '';
-      
-      // 最新の順に表示
-      [...teamMatchHistory].reverse().forEach(match => {
+      teamMatchHistory.forEach(match => {
         addTeamMatchToDisplay(match);
       });
       
@@ -380,40 +362,6 @@ function loadMatchResults() {
   } catch (error) {
     console.error('保存された試合結果の読み込みに失敗しました:', error);
   }
-}
-
-// 重複する試合を削除する
-function removeDuplicateMatches(matches) {
-  const uniqueMatches = [];
-  const matchPairs = new Set();
-  
-  for (const match of matches) {
-    // チームペアの識別子（アルファベット順にソートして一意性を確保）
-    const teamPair = [match.team1, match.team2].sort().join('_vs_');
-    
-    // このペアが既に処理されていなければ追加
-    if (!matchPairs.has(teamPair)) {
-      matchPairs.add(teamPair);
-      uniqueMatches.push(match);
-    } else {
-      // 既に存在する場合、最新のスコアで更新
-      const existingMatch = uniqueMatches.find(m => 
-        (m.team1 === match.team1 && m.team2 === match.team2) || 
-        (m.team1 === match.team2 && m.team2 === match.team1)
-      );
-      
-      // タイムスタンプを比較して新しい方を保持
-      const existingTime = new Date(existingMatch.timestamp).getTime();
-      const newTime = new Date(match.timestamp).getTime();
-      
-      if (newTime > existingTime) {
-        existingMatch.score = match.score;
-        existingMatch.timestamp = match.timestamp;
-      }
-    }
-  }
-  
-  return uniqueMatches;
 }
 
 // チーム順位表データを生成
@@ -540,59 +488,15 @@ function updateProgressBar() {
   document.getElementById('roundProgressFill').style.width = `${progressPercent}%`;
 }
 
-// 同じ対戦カードが既にあるかチェック
-function findExistingMatch(team1, team2) {
-  return teamMatchHistory.findIndex(match => 
-    (match.team1 === team1 && match.team2 === team2) || 
-    (match.team1 === team2 && match.team2 === team1)
-  );
-}
-
-// チーム戦の結果を更新または追加
-function updateTeamMatch(match) {
-  // 同じ対戦カードがあるかチェック
-  const existingMatchIndex = findExistingMatch(match.team1, match.team2);
-  
-  if (existingMatchIndex !== -1) {
-    // 既存の試合データがある場合は更新
-    const existingMatch = teamMatchHistory[existingMatchIndex];
-    console.log(`既存の対戦カードを更新: ${match.team1} vs ${match.team2}`);
-    
-    // スコアと更新日時を更新
-    existingMatch.score = match.score;
-    existingMatch.timestamp = match.timestamp;
-    
-    // 表示を更新（オプション）
-    updateMatchDisplay(existingMatch);
-  } else {
-    // 新規の試合データを追加
-    console.log(`新規の対戦カードを追加: ${match.team1} vs ${match.team2}`);
-    teamMatchHistory.push(match);
-    addTeamMatchToDisplay(match);
-  }
+// チーム戦の結果をリストに追加
+function addTeamMatch(match) {
+  teamMatchHistory.push(match);
+  addTeamMatchToDisplay(match);
   
   // 順位表を更新
   updateStandings();
   
-  // 保存
   saveMatchResults();
-}
-
-// 既存の試合データの表示を更新
-function updateMatchDisplay(match) {
-  // ID付けがされていない場合は更新が難しいので、一度すべて再描画する簡易的な方法
-  const list = document.getElementById('teamMatchHistory');
-  list.innerHTML = '';
-  
-  // 最新の順に表示する（新しいものが上に来るように）
-  [...teamMatchHistory].reverse().forEach(match => {
-    addTeamMatchToDisplay(match);
-  });
-}
-
-// チーム戦の結果をリストに追加（後方互換性のために残す）
-function addTeamMatch(match) {
-  updateTeamMatch(match);
 }
 
 // チーム戦の結果を表示に追加
@@ -615,119 +519,84 @@ function addTeamMatchToDisplay(match) {
   }, 10);
 }
 
-// スコア入力欄の自動更新設定
-function setupAutoUpdate() {
-  // イベント委任を使用して、後から追加される要素にもイベントを設定
-  document.addEventListener('input', event => {
-    if (event.target && event.target.classList.contains('auto-update')) {
-      const input = event.target;
-      const round = input.getAttribute('data-round');
-      const court = input.getAttribute('data-court');
-      
-      // 自動保存のタイマーを設定（入力後500ms待ってから保存）
-      clearTimeout(input.saveTimeout);
-      input.saveTimeout = setTimeout(() => {
-        autoSaveScore(round, court);
-      }, 500);
-    }
-  });
-}
-
-// スコアの自動保存
-function autoSaveScore(round, court) {
-  const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
-  if (!container) return;
-  
-  // 両方の入力欄に値があるか確認
-  const team1Score = container.querySelector('.set-input[data-team="1"]').value.trim();
-  const team2Score = container.querySelector('.set-input[data-team="2"]').value.trim();
-  
-  // 両方のスコアが入力されていれば記録
-  if (team1Score !== '' && team2Score !== '') {
-    recordStructuredScore(round, court);
-  }
-}
-
 // 成功インジケーターを表示する関数
 function showSuccessIndicator(round, court) {
   // 対象のスコア入力コンテナを特定
   const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
-  if (!container) return;
-  
-  // 更新ステータス要素を取得
-  const updateStatus = container.querySelector('.update-status');
-  if (!updateStatus) return;
+  if (!container) {
+    const container = document.querySelector(`.score-input[data-round="${round}"][data-court="${court}"]`).parentElement;
+    if (!container) return;
+  }
   
   // 既存の通知があれば削除
   clearNotifications(container);
-    // 成功通知要素を作成
-  updateStatus.className = 'update-status success-notice';
-  updateStatus.textContent = '✓ 保存しました';
   
-  // 入力欄を一時的に成功スタイルに
-  const inputFields = container.querySelectorAll('.set-input');
-  inputFields.forEach(input => {
-    input.classList.add('success-input');
-  });
+  // 成功通知要素を作成
+  const successNotice = document.createElement('div');
+  successNotice.className = 'success-notice';
+  successNotice.textContent = '✓ 記録しました';
   
-  // 2秒後に通知を消す
-  setTimeout(() => {
-    updateStatus.textContent = '';
-    updateStatus.className = 'update-status';
+  // 新しい通知を追加
+  container.appendChild(successNotice);
+  
+  // ボタンを一時的に無効化
+  const recordButton = container.querySelector('.record-btn');
+  if (recordButton) {
+    recordButton.disabled = true;
+    recordButton.classList.add('success');
     
-    inputFields.forEach(input => {
-      input.classList.remove('success-input');
-    });
-  }, 2000);
+    // 2秒後に通知を消して、ボタンを再有効化
+    setTimeout(() => {
+      if (container.contains(successNotice)) {
+        container.removeChild(successNotice);
+      }
+      recordButton.disabled = false;
+      recordButton.classList.remove('success');
+    }, 2000);
+  }
 }
 
 // エラーインジケーターを表示する関数
 function showErrorIndicator(round, court, message) {
   // 対象のスコア入力コンテナを特定
   const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
-  if (!container) return;
-  
-  // 更新ステータス要素を取得
-  const updateStatus = container.querySelector('.update-status');
-  if (!updateStatus) return;
+  if (!container) {
+    const container = document.querySelector(`.score-input[data-round="${round}"][data-court="${court}"]`).parentElement;
+    if (!container) return;
+  }
   
   // 既存の通知があれば削除
   clearNotifications(container);
   
-  // エラー通知要素を更新
-  updateStatus.className = 'update-status error-notice';
-  updateStatus.textContent = message;
+  // エラー通知要素を作成
+  const errorNotice = document.createElement('div');
+  errorNotice.className = 'error-notice';
+  errorNotice.textContent = message;
+  
+  // 新しい通知を追加
+  container.appendChild(errorNotice);
   
   // インプットをハイライト
-  const inputFields = container.querySelectorAll('.set-input');
-  inputFields.forEach(input => {
-    input.classList.add('error');
-  });
-  
-  // 3秒後に通知を消す
-  setTimeout(() => {
-    updateStatus.textContent = '';
-    updateStatus.className = 'update-status';
+  const scoreInput = container.querySelector('.score-input');
+  if (scoreInput) {
+    scoreInput.classList.add('error');
     
-    inputFields.forEach(input => {
-      input.classList.remove('error');
-    });
-  }, 3000);
+    // 3秒後に通知を消す
+    setTimeout(() => {
+      if (container.contains(errorNotice)) {
+        container.removeChild(errorNotice);
+      }
+      scoreInput.classList.remove('error');
+    }, 3000);
+  }
 }
 
 // 通知要素をクリアする関数
 function clearNotifications(container) {
-  // 更新ステータス要素をリセット
-  const updateStatus = container.querySelector('.update-status');
-  if (updateStatus) {
-    updateStatus.textContent = '';
-    updateStatus.className = 'update-status';
-  }
-  
-  // 入力欄のスタイルをリセット
-  const inputFields = container.querySelectorAll('.set-input');
-  inputFields.forEach(input => {
-    input.classList.remove('error', 'success-input');
+  // 既存の通知があれば削除
+  const existingNotices = container.querySelectorAll('.success-notice, .error-notice');
+  existingNotices.forEach(notice => {
+    container.removeChild(notice);
   });
 }
 
