@@ -564,4 +564,132 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeResultForm();
     initializeSettingsForm();
     calculateStandings();
+    
+    // エクスポートボタンのイベントリスナーを追加
+    document.getElementById('export-results-btn').addEventListener('click', exportMatchAnalysis);
 });
+
+// 試合分析データをエクスポートする関数
+function exportMatchAnalysis() {
+    // 現在の日時をフォーマットしてファイル名に使用
+    const now = new Date();
+    const dateStr = now.getFullYear() + 
+                    ('0' + (now.getMonth() + 1)).slice(-2) + 
+                    ('0' + now.getDate()).slice(-2) + '_' + 
+                    ('0' + now.getHours()).slice(-2) + 
+                    ('0' + now.getMinutes()).slice(-2);
+    const filename = `テニス対戦結果_${dateStr}.csv`;
+    
+    // CSVヘッダー
+    let csvContent = '\ufeff'; // BOMを追加してExcelで日本語を正しく表示
+    
+    // 1. 対戦表データのエクスポート
+    csvContent += '# 対戦表データ\n';
+    csvContent += 'チーム1,チーム2,チーム1スコア,チーム2スコア,勝者,引き分け\n';
+    
+    // 対戦結果をCSVに変換
+    Object.values(appState.matches).forEach(match => {
+        let winnerStr = '';
+        let drawStr = '';
+        
+        if (match.winner === null) {
+            drawStr = '○';
+        } else {
+            winnerStr = match.winner === match.team1 ? match.team1 : match.team2;
+        }
+        
+        csvContent += `${match.team1},${match.team2},${match.scoreTeam1},${match.scoreTeam2},${winnerStr},${drawStr}\n`;
+    });
+    
+    // 2. 順位表データのエクスポート
+    csvContent += '\n# 順位表データ\n';
+    csvContent += '順位,チーム,勝利数,敗北数,引分,得点,勝率\n';
+    
+    appState.standings.forEach((team, index) => {
+        csvContent += `${index + 1},${team.teamId},${team.wins},${team.losses},${team.draws},${team.totalScore},${team.winRate}\n`;
+    });
+    
+    // 3. 対戦分析データの追加
+    csvContent += '\n# 対戦分析データ\n';
+    csvContent += 'チーム,対戦相手,勝利数,敗北数,引分,得点,失点,得失点差\n';
+    
+    // チームごとの対戦成績を集計
+    appState.teams.forEach(team => {
+        const teamId = team.id;
+        
+        // 他の各チームとの対戦成績
+        appState.teams.forEach(opponent => {
+            if (teamId === opponent.id) return; // 自分自身との対戦はスキップ
+            
+            const opponentId = opponent.id;
+            const matchId = getMatchId(teamId, opponentId);
+            const match = appState.matches[matchId];
+            
+            if (match) {
+                let wins = 0;
+                let losses = 0;
+                let draws = 0;
+                let scoredPoints = 0;
+                let concededPoints = 0;
+                
+                if (match.winner === null) {
+                    draws = 1;
+                    // チームのスコアを正しく取得
+                    if (match.team1 === teamId) {
+                        scoredPoints = match.scoreTeam1;
+                        concededPoints = match.scoreTeam2;
+                    } else {
+                        scoredPoints = match.scoreTeam2;
+                        concededPoints = match.scoreTeam1;
+                    }
+                } else if (match.winner === teamId) {
+                    wins = 1;
+                    // チームのスコアを正しく取得
+                    if (match.team1 === teamId) {
+                        scoredPoints = match.scoreTeam1;
+                        concededPoints = match.scoreTeam2;
+                    } else {
+                        scoredPoints = match.scoreTeam2;
+                        concededPoints = match.scoreTeam1;
+                    }
+                } else {
+                    losses = 1;
+                    // チームのスコアを正しく取得
+                    if (match.team1 === teamId) {
+                        scoredPoints = match.scoreTeam1;
+                        concededPoints = match.scoreTeam2;
+                    } else {
+                        scoredPoints = match.scoreTeam2;
+                        concededPoints = match.scoreTeam1;
+                    }
+                }
+                
+                const pointDiff = scoredPoints - concededPoints;
+                csvContent += `${teamId},${opponentId},${wins},${losses},${draws},${scoredPoints},${concededPoints},${pointDiff}\n`;
+            } else {
+                // 対戦していない場合
+                csvContent += `${teamId},${opponentId},0,0,0,0,0,0\n`;
+            }
+        });
+    });
+    
+    // 4. 設定情報の追加
+    csvContent += '\n# 設定情報\n';
+    csvContent += `マッチポイント,${appState.settings.matchPoint}\n`;
+    csvContent += `エクスポート日時,${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}:${('0' + now.getMinutes()).slice(-2)}\n`;
+    
+    // BlobオブジェクトとURLを作成
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    
+    // ダウンロードリンクを作成して実行
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert('試合分析データをダウンロードしました！');
+}
