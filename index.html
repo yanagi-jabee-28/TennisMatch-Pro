@@ -140,9 +140,11 @@
                     <div class="member-list-container">
                         <ul id="edit-members-list">
                             <!-- メンバーリストがここに動的に生成されます -->
-                        </ul>
-                        <div class="member-actions">
-                            <input type="text" id="new-member-name" placeholder="新しいメンバー名">
+                        </ul>                        <div class="member-actions">
+                            <select id="unassigned-members-select">
+                                <option value="">-- 未割り当てのメンバーを選択 --</option>
+                                <!-- 未割り当てのメンバーがここに動的に追加されます -->
+                            </select>
                             <button id="add-member-btn" class="btn btn-small">追加</button>
                         </div>
                     </div>
