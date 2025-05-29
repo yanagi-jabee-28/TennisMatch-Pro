@@ -397,35 +397,7 @@ button[type="submit"]:active {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.record-btn {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-  border: none;
-  border-radius: var(--spacing-sm);
-  padding: var(--spacing-md) var(--spacing-2xl);
-  font-size: var(--font-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  min-width: 120px;
-  margin: var(--spacing-sm) auto;
-}
 
-.record-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-}
-
-.record-btn.success {
-  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
-  transform: translateY(0);
-}
-
-.record-btn:disabled {
-  opacity: 0.7;
-  cursor: default;
-}
 
 .success-notice {
   color: #38a169;
@@ -963,19 +935,7 @@ button[type="submit"]:active {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.record-btn {
-  background: #4299e1;
-  transition: all 0.3s ease;
-}
 
-.record-btn:hover:not(:disabled) {
-  background: #2b6cb0;
-  transform: translateY(-1px);
-}
-
-.record-btn.success {
-  background: #48bb78;
-}
 
 .success-notice, .error-notice {
   border-radius: var(--spacing-sm);

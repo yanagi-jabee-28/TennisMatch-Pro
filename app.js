@@ -26,8 +26,11 @@ document.addEventListener('DOMContentLoaded', function() {
       button.classList.add('active');
     });
   });
-    // 初期ラウンド表示（前のラウンドと次のラウンドのボタン設定）
+  // 初期ラウンド表示（前のラウンドと次のラウンドのボタン設定）
   setupRoundNavigation();
+  
+  // スコア入力欄の自動更新を設定
+  setupAutoUpdate();
 });
 
 // チームと試合情報を読み込み
@@ -92,13 +95,13 @@ function generateMatchSchedule() {
               </div>              <div class="score-input-container" data-round="${roundData.id}" data-court="${court}">
                 <div class="structured-score-input">
                   <div class="set-score">
-                    <input type="number" min="0" max="99" class="set-input" data-set="1" data-team="1" placeholder="0" value="${getSetScore(match.score, 1, 1)}">
+                    <input type="number" min="0" max="99" class="set-input auto-update" data-set="1" data-team="1" data-round="${roundData.id}" data-court="${court}" placeholder="0" value="${getSetScore(match.score, 1, 1)}">
                     <span>-</span>
-                    <input type="number" min="0" max="99" class="set-input" data-set="1" data-team="2" placeholder="0" value="${getSetScore(match.score, 1, 2)}">
+                    <input type="number" min="0" max="99" class="set-input auto-update" data-set="1" data-team="2" data-round="${roundData.id}" data-court="${court}" placeholder="0" value="${getSetScore(match.score, 1, 2)}">
                   </div>
                   <input type="hidden" class="score-input" placeholder="スコア" value="${match.score || ''}" data-round="${roundData.id}" data-court="${court}">
                 </div>
-                <button class="record-btn" onclick="recordStructuredScore(${roundData.id}, ${court})">記録</button>
+                <div class="update-status" data-round="${roundData.id}" data-court="${court}"></div>
               </div>
             </div>
           </div>
@@ -182,6 +185,9 @@ function recordStructuredScore(round, court) {
   // 隠しスコア入力に値をセット
   const scoreInput = container.querySelector('.score-input');
   scoreInput.value = scoreFormat;
+  
+  // 更新ステータス要素を取得
+  const updateStatus = container.querySelector('.update-status');
   
   // 従来の記録関数を呼び出す
   recordMatchScore(round, court);
@@ -519,84 +525,119 @@ function addTeamMatchToDisplay(match) {
   }, 10);
 }
 
+// スコア入力欄の自動更新設定
+function setupAutoUpdate() {
+  // イベント委任を使用して、後から追加される要素にもイベントを設定
+  document.addEventListener('input', event => {
+    if (event.target && event.target.classList.contains('auto-update')) {
+      const input = event.target;
+      const round = input.getAttribute('data-round');
+      const court = input.getAttribute('data-court');
+      
+      // 自動保存のタイマーを設定（入力後500ms待ってから保存）
+      clearTimeout(input.saveTimeout);
+      input.saveTimeout = setTimeout(() => {
+        autoSaveScore(round, court);
+      }, 500);
+    }
+  });
+}
+
+// スコアの自動保存
+function autoSaveScore(round, court) {
+  const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
+  if (!container) return;
+  
+  // 両方の入力欄に値があるか確認
+  const team1Score = container.querySelector('.set-input[data-team="1"]').value.trim();
+  const team2Score = container.querySelector('.set-input[data-team="2"]').value.trim();
+  
+  // 両方のスコアが入力されていれば記録
+  if (team1Score !== '' && team2Score !== '') {
+    recordStructuredScore(round, court);
+  }
+}
+
 // 成功インジケーターを表示する関数
 function showSuccessIndicator(round, court) {
   // 対象のスコア入力コンテナを特定
   const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
-  if (!container) {
-    const container = document.querySelector(`.score-input[data-round="${round}"][data-court="${court}"]`).parentElement;
-    if (!container) return;
-  }
+  if (!container) return;
+  
+  // 更新ステータス要素を取得
+  const updateStatus = container.querySelector('.update-status');
+  if (!updateStatus) return;
   
   // 既存の通知があれば削除
   clearNotifications(container);
+    // 成功通知要素を作成
+  updateStatus.className = 'update-status success-notice';
+  updateStatus.textContent = '✓ 保存しました';
   
-  // 成功通知要素を作成
-  const successNotice = document.createElement('div');
-  successNotice.className = 'success-notice';
-  successNotice.textContent = '✓ 記録しました';
+  // 入力欄を一時的に成功スタイルに
+  const inputFields = container.querySelectorAll('.set-input');
+  inputFields.forEach(input => {
+    input.classList.add('success-input');
+  });
   
-  // 新しい通知を追加
-  container.appendChild(successNotice);
-  
-  // ボタンを一時的に無効化
-  const recordButton = container.querySelector('.record-btn');
-  if (recordButton) {
-    recordButton.disabled = true;
-    recordButton.classList.add('success');
+  // 2秒後に通知を消す
+  setTimeout(() => {
+    updateStatus.textContent = '';
+    updateStatus.className = 'update-status';
     
-    // 2秒後に通知を消して、ボタンを再有効化
-    setTimeout(() => {
-      if (container.contains(successNotice)) {
-        container.removeChild(successNotice);
-      }
-      recordButton.disabled = false;
-      recordButton.classList.remove('success');
-    }, 2000);
-  }
+    inputFields.forEach(input => {
+      input.classList.remove('success-input');
+    });
+  }, 2000);
 }
 
 // エラーインジケーターを表示する関数
 function showErrorIndicator(round, court, message) {
   // 対象のスコア入力コンテナを特定
   const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
-  if (!container) {
-    const container = document.querySelector(`.score-input[data-round="${round}"][data-court="${court}"]`).parentElement;
-    if (!container) return;
-  }
+  if (!container) return;
+  
+  // 更新ステータス要素を取得
+  const updateStatus = container.querySelector('.update-status');
+  if (!updateStatus) return;
   
   // 既存の通知があれば削除
   clearNotifications(container);
   
-  // エラー通知要素を作成
-  const errorNotice = document.createElement('div');
-  errorNotice.className = 'error-notice';
-  errorNotice.textContent = message;
-  
-  // 新しい通知を追加
-  container.appendChild(errorNotice);
+  // エラー通知要素を更新
+  updateStatus.className = 'update-status error-notice';
+  updateStatus.textContent = message;
   
   // インプットをハイライト
-  const scoreInput = container.querySelector('.score-input');
-  if (scoreInput) {
-    scoreInput.classList.add('error');
+  const inputFields = container.querySelectorAll('.set-input');
+  inputFields.forEach(input => {
+    input.classList.add('error');
+  });
+  
+  // 3秒後に通知を消す
+  setTimeout(() => {
+    updateStatus.textContent = '';
+    updateStatus.className = 'update-status';
     
-    // 3秒後に通知を消す
-    setTimeout(() => {
-      if (container.contains(errorNotice)) {
-        container.removeChild(errorNotice);
-      }
-      scoreInput.classList.remove('error');
-    }, 3000);
-  }
+    inputFields.forEach(input => {
+      input.classList.remove('error');
+    });
+  }, 3000);
 }
 
 // 通知要素をクリアする関数
 function clearNotifications(container) {
-  // 既存の通知があれば削除
-  const existingNotices = container.querySelectorAll('.success-notice, .error-notice');
-  existingNotices.forEach(notice => {
-    container.removeChild(notice);
+  // 更新ステータス要素をリセット
+  const updateStatus = container.querySelector('.update-status');
+  if (updateStatus) {
+    updateStatus.textContent = '';
+    updateStatus.className = 'update-status';
+  }
+  
+  // 入力欄のスタイルをリセット
+  const inputFields = container.querySelectorAll('.set-input');
+  inputFields.forEach(input => {
+    input.classList.remove('error', 'success-input');
   });
 }
 
