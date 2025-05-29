@@ -95,9 +95,7 @@
         </section>
     </main>    <footer>
         <p>&copy; 2025 硬式テニス 試合管理アプリ</p>
-    </footer>
-
-    <!-- スコア入力用のカスタムモーダル -->
+    </footer>    <!-- スコア入力用のカスタムモーダル -->
     <div id="score-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -119,6 +117,36 @@
             <div class="modal-footer">
                 <button id="save-score-btn" class="btn">保存</button>
                 <button id="cancel-score-btn" class="btn btn-secondary">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- チームメンバー編集用のモーダル -->
+    <div id="team-edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="team-edit-modal-title">チームメンバー編集</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="team-edit-container">
+                    <div class="team-info">
+                        <strong id="edit-team-id">チーム1</strong>
+                    </div>
+                    <div class="member-list-container">
+                        <ul id="edit-members-list">
+                            <!-- メンバーリストがここに動的に生成されます -->
+                        </ul>
+                        <div class="member-actions">
+                            <input type="text" id="new-member-name" placeholder="新しいメンバー名">
+                            <button id="add-member-btn" class="btn btn-small">追加</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-team-btn" class="btn">保存</button>
+                <button id="cancel-team-btn" class="btn btn-secondary">キャンセル</button>
             </div>
         </div>
     </div>
