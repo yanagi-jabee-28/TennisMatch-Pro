@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>  <div class="container">
+<body>
+  <div class="container">
     <h1>🎾 Tennis Match Manager</h1>
     
     <!-- タブメニュー -->
@@ -46,12 +47,14 @@
     <!-- チーム戦タブ -->
     <div id="team-tab" class="tab-content">
       <div class="team-match-container">
-        <div class="current-round">
-          <h2>現在のラウンド</h2>
-          <div class="match-courts">
-            <div class="court">
-              <h3>コート 1</h3>
-              <div id="court1" class="court-match">
+        <h2>現在のラウンド</h2>
+
+        <!-- 試合表（縦に配置） -->
+        <div class="match-courts-vertical">
+          <div class="court">
+            <h3>コート 1</h3>
+            <div id="court1" class="court-match">
+              <div class="team-row">
                 <select id="team1-court1" class="team-select">
                   <option value="">チーム選択</option>
                 </select>
@@ -59,14 +62,18 @@
                 <select id="team2-court1" class="team-select">
                   <option value="">チーム選択</option>
                 </select>
+              </div>
+              <div class="score-row">
                 <input type="text" id="score-court1" placeholder="スコア" class="score-input">
                 <button onclick="recordTeamMatch(1)" class="record-btn">記録</button>
               </div>
             </div>
-            
-            <div class="court">
-              <h3>コート 2</h3>
-              <div id="court2" class="court-match">
+          </div>
+          
+          <div class="court">
+            <h3>コート 2</h3>
+            <div id="court2" class="court-match">
+              <div class="team-row">
                 <select id="team1-court2" class="team-select">
                   <option value="">チーム選択</option>
                 </select>
@@ -74,6 +81,8 @@
                 <select id="team2-court2" class="team-select">
                   <option value="">チーム選択</option>
                 </select>
+              </div>
+              <div class="score-row">
                 <input type="text" id="score-court2" placeholder="スコア" class="score-input">
                 <button onclick="recordTeamMatch(2)" class="record-btn">記録</button>
               </div>
@@ -84,12 +93,12 @@
             <h3>休憩チーム</h3>
             <div id="restingTeam" class="resting-display">自動で決定されます</div>
           </div>
-          
-          <button id="generateRound" class="generate-btn">次のラウンドを生成</button>
         </div>
         
+        <button id="generateRound" class="generate-btn">次のラウンドを生成</button>
+        
         <div class="team-results">
-          <h3>チーム戦績</h3>
+          <h3>過去のマッチ</h3>
           <ul id="teamMatchHistory"></ul>
         </div>
       </div>

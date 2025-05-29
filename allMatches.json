@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "matches": [
+      {"team1": "チーム1", "team2": "チーム2", "score": ""},
+      {"team1": "チーム3", "team2": "チーム4", "score": ""},
+      {"restingTeam": "チーム5"}
+    ]
+  },
+  {
+    "id": 2,
+    "matches": [
+      {"team1": "チーム1", "team2": "チーム3", "score": ""},
+      {"team1": "チーム2", "team2": "チーム5", "score": ""},
+      {"restingTeam": "チーム4"}
+    ]
+  },
+  {
+    "id": 3,
+    "matches": [
+      {"team1": "チーム1", "team2": "チーム4", "score": ""},
+      {"team1": "チーム3", "team2": "チーム5", "score": ""},
+      {"restingTeam": "チーム2"}
+    ]
+  },
+  {
+    "id": 4,
+    "matches": [
+      {"team1": "チーム1", "team2": "チーム5", "score": ""},
+      {"team1": "チーム2", "team2": "チーム4", "score": ""},
+      {"restingTeam": "チーム3"}
+    ]
+  },
+  {
+    "id": 5,
+    "matches": [
+      {"team1": "チーム2", "team2": "チーム3", "score": ""},
+      {"team1": "チーム4", "team2": "チーム5", "score": ""},
+      {"restingTeam": "チーム1"}
+    ]
+  }
+]

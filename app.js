@@ -1,8 +1,8 @@
-
 // グローバル変数
 let teams = [];
 let teamMatchHistory = [];
 let currentRoundTeams = [];
+let allMatchesData = [];
 
 // 初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -23,6 +23,16 @@ async function loadPlayersAndTeams() {
     const teamsData = await teamsResponse.json();
     teams = teamsData.teams;
     populateTeamSelects();
+    
+    // 全試合のデータを読み込む
+    try {
+      const allMatchesResponse = await fetch('allMatches.json');
+      allMatchesData = await allMatchesResponse.json();
+      console.log("全試合データを読み込みました", allMatchesData);
+    } catch (matchError) {
+      console.log("全試合データの読み込みに失敗しました", matchError);
+    }
+    
     generateNewRound();
   } catch (error) {
     console.error('データの読み込みに失敗しました:', error);
