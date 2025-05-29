@@ -242,11 +242,12 @@ button[type="submit"]:active {
 
 .team-selector {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
   width: 100%;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .team-selector .team-select {
@@ -260,7 +261,8 @@ button[type="submit"]:active {
   color: #667eea;
   font-size: 1.2rem;
   flex-shrink: 0;
-  margin: 0 8px;
+  margin: 0 0 0 0;
+  text-align: center;
 }
 
 .team-pair {
