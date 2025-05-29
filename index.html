@@ -37,7 +37,8 @@
         <section id="match-results">
             <h2>試合結果入力</h2>
             <div class="info-box">
-                <p class="click-info">対戦表のマスをクリックすると、両チームの点数を順番に入力できます。記録済みの結果をクリックすると修正できます。</p>
+                <p class="click-info">対戦表のマスをクリックすると、各チームの点数を順番に入力できます。記録済みの結果をクリックすると修正できます。</p>
+                <p class="click-info-sub">マッチポイント（勝利に必要な点数）と必要な点差は下の「試合設定」で変更できます。</p>
             </div>
             <div class="form-container">
                 <form id="result-form">
@@ -64,8 +65,25 @@
                     <button type="submit" class="btn">結果を保存</button>
                 </form>
             </div>
+        </section>        <section id="game-settings">
+            <h2>試合設定</h2>
+            <div class="form-container">
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label for="match-point">マッチポイント:</label>
+                        <input type="number" id="match-point" min="1" max="21" value="7" required>
+                        <small class="form-text">勝利に必要な最低点数を設定します（1～21）。例: 7に設定すると、7点以上かつ設定した点差以上で勝利となります。</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="min-point-diff">最小点差:</label>
+                        <input type="number" id="min-point-diff" min="1" max="5" value="2" required>
+                        <small class="form-text">勝利に必要な最小点差を設定します（1～5）。例: 2に設定すると、2点差以上（7-5など）で勝利と記録されます。</small>
+                    </div>
+                    <button type="submit" class="btn">設定を保存</button>
+                </form>
+            </div>
         </section>
-
+        
         <section id="team-standings">
             <h2>順位表</h2>
             <div class="table-container">
