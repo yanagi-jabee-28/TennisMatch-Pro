@@ -47,7 +47,7 @@ function renderTeams() {
         teamCard.className = 'team-card';
         
         teamCard.innerHTML = `
-            <h3>${team.name}</h3>
+            <h3>${team.id}</h3>
             <ul class="team-members">
                 ${team.members.map(member => `<li>${member}</li>`).join('')}
             </ul>
@@ -62,20 +62,18 @@ function createMatchTable() {
     const tableHeader = document.getElementById('header-row');
     const tableBody = document.querySelector('#match-grid tbody');
     
-    // ヘッダー行にチーム名を追加
+    // ヘッダー行にチーム番号を追加
     tableHeader.innerHTML = '<th class="empty-cell"></th>';
     appState.teams.forEach(team => {
-        tableHeader.innerHTML += `<th>${team.name}</th>`;
-    });
-    
-    // 対戦表の行を作成
+        tableHeader.innerHTML += `<th>${team.id}</th>`;
+    });    // 対戦表の行を作成
     tableBody.innerHTML = '';
     appState.teams.forEach((rowTeam, rowIndex) => {
         const row = document.createElement('tr');
         
-        // 行の最初のセルにチーム名
+        // 行の最初のセルにチーム番号
         const firstCell = document.createElement('th');
-        firstCell.textContent = rowTeam.name;
+        firstCell.textContent = rowTeam.id;
         row.appendChild(firstCell);
         
         // 各対戦相手との結果セルを作成
@@ -141,12 +139,8 @@ function handleCellClick(event) {
     const rowTeamId = parseInt(cell.dataset.rowTeamId);
     const colTeamId = parseInt(cell.dataset.colTeamId);
     const matchId = cell.dataset.matchId;
-    
-    const rowTeamName = getTeamNameById(rowTeamId);
-    const colTeamName = getTeamNameById(colTeamId);
-    
-    // 行側のチーム（クリックされたセルの行）のスコア入力
-    const team1ScoreInput = prompt(`${rowTeamName}の点数を入力してください (0-7):`);
+      // 行側のチーム（クリックされたセルの行）のスコア入力
+    const team1ScoreInput = prompt(`チーム${rowTeamId}の点数を入力してください (0-7):`);
     
     // キャンセルが押された場合
     if (team1ScoreInput === null) return;
@@ -159,7 +153,7 @@ function handleCellClick(event) {
     }
     
     // 列側のチーム（対戦相手）のスコア入力
-    const team2ScoreInput = prompt(`${colTeamName}の点数を入力してください (0-7):`);
+    const team2ScoreInput = prompt(`チーム${colTeamId}の点数を入力してください (0-7):`);
     
     // キャンセルが押された場合
     if (team2ScoreInput === null) return;
@@ -220,10 +214,9 @@ function handleCellClick(event) {
     calculateStandings();
 }
 
-// チームIDからチーム名を取得する関数
+// チームIDからチーム番号を取得する関数（現在は未使用）
 function getTeamNameById(teamId) {
-    const team = appState.teams.find(t => t.id === teamId);
-    return team ? team.name : `不明なチーム(${teamId})`;
+    return `${teamId}`;
 }
 
 // チーム選択フォームを初期化
@@ -318,7 +311,6 @@ function calculateStandings() {
     appState.teams.forEach(team => {
         teamStats[team.id] = {
             teamId: team.id,
-            teamName: team.name,
             wins: 0,
             losses: 0,
             draws: 0,
@@ -383,7 +375,7 @@ function renderStandings() {
         
         row.innerHTML = `
             <td>${index + 1}</td>
-            <td>${team.teamName}</td>
+            <td>${team.teamId}</td>
             <td>${team.wins}</td>
             <td>${team.losses}</td>
             <td>${team.draws > 0 ? team.draws : '-'}</td>
