@@ -92,13 +92,13 @@ function generateMatchSchedule() {
               </div>              <div class="score-input-container" data-round="${roundData.id}" data-court="${court}">
                 <div class="structured-score-input">
                   <div class="set-score">
-                    <input type="number" min="0" max="99" class="set-input auto-update" data-set="1" data-team="1" data-round="${roundData.id}" data-court="${court}" placeholder="0" value="${getSetScore(match.score, 1, 1)}">
+                    <input type="number" min="0" max="99" class="set-input" data-set="1" data-team="1" placeholder="0" value="${getSetScore(match.score, 1, 1)}">
                     <span>-</span>
-                    <input type="number" min="0" max="99" class="set-input auto-update" data-set="1" data-team="2" data-round="${roundData.id}" data-court="${court}" placeholder="0" value="${getSetScore(match.score, 1, 2)}">
+                    <input type="number" min="0" max="99" class="set-input" data-set="1" data-team="2" placeholder="0" value="${getSetScore(match.score, 1, 2)}">
                   </div>
                   <input type="hidden" class="score-input" placeholder="スコア" value="${match.score || ''}" data-round="${roundData.id}" data-court="${court}">
                 </div>
-                <div class="update-status" data-round="${roundData.id}" data-court="${court}"></div>
+                <button class="record-btn" onclick="recordStructuredScore(${roundData.id}, ${court})">記録</button>
               </div>
             </div>
           </div>
