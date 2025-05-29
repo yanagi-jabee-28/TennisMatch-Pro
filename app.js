@@ -199,17 +199,9 @@ function handleCellClick(event) {
         alert(`スコアは0以上の数字を入力してください`);
         return;
     }
-    
-    // マッチポイントを超える場合は自動的に上限を設定
+      // マッチポイントを超える場合は自動的に上限を設定
     if (team2Score > matchPoint) {
         team2Score = matchPoint;
-    }
-    
-    // 同点の場合は確認
-    if (team1Score === team2Score) {
-        if (!confirm('同点の場合、タイブレークなどで決着をつける必要があります。このまま記録しますか？')) {
-            return;
-        }
     }
     
     // 勝者を決定
