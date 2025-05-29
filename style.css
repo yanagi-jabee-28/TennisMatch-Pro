@@ -206,31 +206,34 @@ button[type="submit"]:active {
 
 .match-courts-horizontal {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
   margin-bottom: 16px;
   width: 100%;
   justify-items: center;
+  align-items: stretch;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .court {
-  background: rgba(255, 255, 255, 0.8);
-  padding: 20px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 28px 20px 24px 20px;
+  border-radius: 16px;
   border: 2px solid #e2e8f0;
-  min-width: 300px;
+  min-width: 280px;
+  max-width: 420px;
+  width: 100%;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: box-shadow 0.2s;
 }
 
-.court h3, .court h4 {
-  text-align: center;
-  margin-bottom: 12px;
-  color: #667eea;
-  font-size: 1.1rem;
-  width: 100%;
+.court:hover {
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.10);
 }
 
 .team-match {
@@ -437,6 +440,16 @@ button[type="submit"]:active {
     max-width: 98vw;
     padding: 16px 2px;
   }
+  .match-courts-horizontal {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    max-width: 98vw;
+  }
+  .court {
+    max-width: 98vw;
+    min-width: unset;
+    margin: 0 auto;
+  }
 }
 
 @media (max-width: 768px) {
@@ -456,6 +469,11 @@ button[type="submit"]:active {
   .match-courts-horizontal {
     grid-template-columns: 1fr;
     gap: 16px;
+    max-width: 100vw;
+  }
+  .court {
+    max-width: 100vw;
+    padding: 16px 4px;
   }
 }
 
