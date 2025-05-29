@@ -510,6 +510,16 @@ select, input {
     font-size: 14px;
 }
 
+.original-member {
+    font-weight: bold;
+    color: #1a73e8;
+}
+
+#unassigned-members-select option[value=""] {
+    font-style: italic;
+    color: #666;
+}
+
 /* チーム情報セクションのコントロール */
 .team-controls {
     margin-bottom: 1rem;

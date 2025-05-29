@@ -308,12 +308,18 @@ function renderMembersList() {
             <button class="remove-member-btn" data-index="${index}">×</button>
         `;
         membersList.appendChild(li);
-        
-        // 削除ボタンにイベントリスナーを追加
+          // 削除ボタンにイベントリスナーを追加
         const removeBtn = li.querySelector('.remove-member-btn');
         if (removeBtn) {
             removeBtn.addEventListener('click', () => {
+                // 削除されるメンバーを保存
+                const removedMember = tempTeamMembers[index];
+                console.log(`メンバー "${removedMember}" を削除します`);
+                
+                // チームメンバーリストから削除
                 tempTeamMembers.splice(index, 1);
+                
+                // リストを更新
                 renderMembersList();
                 // メンバーが削除されたら、未割り当てのメンバーリストも更新
                 renderUnassignedMembersList();
@@ -1041,10 +1047,18 @@ function getUnassignedMembers() {
         allOriginalMembers.push(...team.members);
     });
     
-    // 未割り当てのメンバー = オリジナルの全メンバー - 他のチームに割り当て済みのメンバー
-    const unassignedMembers = allOriginalMembers.filter(member => !allAssignedMembers.includes(member));
+    // 編集中のチームのオリジナルメンバーを取得
+    const originalTeam = appState.originalTeams.find(team => team.id === currentEditTeamId);
+    const originalTeamMembers = originalTeam ? originalTeam.members : [];
     
-    // 現在編集中のチームに既に割り当てられているメンバーも除外（重複を防ぐ）
+    // 未割り当てのメンバー = オリジナルの全メンバー - 他のチームに割り当て済みのメンバー
+    const unassignedMembers = allOriginalMembers.filter(member => {
+        // 他のチームに割り当て済みでないメンバー、もしくは
+        // 元々現在のチームにいたメンバー（これにより削除されたメンバーも未割当として表示される）
+        return !allAssignedMembers.includes(member) || originalTeamMembers.includes(member);
+    });
+    
+    // 現在編集中のチームに既に割り当てられているメンバーは除外（重複を防ぐ）
     return unassignedMembers.filter(member => !tempTeamMembers.includes(member));
 }
 
@@ -1071,11 +1085,23 @@ function renderUnassignedMembersList() {
         option.textContent = "利用可能なメンバーがありません";
         unassignedMembersSelect.appendChild(option);
     } else {
+        // オリジナルチームの情報を取得
+        const originalTeam = appState.originalTeams.find(team => team.id === currentEditTeamId);
+        const originalTeamMembers = originalTeam ? originalTeam.members : [];
+        
         // 未割り当てのメンバーをリストに追加
         unassignedMembers.forEach(member => {
             const option = document.createElement('option');
             option.value = member;
-            option.textContent = member;
+            
+            // 元々このチームのメンバーだった場合、特別に表示
+            if (originalTeamMembers.includes(member)) {
+                option.textContent = `${member} (元のメンバー)`;
+                option.classList.add('original-member');
+            } else {
+                option.textContent = member;
+            }
+            
             unassignedMembersSelect.appendChild(option);
         });
     }
