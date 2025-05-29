@@ -119,27 +119,25 @@ function createMatchTable() {
                 // 試合結果があれば表示
                 if (appState.matches[matchId]) {
                     const match = appState.matches[matchId];
-                    const isWinner = match.winner === rowTeam.id;
-                    const resultClass = isWinner ? 'winner' : 'loser';
-                      // 行側のチーム（自チーム）を常に左側に表示するため、
+                    
+                    // 勝者が存在するか引き分けかで表示スタイルを変更
+                    let resultClass;
+                    if (match.winner === null) {
+                        resultClass = 'draw';
+                    } else {
+                        resultClass = match.winner === rowTeam.id ? 'winner' : 'loser';
+                    }
+                    
+                    // 行側のチーム（自チーム）を常に左側に表示するため、
                     // 適切な順序でスコアを表示
                     let displayScore;
-                    let resultText;
-                    
                     if (match.team1 === rowTeam.id) {
                         displayScore = `${match.scoreTeam1}-${match.scoreTeam2}`;
                     } else {
                         displayScore = `${match.scoreTeam2}-${match.scoreTeam1}`;
                     }
                     
-                    // 勝敗または引き分けの表示
-                    if (match.winner === null) {
-                        resultText = `<span class="match-result draw">${displayScore}</span>`;
-                    } else {
-                        resultText = `<span class="match-result ${resultClass}">${displayScore}</span>`;
-                    }
-                    
-                    cell.innerHTML = resultText;
+                    cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
                     
                     // 修正のためのクリックイベント追加
                     cell.addEventListener('click', function() {
@@ -172,29 +170,35 @@ function handleCellClick(event) {
     
     // 最大スコアを取得
     const maxScore = appState.settings.maxScore;
-    
-    // 行側のチーム（クリックされたセルの行）のスコア入力
-    const team1ScoreInput = prompt(`チーム${rowTeamId}の点数を入力してください\n(0～${maxScore}の間の数字):`);
+      // 行側のチーム（クリックされたセルの行）のスコア入力
+    const team1ScoreInput = prompt(`チーム${rowTeamId}の点数を入力してください:`);
     
     // キャンセルが押された場合
-    if (team1ScoreInput === null) return;
-      // 入力値のバリデーション
-    const team1Score = parseInt(team1ScoreInput);
-    if (isNaN(team1Score) || team1Score < 0 || team1Score > maxScore) {
-        alert(`スコアは0から${maxScore}の間の数字を入力してください`);
+    if (team1ScoreInput === null) return;// 入力値のバリデーション
+    let team1Score = parseInt(team1ScoreInput);
+    if (isNaN(team1Score) || team1Score < 0) {
+        alert(`スコアは0以上の数字を入力してください`);
         return;
+    }
+    // 最大値を超える場合は自動的に上限を設定
+    if (team1Score > maxScore) {
+        team1Score = maxScore;
     }
     
     // 列側のチーム（対戦相手）のスコア入力
-    const team2ScoreInput = prompt(`チーム${colTeamId}の点数を入力してください\n(0～${maxScore}の間の数字):`);
+    const team2ScoreInput = prompt(`チーム${colTeamId}の点数を入力してください:`);
       // キャンセルが押された場合
     if (team2ScoreInput === null) return;
       // 入力値のバリデーション
-    const team2Score = parseInt(team2ScoreInput);
-    if (isNaN(team2Score) || team2Score < 0 || team2Score > maxScore) {
-        alert(`スコアは0から${maxScore}の間の数字を入力してください`);
+    let team2Score = parseInt(team2ScoreInput);
+    if (isNaN(team2Score) || team2Score < 0) {
+        alert(`スコアは0以上の数字を入力してください`);
         return;
-    }      // スコアのバリデーションはもう行われているので不要
+    }
+    // 最大値を超える場合は自動的に上限を設定
+    if (team2Score > maxScore) {
+        team2Score = maxScore;
+    }// スコアのバリデーションはもう行われているので不要
     
     // 同点の場合は確認
     if (team1Score === team2Score) {
@@ -302,24 +306,28 @@ function initializeResultForm() {
             alert('異なるチームを選択してください');
             return;
         }
+          let scoreTeam1 = parseInt(document.getElementById('score-team1').value);
+        let scoreTeam2 = parseInt(document.getElementById('score-team2').value);
         
-        const scoreTeam1 = parseInt(document.getElementById('score-team1').value);
-        const scoreTeam2 = parseInt(document.getElementById('score-team2').value);
+        // スコアが最大値を超えていたら上限を適用
+        const maxScore = appState.settings.maxScore;
+        if (scoreTeam1 > maxScore) scoreTeam1 = maxScore;
+        if (scoreTeam2 > maxScore) scoreTeam2 = maxScore;
         
-        // マッチポイントと最小点差に基づいて勝者を決定
+        // マッチポイントとポイント差に基づいて勝者を決定
+        let winner;
         const matchPoint = appState.settings.matchPoint;
         const minPointDiff = appState.settings.minPointDiff;
         const pointDiff = Math.abs(scoreTeam1 - scoreTeam2);
         
-        let winner;
         if (scoreTeam1 === scoreTeam2) {
             // 同点
             winner = null;
         } else if (scoreTeam1 > scoreTeam2) {
-            // チーム1の点数が高い場合、マッチポイント以上かつ点差が必要な差以上あれば勝ち
+            // チーム1が点数が高い場合、マッチポイント以上かつ点差が必要な差以上あれば勝ち
             winner = (scoreTeam1 >= matchPoint && pointDiff >= minPointDiff) ? team1Id : null;
         } else {
-            // チーム2の点数が高い場合、マッチポイント以上かつ点差が必要な差以上あれば勝ち
+            // チーム2が点数が高い場合、マッチポイント以上かつ点差が必要な差以上あれば勝ち
             winner = (scoreTeam2 >= matchPoint && pointDiff >= minPointDiff) ? team2Id : null;
         }
         
@@ -431,12 +439,6 @@ function renderStandings() {
     appState.standings.forEach((team, index) => {
         const row = document.createElement('tr');
         
-        // マッチポイントの現在の設定を表示するための文字列
-        const totalGames = team.wins + team.losses + team.draws;
-        const matchSummary = totalGames > 0 ? 
-            `${team.wins}-${team.losses}${team.draws > 0 ? `-${team.draws}` : ''}` : 
-            '-';
-        
         row.innerHTML = `
             <td>${index + 1}</td>
             <td>${team.teamId}</td>
@@ -449,25 +451,27 @@ function renderStandings() {
         
         standingsBody.appendChild(row);
     });
-    
-    // マッチポイント設定を表示
-    const settingInfo = document.createElement('p');
-    settingInfo.className = 'settings-info';
-    settingInfo.textContent = `現在の設定：マッチポイント ${appState.settings.matchPoint}、必要点差 ${appState.settings.minPointDiff}`;
-    
-    const standingsTable = document.getElementById('standings-table');
-    standingsTable.parentNode.insertBefore(settingInfo, standingsTable.nextSibling);
 }
 
 // 試合設定フォームの初期化と処理
 function initializeSettingsForm() {
-    const settingsForm = document.getElementById('settings-form');
-    const matchPointInput = document.getElementById('match-point');
-    const minPointDiffInput = document.getElementById('min-point-diff');
+    const settingsForm = document.getElementById('header-settings-form');
+    const matchPointInput = document.getElementById('header-match-point');
+    const minPointDiffInput = document.getElementById('header-min-point-diff');
+    const maxScoreInput = document.getElementById('header-max-score');
+    
+    // スコア入力欄の最大値を設定
+    const scoreTeam1Input = document.getElementById('score-team1');
+    const scoreTeam2Input = document.getElementById('score-team2');
+    if (scoreTeam1Input && scoreTeam2Input) {
+        scoreTeam1Input.max = appState.settings.maxScore;
+        scoreTeam2Input.max = appState.settings.maxScore;
+    }
     
     // 現在の設定を表示
     matchPointInput.value = appState.settings.matchPoint;
     minPointDiffInput.value = appState.settings.minPointDiff;
+    maxScoreInput.value = appState.settings.maxScore;
     
     // 設定変更時の処理
     settingsForm.addEventListener('submit', (e) => {
@@ -475,10 +479,11 @@ function initializeSettingsForm() {
         
         const newMatchPoint = parseInt(matchPointInput.value);
         const newMinPointDiff = parseInt(minPointDiffInput.value);
+        const newMaxScore = parseInt(maxScoreInput.value);
         
         // 入力値の検証
-        if (isNaN(newMatchPoint) || newMatchPoint < 1 || newMatchPoint > 21) {
-            alert('マッチポイントは1から21の間で設定してください');
+        if (isNaN(newMatchPoint) || newMatchPoint < 1 || newMatchPoint > 99) {
+            alert('マッチポイントは1から99の間で設定してください');
             return;
         }
         
@@ -487,10 +492,23 @@ function initializeSettingsForm() {
             return;
         }
         
-        // 設定を保存
+        if (isNaN(newMaxScore) || newMaxScore < newMatchPoint || newMaxScore > 99) {
+            alert('最大スコアはマッチポイント以上、99以下で設定してください');
+            return;
+        }
+          // 設定を保存
         appState.settings.matchPoint = newMatchPoint;
         appState.settings.minPointDiff = newMinPointDiff;
+        appState.settings.maxScore = newMaxScore;
         saveSettings();
+        
+        // スコア入力欄の最大値を更新
+        const scoreTeam1Input = document.getElementById('score-team1');
+        const scoreTeam2Input = document.getElementById('score-team2');
+        if (scoreTeam1Input && scoreTeam2Input) {
+            scoreTeam1Input.max = newMaxScore;
+            scoreTeam2Input.max = newMaxScore;
+        }
         
         // 結果に影響するため、順位表を再計算
         calculateStandings();
