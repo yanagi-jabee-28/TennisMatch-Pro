@@ -589,16 +589,17 @@ function exportMatchAnalysis() {
     
     // 対戦結果をCSVに変換
     Object.values(appState.matches).forEach(match => {
-        let winnerStr = '';
-        let drawStr = '';
+        // 勝者の表示方法を決定
+        let winnerDisplay = '';
+        let drawDisplay = 'FALSE';
         
         if (match.winner === null) {
-            drawStr = '○';
+            drawDisplay = 'TRUE';
         } else {
-            winnerStr = match.winner === match.team1 ? match.team1 : match.team2;
+            winnerDisplay = `チーム${match.winner}`;
         }
         
-        csvContent += `${match.team1},${match.team2},${match.scoreTeam1},${match.scoreTeam2},${winnerStr},${drawStr}\n`;
+        csvContent += `チーム${match.team1},チーム${match.team2},${match.scoreTeam1},${match.scoreTeam2},${winnerDisplay},${drawDisplay}\n`;
     });
     
     // 2. 順位表データのエクスポート
@@ -606,7 +607,7 @@ function exportMatchAnalysis() {
     csvContent += '順位,チーム,勝利数,敗北数,引分,得点,勝率\n';
     
     appState.standings.forEach((team, index) => {
-        csvContent += `${index + 1},${team.teamId},${team.wins},${team.losses},${team.draws},${team.totalScore},${team.winRate}\n`;
+        csvContent += `${index + 1},チーム${team.teamId},${team.wins},${team.losses},${team.draws},${team.totalScore},${(team.winRate * 100).toFixed(1)}%\n`;
     });
     
     // 3. 対戦分析データの追加
@@ -665,19 +666,43 @@ function exportMatchAnalysis() {
                 }
                 
                 const pointDiff = scoredPoints - concededPoints;
-                csvContent += `${teamId},${opponentId},${wins},${losses},${draws},${scoredPoints},${concededPoints},${pointDiff}\n`;
+                csvContent += `チーム${teamId},チーム${opponentId},${wins},${losses},${draws},${scoredPoints},${concededPoints},${pointDiff}\n`;
             } else {
                 // 対戦していない場合
-                csvContent += `${teamId},${opponentId},0,0,0,0,0,0\n`;
+                csvContent += `チーム${teamId},チーム${opponentId},0,0,0,0,0,0\n`;
             }
         });
     });
-    
-    // 4. 設定情報の追加
+      // 4. 設定情報の追加
     csvContent += '\n# 設定情報\n';
     csvContent += `マッチポイント,${appState.settings.matchPoint}\n`;
     csvContent += `エクスポート日時,${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}:${('0' + now.getMinutes()).slice(-2)}\n`;
     
+    // 5. 大会情報の追加（config.jsonから）
+    try {
+        fetch('config.json')
+            .then(response => response.json())
+            .then(config => {
+                if (config.tournamentInfo) {
+                    csvContent += '\n# 大会情報\n';
+                    csvContent += `大会名,${config.tournamentInfo.name || '不明'}\n`;
+                    csvContent += `開催日,${config.tournamentInfo.date || '不明'}\n`;
+                    csvContent += `場所,${config.tournamentInfo.location || '不明'}\n`;
+                    csvContent += `形式,${config.tournamentInfo.format || '不明'}\n`;
+                }
+                
+                // データを準備した後でダウンロードを実行
+                downloadCSV(csvContent, filename);
+            });
+    } catch (error) {
+        console.error('大会情報の取得に失敗しました:', error);
+        // エラーが発生しても基本データはダウンロードできるようにする
+        downloadCSV(csvContent, filename);
+    }
+}
+
+// CSVデータをダウンロードする関数
+function downloadCSV(csvContent, filename) {
     // BlobオブジェクトとURLを作成
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
@@ -689,7 +714,12 @@ function exportMatchAnalysis() {
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-    
+
+    // クリーンアップ
+    setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    }, 100);
+
     alert('試合分析データをダウンロードしました！');
 }
