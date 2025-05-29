@@ -888,6 +888,18 @@ function exportMatchAnalysis() {
     // CSVヘッダー
     let csvContent = '\ufeff'; // BOMを追加してExcelで日本語を正しく表示
     
+    // 0. チームメンバー情報のエクスポート
+    csvContent += '# チームメンバー情報\n';
+    csvContent += 'チームID,メンバー\n';
+    
+    appState.teams.forEach(team => {
+        team.members.forEach(member => {
+            csvContent += `チーム${team.id},${member}\n`;
+        });
+    });
+    
+    csvContent += '\n';
+    
     // 1. 対戦表データのエクスポート
     csvContent += '# 対戦表データ\n';
     csvContent += 'チーム1,チーム2,チーム1スコア,チーム2スコア,勝者,引き分け\n';
