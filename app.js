@@ -159,51 +159,110 @@ function createMatchTable() {
     });
 }
 
+// モーダルの要素
+const scoreModal = document.getElementById('score-modal');
+let currentMatchData = null;
+
+// モーダルを開く関数
+function openScoreModal(rowTeamId, colTeamId, matchId) {
+    // モーダルのタイトルと入力ラベルを設定
+    document.getElementById('score-modal-title').textContent = `スコア入力`;
+    document.getElementById('team1-label').textContent = `チーム${rowTeamId}:`;
+    document.getElementById('team2-label').textContent = `チーム${colTeamId}:`;
+    
+    // 入力欄の初期化と最大値設定
+    const score1Input = document.getElementById('modal-score-team1');
+    const score2Input = document.getElementById('modal-score-team2');
+    
+    score1Input.value = 0;
+    score2Input.value = 0;
+    
+    // マッチポイントを取得（最大スコアとして使用）
+    const matchPoint = appState.settings.matchPoint;
+    score1Input.max = matchPoint;
+    score2Input.max = matchPoint;
+    
+    // 現在の試合データを保存
+    currentMatchData = {
+        rowTeamId: rowTeamId,
+        colTeamId: colTeamId,
+        matchId: matchId
+    };
+    
+    // モーダルを表示
+    scoreModal.style.display = 'block';
+}
+
+// モーダルを閉じる関数
+function closeScoreModal() {
+    scoreModal.style.display = 'none';
+    currentMatchData = null;
+}
+
+// スコアを保存する関数
+function saveScore() {
+    if (!currentMatchData) return;
+    
+    const { rowTeamId, colTeamId, matchId } = currentMatchData;
+    const score1Input = document.getElementById('modal-score-team1');
+    const score2Input = document.getElementById('modal-score-team2');
+    
+    // 入力値の取得
+    let team1Score = parseInt(score1Input.value);
+    let team2Score = parseInt(score2Input.value);
+    
+    // 入力値のバリデーション
+    if (isNaN(team1Score) || isNaN(team2Score) || team1Score < 0 || team2Score < 0) {
+        alert('スコアは0以上の数字を入力してください');
+        return;
+    }
+    
+    // マッチポイントを取得（最大スコアとして使用）
+    const matchPoint = appState.settings.matchPoint;
+    
+    // マッチポイントを超える場合は自動的に上限を設定
+    if (team1Score > matchPoint) team1Score = matchPoint;
+    if (team2Score > matchPoint) team2Score = matchPoint;
+    
+    // スコアを保存
+    processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score);
+    
+    // モーダルを閉じる
+    closeScoreModal();
+}
+
+// モーダルのイベントリスナー設定
+document.addEventListener('DOMContentLoaded', function() {
+    // 保存ボタンのクリックイベント
+    document.getElementById('save-score-btn').addEventListener('click', saveScore);
+    
+    // キャンセルボタンのクリックイベント
+    document.getElementById('cancel-score-btn').addEventListener('click', closeScoreModal);
+    
+    // 閉じるボタン（×）のクリックイベント
+    document.querySelector('.close-modal').addEventListener('click', closeScoreModal);
+    
+    // モーダル外をクリックした時に閉じる
+    window.addEventListener('click', function(event) {
+        if (event.target === scoreModal) {
+            closeScoreModal();
+        }
+    });
+});
+
 // セルクリック時の処理
 function handleCellClick(event) {
     const cell = event.currentTarget;    
     const rowTeamId = parseInt(cell.dataset.rowTeamId);
     const colTeamId = parseInt(cell.dataset.colTeamId);
     const matchId = cell.dataset.matchId;
-      
-    // マッチポイントを取得（最大スコアとして使用）
-    const matchPoint = appState.settings.matchPoint;
-      
-    // 行側のチーム（クリックされたセルの行）のスコア入力
-    const team1ScoreInput = prompt(`チーム${rowTeamId}の点数を入力してください:`);
     
-    // キャンセルが押された場合
-    if (team1ScoreInput === null) return;
-      
-    // 入力値のバリデーション
-    let team1Score = parseInt(team1ScoreInput);
-    if (isNaN(team1Score) || team1Score < 0) {
-        alert(`スコアは0以上の数字を入力してください`);
-        return;
-    }
-    
-    // マッチポイントを超える場合は自動的に上限を設定
-    if (team1Score > matchPoint) {
-        team1Score = matchPoint;
-    }
-    
-    // 列側のチーム（対戦相手）のスコア入力
-    const team2ScoreInput = prompt(`チーム${colTeamId}の点数を入力してください:`);
-      
-    // キャンセルが押された場合
-    if (team2ScoreInput === null) return;
-      
-    // 入力値のバリデーション
-    let team2Score = parseInt(team2ScoreInput);
-    if (isNaN(team2Score) || team2Score < 0) {
-        alert(`スコアは0以上の数字を入力してください`);
-        return;
-    }
-      // マッチポイントを超える場合は自動的に上限を設定
-    if (team2Score > matchPoint) {
-        team2Score = matchPoint;
-    }
-    
+    // モーダルを開く
+    openScoreModal(rowTeamId, colTeamId, matchId);
+}
+
+// スコアを処理して結果を保存する関数
+function processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score) {
     // 勝者を決定
     let winner;
     
@@ -231,8 +290,7 @@ function handleCellClick(event) {
         scoreTeam1 = team2Score;
         scoreTeam2 = team1Score;
     }
-    
-    // 試合結果を保存
+      // 試合結果を保存
     appState.matches[matchId] = {
         team1: firstTeamId,
         team2: secondTeamId,
@@ -247,7 +305,7 @@ function handleCellClick(event) {
     // UI更新
     createMatchTable();
     calculateStandings();
-}
+  }
 
 // チームIDからチーム番号を取得する関数（現在は未使用）
 function getTeamNameById(teamId) {

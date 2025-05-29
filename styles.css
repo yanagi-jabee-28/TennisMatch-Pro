@@ -273,6 +273,105 @@ select, input {
     color: #888;
 }
 
+/* モーダルスタイル */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 0;
+    width: 400px;
+    max-width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    animation: modalFade 0.3s;
+}
+
+@keyframes modalFade {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 8px 8px 0 0;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-modal {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.score-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.team-score-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.team-score-input label {
+    font-weight: 500;
+    flex: 1;
+}
+
+.team-score-input input {
+    width: 80px;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+    gap: 10px;
+}
+
+.btn-secondary {
+    background-color: #f1f3f4;
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background-color: #e8eaed;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     main {
