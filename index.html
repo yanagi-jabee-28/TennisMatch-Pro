@@ -1,8 +1,24 @@
 ```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テニス試合管理アプリ</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>テニス試合管理アプリ</h1>
     <form id="matchForm">
-        <label>プレイヤー1: <select id="player1" required></select></label>
-        <label>プレイヤー2: <select id="player2" required></select></label>
-        <label>スコア: <input type="text" id="score" placeholder="例: 6-3, 4-6, 7-5" required></label>
-        <button type="submit">試合を登録</button>
+      <label>プレイヤー1: <select id="player1" required></select></label>
+      <label>プレイヤー2: <select id="player2" required></select></label>
+      <label>スコア: <input type="text" id="score" placeholder="例: 6-3, 4-6, 7-5" required></label>
+      <button type="submit">試合を登録</button>
     </form>
+    <ul id="matchList"></ul>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
 ```
