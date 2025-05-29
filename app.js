@@ -1,28 +1,20 @@
 // グローバル変数
 let teams = [];
 let teamMatchHistory = [];
-let currentRoundTeams = [];
 let allMatchesData = [];
 
 // 初期化
 document.addEventListener('DOMContentLoaded', function() {
-  loadPlayersAndTeams();
-  initializeTabs();
+  loadTeamsAndMatches();
 });
 
-// プレイヤーとチーム情報を読み込み
-async function loadPlayersAndTeams() {
+// チームと試合情報を読み込み
+async function loadTeamsAndMatches() {
   try {
-    // 個人戦用のプレイヤー読み込み
-    const playersResponse = await fetch('players.json');
-    const players = await playersResponse.json();
-    populatePlayerSelects(players);
-    
     // チーム戦用のチーム読み込み
     const teamsResponse = await fetch('teams.json');
     const teamsData = await teamsResponse.json();
     teams = teamsData.teams;
-    populateTeamSelects();
     
     // 全試合のデータを読み込む
     try {
@@ -33,106 +25,100 @@ async function loadPlayersAndTeams() {
       console.log("全試合データの読み込みに失敗しました", matchError);
     }
     
-    generateNewRound();
+    // ローカルストレージから保存された結果を読み込み
+    loadMatchResults();
+    
+    generateMatchSchedule();
   } catch (error) {
     console.error('データの読み込みに失敗しました:', error);
   }
 }
 
-// プレイヤー選択肢を設定
-function populatePlayerSelects(players) {
-  const player1Select = document.getElementById('player1');
-  const player2Select = document.getElementById('player2');
+// 試合スケジュールを生成
+function generateMatchSchedule() {
+  const allRoundsContainer = document.getElementById('all-rounds');
+  allRoundsContainer.innerHTML = '';
   
-  players.forEach(name => {
-    const opt1 = document.createElement('option');
-    opt1.value = opt1.textContent = name;
-    player1Select.appendChild(opt1);
+  allMatchesData.forEach(roundData => {
+    const roundDiv = document.createElement('div');
+    roundDiv.className = 'round-container';
     
-    const opt2 = document.createElement('option');
-    opt2.value = opt2.textContent = name;
-    player2Select.appendChild(opt2);
+    roundDiv.innerHTML = `
+      <h3 class="round-title">ラウンド ${roundData.id}</h3>
+      <div class="match-courts-horizontal">
+        ${roundData.matches.filter(match => match.team1 && match.team2).map((match, index) => {
+          const court = index + 1;
+          const team1 = getTeamById(match.team1);
+          const team2 = getTeamById(match.team2);
+          return `
+            <div class="court">
+              <h4>コート ${court}</h4>
+              <div class="team-match">
+                <div class="team-selector">
+                  <select class="team-select" data-round="${roundData.id}" data-court="${court}" data-position="team1">
+                    <option value="">チーム1を選択</option>
+                    ${teams.map(team => `
+                      <option value="${team.name}" ${team.name === match.team1 ? 'selected' : ''}>
+                        ${team.name} (${team.members.join(', ')})
+                      </option>
+                    `).join('')}
+                  </select>
+                  <span class="vs">vs</span>
+                  <select class="team-select" data-round="${roundData.id}" data-court="${court}" data-position="team2">
+                    <option value="">チーム2を選択</option>
+                    ${teams.map(team => `
+                      <option value="${team.name}" ${team.name === match.team2 ? 'selected' : ''}>
+                        ${team.name} (${team.members.join(', ')})
+                      </option>
+                    `).join('')}
+                  </select>
+                </div>
+                <div class="score-input-container">
+                  <input type="text" class="score-input" placeholder="スコア" value="${match.score || ''}" data-round="${roundData.id}" data-court="${court}">
+                  <button class="record-btn" onclick="recordMatchScore(${roundData.id}, ${court})">記録</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="resting-team">
+        <span class="resting-label">休憩:</span>
+        <span class="resting-team-name">${roundData.matches.find(match => match.restingTeam)?.restingTeam || ''}</span>
+      </div>
+    `;
+    
+    allRoundsContainer.appendChild(roundDiv);
   });
+  
+  // チーム選択の変更イベントを追加
+  addTeamSelectionHandlers();
 }
 
-// チーム選択肢を設定
-function populateTeamSelects() {
+// チームIDでチーム情報を取得
+function getTeamById(teamName) {
+  return teams.find(team => team.name === teamName);
+}
+
+// チーム選択のイベントハンドラーを追加
+function addTeamSelectionHandlers() {
   const teamSelects = document.querySelectorAll('.team-select');
-  
   teamSelects.forEach(select => {
-    // 既存のオプションをクリア（最初のオプションは残す）
-    while (select.children.length > 1) {
-      select.removeChild(select.lastChild);
-    }
-    
-    teams.forEach(team => {
-      const option = document.createElement('option');
-      option.value = team.id;
-      option.textContent = `${team.name} (${team.members.join(', ')})`;
-      select.appendChild(option);
+    select.addEventListener('change', function() {
+      const round = this.dataset.round;
+      const court = this.dataset.court;
+      const position = this.dataset.position;
+      const teamName = this.value;
+      
+      // allMatchesDataを更新
+      const roundData = allMatchesData[round - 1];
+      const matchData = roundData.matches[court - 1];
+      matchData[position] = teamName;
+      
+      // JSONファイルに保存（実際の実装では、サーバーサイドAPIが必要）
+      console.log('チーム選択が更新されました:', { round, court, position, teamName });
     });
   });
-}
-
-// タブ機能の初期化
-function initializeTabs() {
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
-  
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const targetTab = this.dataset.tab;
-      
-      // アクティブクラスを削除
-      tabBtns.forEach(b => b.classList.remove('active'));
-      tabContents.forEach(c => c.classList.remove('active'));
-      
-      // 選択されたタブをアクティブに
-      this.classList.add('active');
-      document.getElementById(`${targetTab}-tab`).classList.add('active');
-    });
-  });
-}
-
-// 新しいラウンドを生成
-function generateNewRound() {
-  // 利用可能なチームをシャッフル
-  const availableTeams = [...teams];
-  shuffleArray(availableTeams);
-  
-  // 2試合分のチーム（4チーム）を選択
-  const matchTeams = availableTeams.slice(0, 4);
-  const restingTeam = availableTeams[4];
-  
-  // コート1とコート2にチームを配置
-  setCourtTeams(1, matchTeams[0], matchTeams[1]);
-  setCourtTeams(2, matchTeams[2], matchTeams[3]);
-  
-  // 休憩チームを表示
-  document.getElementById('restingTeam').textContent = 
-    `${restingTeam.name} (${restingTeam.members.join(', ')})`;
-  
-  currentRoundTeams = {
-    court1: [matchTeams[0], matchTeams[1]],
-    court2: [matchTeams[2], matchTeams[3]],
-    resting: restingTeam
-  };
-}
-
-// コートにチームを設定
-function setCourtTeams(courtNum, team1, team2) {
-  document.getElementById(`team1-court${courtNum}`).value = team1.id;
-  document.getElementById(`team2-court${courtNum}`).value = team2.id;
-  document.getElementById(`score-court${courtNum}`).value = '';
-}
-
-// 配列をシャッフル
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
 }
 
 // 試合スコアを記録する
@@ -149,6 +135,25 @@ function recordMatchScore(round, court) {
   const roundData = allMatchesData[round - 1];
   const matchData = roundData.matches[court - 1];
   
+  // チーム選択が正しく行われているかチェック
+  const team1Select = document.querySelector(`.team-select[data-round="${round}"][data-court="${court}"][data-position="team1"]`);
+  const team2Select = document.querySelector(`.team-select[data-round="${round}"][data-court="${court}"][data-position="team2"]`);
+  
+  if (!team1Select.value || !team2Select.value) {
+    alert('両方のチームを選択してください');
+    return;
+  }
+  
+  if (team1Select.value === team2Select.value) {
+    alert('異なるチームを選択してください');
+    return;
+  }
+  
+  // データを更新
+  matchData.team1 = team1Select.value;
+  matchData.team2 = team2Select.value;
+  matchData.score = score;
+  
   const match = {
     round: round,
     court: court,
@@ -158,17 +163,57 @@ function recordMatchScore(round, court) {
     timestamp: new Date().toLocaleString('ja-JP')
   };
   
-  // スコアをJSONデータに記録
-  matchData.score = score;
-  
   addTeamMatch(match);
   
-  // フォームをクリア
-  scoreInput.value = '';
+  // 成功メッセージ
+  alert('試合結果を記録しました！');
+  
+  // JSONファイルに保存（実際の実装では、サーバーサイドAPIが必要）
+  saveMatchResults();
+}
+
+// 試合結果をローカルストレージに保存（JSONファイル保存の代替）
+function saveMatchResults() {
+  try {
+    localStorage.setItem('allMatchesData', JSON.stringify(allMatchesData));
+    localStorage.setItem('teamMatchHistory', JSON.stringify(teamMatchHistory));
+    console.log('試合結果をローカルストレージに保存しました');
+  } catch (error) {
+    console.error('試合結果の保存に失敗しました:', error);
+  }
+}
+
+// ローカルストレージから試合結果を読み込み
+function loadMatchResults() {
+  try {
+    const savedMatchesData = localStorage.getItem('allMatchesData');
+    const savedHistory = localStorage.getItem('teamMatchHistory');
+    
+    if (savedMatchesData) {
+      allMatchesData = JSON.parse(savedMatchesData);
+    }
+    
+    if (savedHistory) {
+      teamMatchHistory = JSON.parse(savedHistory);
+      // 保存された履歴を表示
+      teamMatchHistory.forEach(match => {
+        addTeamMatchToDisplay(match);
+      });
+    }
+  } catch (error) {
+    console.error('保存された試合結果の読み込みに失敗しました:', error);
+  }
 }
 
 // チーム戦の結果をリストに追加
 function addTeamMatch(match) {
+  teamMatchHistory.push(match);
+  addTeamMatchToDisplay(match);
+  saveMatchResults();
+}
+
+// チーム戦の結果を表示に追加
+function addTeamMatchToDisplay(match) {
   const list = document.getElementById('teamMatchHistory');
   const li = document.createElement('li');
   li.innerHTML = `
@@ -186,43 +231,4 @@ function addTeamMatch(match) {
     li.style.opacity = 1;
     li.style.transform = 'translateY(0)';
   }, 10);
-  
-  teamMatchHistory.push(match);
 }
-
-// 個人戦用の既存コード
-function addMatch(match) {
-  const list = document.getElementById('matchList');
-  const li = document.createElement('li');
-  li.innerHTML = `
-    <div class="match-info">
-      <div class="match-players">${match.player1} vs ${match.player2}</div>
-      <div class="match-score">スコア: ${match.score}</div>
-    </div>
-  `;
-  li.style.opacity = 0;
-  li.style.transform = 'translateY(-20px)';
-  list.insertBefore(li, list.firstChild);
-  
-  setTimeout(() => { 
-    li.style.transition = 'all 0.5s ease';
-    li.style.opacity = 1;
-    li.style.transform = 'translateY(0)';
-  }, 10);
-}
-
-// 個人戦フォームのイベントリスナー
-document.getElementById('matchForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const player1 = document.getElementById('player1').value;
-    const player2 = document.getElementById('player2').value;
-    const score = document.getElementById('score').value.trim();
-    if (!player1 || !player2 || !score) return;
-    if (player1 === player2) {
-      alert('同じプレイヤーは選択できません');
-      return;
-    }
-    const match = { player1, player2, score };
-    addMatch(match);
-    this.reset();
-});

@@ -140,42 +140,6 @@ button[type="submit"]:active {
   font-size: 14px;
 }
 
-/* タブメニューのスタイル */
-.tab-menu {
-  display: flex;
-  margin-bottom: 32px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 12px;
-  padding: 8px;
-  gap: 8px;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 12px 24px;
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #4a5568;
-}
-
-.tab-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
 /* チーム戦のスタイル */
 .team-match-container {
   display: grid;
@@ -240,11 +204,33 @@ button[type="submit"]:active {
   font-size: 1.1rem;
 }
 
-.court-match {
+.team-match {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.team-selector {
+  display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
+.team-selector .team-select {
+  flex: 1;
+  min-width: 180px;
+  max-width: 220px;
+}
+
+.team-selector .vs {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin: 0 8px;
 }
 
 .team-pair {
@@ -428,17 +414,18 @@ button[type="submit"]:active {
     padding: 20px 16px;
     gap: 16px;
   }
-  
-  .team-row {
+    .team-selector {
     flex-direction: column;
+    gap: 8px;
   }
   
-  .score-row {
-    flex-direction: column;
-  }
-  
-  .vs {
+  .team-selector .vs {
     margin: 8px 0;
+  }
+  
+  .team-selector .team-select {
+    max-width: 100%;
+    min-width: unset;
   }
   
   .team-select,
