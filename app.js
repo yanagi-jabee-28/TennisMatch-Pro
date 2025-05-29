@@ -101,7 +101,16 @@ function createMatchTable() {
                     const isWinner = match.winner === rowTeam.id;
                     const resultClass = isWinner ? 'winner' : 'loser';
                     
-                    cell.innerHTML = `<span class="match-result ${resultClass}">${match.scoreTeam1}-${match.scoreTeam2}</span>`;
+                    // 行側のチーム（自チーム）を常に左側に表示するため、
+                    // 適切な順序でスコアを表示
+                    let displayScore;
+                    if (match.team1 === rowTeam.id) {
+                        displayScore = `${match.scoreTeam1}-${match.scoreTeam2}`;
+                    } else {
+                        displayScore = `${match.scoreTeam2}-${match.scoreTeam1}`;
+                    }
+                    
+                    cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
                     
                     // 修正のためのクリックイベント追加
                     cell.addEventListener('click', function() {
