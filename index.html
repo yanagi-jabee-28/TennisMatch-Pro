@@ -13,14 +13,6 @@
                     <label for="header-match-point">マッチポイント:</label>
                     <input type="number" id="header-match-point" min="1" max="99" value="7" required>
                 </div>
-                <div class="form-group inline">
-                    <label for="header-min-point-diff">最小点差:</label>
-                    <input type="number" id="header-min-point-diff" min="1" max="5" value="2" required>
-                </div>
-                <div class="form-group inline">
-                    <label for="header-max-score">最大スコア:</label>
-                    <input type="number" id="header-max-score" min="1" max="99" value="21" required>
-                </div>
                 <button type="submit" class="btn btn-small">設定を保存</button>
             </form>
         </div>
@@ -51,7 +43,7 @@
 
         <section id="match-results">
             <h2>試合結果入力</h2>            <div class="info-box">
-                <p class="click-info">対戦表のマスをクリックすると、各チームの点数を順番に入力できます。点数が最大スコアを超える場合は自動的に上限が適用されます。記録済みの結果をクリックすると修正できます。</p>
+                <p class="click-info">対戦表のマスをクリックすると、各チームの点数を順番に入力できます。点数がマッチポイントを超える場合は自動的に上限が適用されます。記録済みの結果をクリックすると修正できます。</p>
             </div>
             <div class="form-container">
                 <form id="result-form">
@@ -68,11 +60,11 @@
                         </select>
                     </div>                    <div class="form-group">
                         <label for="score-team1">チーム1スコア:</label>
-                        <input type="number" id="score-team1" min="0" max="21" required>
+                        <input type="number" id="score-team1" min="0" required>
                     </div>
                     <div class="form-group">
                         <label for="score-team2">チーム2スコア:</label>
-                        <input type="number" id="score-team2" min="0" max="21" required>
+                        <input type="number" id="score-team2" min="0" required>
                     </div>
                     <button type="submit" class="btn">結果を保存</button>
                 </form>
