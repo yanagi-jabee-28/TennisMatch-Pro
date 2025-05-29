@@ -89,6 +89,12 @@ function createMatchTable() {
                 // 対戦カードのIDを作成（小さい番号が先）
                 const matchId = getMatchId(rowTeam.id, colTeam.id);
                 
+                // データ属性を追加してクリックイベントで使用
+                cell.dataset.rowTeamId = rowTeam.id;
+                cell.dataset.colTeamId = colTeam.id;
+                cell.dataset.matchId = matchId;
+                cell.classList.add('clickable-cell');
+                
                 // 試合結果があれば表示
                 if (appState.matches[matchId]) {
                     const match = appState.matches[matchId];
@@ -96,8 +102,20 @@ function createMatchTable() {
                     const resultClass = isWinner ? 'winner' : 'loser';
                     
                     cell.innerHTML = `<span class="match-result ${resultClass}">${match.scoreTeam1}-${match.scoreTeam2}</span>`;
+                    
+                    // 修正のためのクリックイベント追加
+                    cell.addEventListener('click', function() {
+                        if (confirm('この試合結果を削除して再入力しますか？')) {
+                            delete appState.matches[matchId];
+                            saveMatchResults();
+                            createMatchTable();
+                            calculateStandings();
+                        }
+                    });
                 } else {
                     cell.textContent = '未対戦';
+                    // クリックイベントを追加
+                    cell.addEventListener('click', handleCellClick);
                 }
             }
             
@@ -106,6 +124,76 @@ function createMatchTable() {
         
         tableBody.appendChild(row);
     });
+}
+
+// セルクリック時の処理
+function handleCellClick(event) {
+    const cell = event.currentTarget;
+    const rowTeamId = parseInt(cell.dataset.rowTeamId);
+    const colTeamId = parseInt(cell.dataset.colTeamId);
+    const matchId = cell.dataset.matchId;
+    
+    // スコア入力モードダイアログを表示
+    const scoreInput = prompt(`${getTeamNameById(rowTeamId)}の勝利として記録します。\n${getTeamNameById(rowTeamId)}のスコア (1-7):`);
+    
+    // キャンセルが押された場合
+    if (scoreInput === null) return;
+    
+    // 入力値のバリデーション
+    const winnerScore = parseInt(scoreInput);
+    if (isNaN(winnerScore) || winnerScore < 1 || winnerScore > 7) {
+        alert('スコアは1から7の間で入力してください');
+        return;
+    }
+    
+    // 敗者のスコア入力
+    const loserScoreInput = prompt(`${getTeamNameById(colTeamId)}のスコア (0-${winnerScore-1}):`);
+    
+    // キャンセルが押された場合
+    if (loserScoreInput === null) return;
+    
+    // 入力値のバリデーション
+    const loserScore = parseInt(loserScoreInput);
+    if (isNaN(loserScore) || loserScore < 0 || loserScore >= winnerScore) {
+        alert(`敗者のスコアは0から${winnerScore-1}の間で入力してください`);
+        return;
+    }
+    
+    // 小さいチームIDが先になるように調整
+    const firstTeamId = Math.min(rowTeamId, colTeamId);
+    const secondTeamId = Math.max(rowTeamId, colTeamId);
+    
+    // スコアも勝者に合わせて調整
+    let scoreTeam1, scoreTeam2;
+    if (firstTeamId === rowTeamId) {
+        scoreTeam1 = winnerScore;
+        scoreTeam2 = loserScore;
+    } else {
+        scoreTeam1 = loserScore;
+        scoreTeam2 = winnerScore;
+    }
+    
+    // 試合結果を保存
+    appState.matches[matchId] = {
+        team1: firstTeamId,
+        team2: secondTeamId,
+        scoreTeam1: scoreTeam1,
+        scoreTeam2: scoreTeam2,
+        winner: rowTeamId
+    };
+    
+    // ローカルストレージに保存
+    saveMatchResults();
+    
+    // UI更新
+    createMatchTable();
+    calculateStandings();
+}
+
+// チームIDからチーム名を取得する関数
+function getTeamNameById(teamId) {
+    const team = appState.teams.find(t => t.id === teamId);
+    return team ? team.name : `不明なチーム(${teamId})`;
 }
 
 // チーム選択フォームを初期化
