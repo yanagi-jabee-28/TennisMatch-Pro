@@ -63,8 +63,7 @@ function generateMatchSchedule() {
                   </div>
                   <input type="hidden" class="team-value" value="${match.team1}" data-round="${roundData.id}" data-court="${court}" data-position="team1">
                   <input type="hidden" class="team-value" value="${match.team2}" data-round="${roundData.id}" data-court="${court}" data-position="team2">
-                </div>
-                <div class="score-input-container">
+                </div>                <div class="score-input-container" data-round="${roundData.id}" data-court="${court}">
                   <input type="text" class="score-input" placeholder="スコア" value="${match.score || ''}" data-round="${roundData.id}" data-court="${court}">
                   <button class="record-btn" onclick="recordMatchScore(${roundData.id}, ${court})">記録</button>
                 </div>
@@ -91,9 +90,8 @@ function getTeamById(teamName) {
 function recordMatchScore(round, court) {
   const scoreInput = document.querySelector(`.score-input[data-round="${round}"][data-court="${court}"]`);
   const score = scoreInput.value.trim();
-  
-  if (!score) {
-    alert('スコアを入力してください');
+    if (!score) {
+    showErrorIndicator(round, court, 'スコアを入力してください');
     return;
   }
   
@@ -109,7 +107,7 @@ function recordMatchScore(round, court) {
   const team2 = team2Input.value;
   
   if (!team1 || !team2) {
-    alert('チーム情報が不正です');
+    showErrorIndicator(round, court, 'チーム情報が不正です');
     return;
   }
   
@@ -126,11 +124,10 @@ function recordMatchScore(round, court) {
     score: score,
     timestamp: new Date().toLocaleString('ja-JP')
   };
+    addTeamMatch(match);
   
-  addTeamMatch(match);
-  
-  // 成功メッセージ
-  alert('試合結果を記録しました！');
+  // 成功メッセージ（アラートの代わりに視覚的フィードバックを表示）
+  showSuccessIndicator(round, court);
   
   // JSONファイルに保存（実際の実装では、サーバーサイドAPIが必要）
   saveMatchResults();
@@ -189,10 +186,90 @@ function addTeamMatchToDisplay(match) {
   li.style.opacity = 0;
   li.style.transform = 'translateY(-20px)';
   list.insertBefore(li, list.firstChild);
-  
-  setTimeout(() => { 
+    setTimeout(() => { 
     li.style.transition = 'all 0.5s ease';
     li.style.opacity = 1;
     li.style.transform = 'translateY(0)';
   }, 10);
+}
+
+// 成功インジケーターを表示する関数
+function showSuccessIndicator(round, court) {
+  // 対象のスコア入力コンテナを特定
+  const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
+  if (!container) {
+    const container = document.querySelector(`.score-input[data-round="${round}"][data-court="${court}"]`).parentElement;
+    if (!container) return;
+  }
+  
+  // 既存の通知があれば削除
+  clearNotifications(container);
+  
+  // 成功通知要素を作成
+  const successNotice = document.createElement('div');
+  successNotice.className = 'success-notice';
+  successNotice.textContent = '✓ 記録しました';
+  
+  // 新しい通知を追加
+  container.appendChild(successNotice);
+  
+  // ボタンを一時的に無効化
+  const recordButton = container.querySelector('.record-btn');
+  if (recordButton) {
+    recordButton.disabled = true;
+    recordButton.classList.add('success');
+    
+    // 2秒後に通知を消して、ボタンを再有効化
+    setTimeout(() => {
+      if (container.contains(successNotice)) {
+        container.removeChild(successNotice);
+      }
+      recordButton.disabled = false;
+      recordButton.classList.remove('success');
+    }, 2000);
+  }
+}
+
+// エラーインジケーターを表示する関数
+function showErrorIndicator(round, court, message) {
+  // 対象のスコア入力コンテナを特定
+  const container = document.querySelector(`.score-input-container[data-round="${round}"][data-court="${court}"]`);
+  if (!container) {
+    const container = document.querySelector(`.score-input[data-round="${round}"][data-court="${court}"]`).parentElement;
+    if (!container) return;
+  }
+  
+  // 既存の通知があれば削除
+  clearNotifications(container);
+  
+  // エラー通知要素を作成
+  const errorNotice = document.createElement('div');
+  errorNotice.className = 'error-notice';
+  errorNotice.textContent = message;
+  
+  // 新しい通知を追加
+  container.appendChild(errorNotice);
+  
+  // インプットをハイライト
+  const scoreInput = container.querySelector('.score-input');
+  if (scoreInput) {
+    scoreInput.classList.add('error');
+    
+    // 3秒後に通知を消す
+    setTimeout(() => {
+      if (container.contains(errorNotice)) {
+        container.removeChild(errorNotice);
+      }
+      scoreInput.classList.remove('error');
+    }, 3000);
+  }
+}
+
+// 通知要素をクリアする関数
+function clearNotifications(container) {
+  // 既存の通知があれば削除
+  const existingNotices = container.querySelectorAll('.success-notice, .error-notice');
+  existingNotices.forEach(notice => {
+    container.removeChild(notice);
+  });
 }

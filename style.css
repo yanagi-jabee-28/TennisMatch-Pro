@@ -415,6 +415,52 @@ button[type="submit"]:active {
   box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
 }
 
+.record-btn.success {
+  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  transform: translateY(0);
+}
+
+.record-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.success-notice {
+  color: #38a169;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease-in;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--spacing-sm);
+  background-color: rgba(72, 187, 120, 0.1);
+  margin-left: var(--spacing-sm);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-notice {
+  color: #e53e3e;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease-in;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--spacing-sm);
+  background-color: rgba(229, 62, 62, 0.1);
+  margin-left: var(--spacing-sm);
+}
+
+.score-input.error {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 2px rgba(229, 62, 62, 0.2);
+}
+
 .resting-team {
   background: rgba(229, 62, 62, 0.05);
   padding: var(--spacing-md) var(--spacing-lg);
