@@ -38,8 +38,7 @@ async function loadTeamsAndMatches() {
 function generateMatchSchedule() {
   const allRoundsContainer = document.getElementById('all-rounds');
   allRoundsContainer.innerHTML = '';
-  
-  allMatchesData.forEach(roundData => {
+    allMatchesData.forEach(roundData => {
     const roundDiv = document.createElement('div');
     roundDiv.className = 'round-container';
     
@@ -55,23 +54,15 @@ function generateMatchSchedule() {
               <h4>コート ${court}</h4>
               <div class="team-match">
                 <div class="team-selector">
-                  <select class="team-select" data-round="${roundData.id}" data-court="${court}" data-position="team1">
-                    <option value="">チーム1を選択</option>
-                    ${teams.map(team => `
-                      <option value="${team.name}" ${team.name === match.team1 ? 'selected' : ''}>
-                        ${team.name} (${team.members.join(', ')})
-                      </option>
-                    `).join('')}
-                  </select>
+                  <div class="team-display" data-round="${roundData.id}" data-court="${court}" data-position="team1" data-team="${match.team1}">
+                    ${match.team1} (${team1 ? team1.members.join(', ') : ''})
+                  </div>
                   <span class="vs">vs</span>
-                  <select class="team-select" data-round="${roundData.id}" data-court="${court}" data-position="team2">
-                    <option value="">チーム2を選択</option>
-                    ${teams.map(team => `
-                      <option value="${team.name}" ${team.name === match.team2 ? 'selected' : ''}>
-                        ${team.name} (${team.members.join(', ')})
-                      </option>
-                    `).join('')}
-                  </select>
+                  <div class="team-display" data-round="${roundData.id}" data-court="${court}" data-position="team2" data-team="${match.team2}">
+                    ${match.team2} (${team2 ? team2.members.join(', ') : ''})
+                  </div>
+                  <input type="hidden" class="team-value" value="${match.team1}" data-round="${roundData.id}" data-court="${court}" data-position="team1">
+                  <input type="hidden" class="team-value" value="${match.team2}" data-round="${roundData.id}" data-court="${court}" data-position="team2">
                 </div>
                 <div class="score-input-container">
                   <input type="text" class="score-input" placeholder="スコア" value="${match.score || ''}" data-round="${roundData.id}" data-court="${court}">
@@ -87,38 +78,13 @@ function generateMatchSchedule() {
         <span class="resting-team-name">${roundData.matches.find(match => match.restingTeam)?.restingTeam || ''}</span>
       </div>
     `;
-    
-    allRoundsContainer.appendChild(roundDiv);
+      allRoundsContainer.appendChild(roundDiv);
   });
-  
-  // チーム選択の変更イベントを追加
-  addTeamSelectionHandlers();
 }
 
 // チームIDでチーム情報を取得
 function getTeamById(teamName) {
   return teams.find(team => team.name === teamName);
-}
-
-// チーム選択のイベントハンドラーを追加
-function addTeamSelectionHandlers() {
-  const teamSelects = document.querySelectorAll('.team-select');
-  teamSelects.forEach(select => {
-    select.addEventListener('change', function() {
-      const round = this.dataset.round;
-      const court = this.dataset.court;
-      const position = this.dataset.position;
-      const teamName = this.value;
-      
-      // allMatchesDataを更新
-      const roundData = allMatchesData[round - 1];
-      const matchData = roundData.matches[court - 1];
-      matchData[position] = teamName;
-      
-      // JSONファイルに保存（実際の実装では、サーバーサイドAPIが必要）
-      console.log('チーム選択が更新されました:', { round, court, position, teamName });
-    });
-  });
 }
 
 // 試合スコアを記録する
@@ -135,23 +101,21 @@ function recordMatchScore(round, court) {
   const roundData = allMatchesData[round - 1];
   const matchData = roundData.matches[court - 1];
   
-  // チーム選択が正しく行われているかチェック
-  const team1Select = document.querySelector(`.team-select[data-round="${round}"][data-court="${court}"][data-position="team1"]`);
-  const team2Select = document.querySelector(`.team-select[data-round="${round}"][data-court="${court}"][data-position="team2"]`);
+  // 隠しフィールドからチーム情報を取得
+  const team1Input = document.querySelector(`.team-value[data-round="${round}"][data-court="${court}"][data-position="team1"]`);
+  const team2Input = document.querySelector(`.team-value[data-round="${round}"][data-court="${court}"][data-position="team2"]`);
   
-  if (!team1Select.value || !team2Select.value) {
-    alert('両方のチームを選択してください');
-    return;
-  }
+  const team1 = team1Input.value;
+  const team2 = team2Input.value;
   
-  if (team1Select.value === team2Select.value) {
-    alert('異なるチームを選択してください');
+  if (!team1 || !team2) {
+    alert('チーム情報が不正です');
     return;
   }
   
   // データを更新
-  matchData.team1 = team1Select.value;
-  matchData.team2 = team2Select.value;
+  matchData.team1 = team1;
+  matchData.team2 = team2;
   matchData.score = score;
   
   const match = {

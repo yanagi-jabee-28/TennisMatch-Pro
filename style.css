@@ -297,6 +297,20 @@ button[type="submit"]:active {
   max-width: 280px;
 }
 
+.team-selector .team-display {
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 2px solid #e2e8f0;
+  border-radius: var(--spacing-sm);
+  font-size: var(--font-sm);
+  background: white;
+  text-align: center;
+  font-weight: 600;
+  color: #2d3748;
+}
+
 .team-selector .vs {
   font-weight: bold;
   color: #667eea;
