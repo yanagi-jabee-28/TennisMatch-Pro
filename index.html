@@ -10,29 +10,90 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="container">
+<body>  <div class="container">
     <h1>🎾 Tennis Match Manager</h1>
-    <form id="matchForm">
-      <div class="form-group">
-        <label for="player1">プレイヤー 1</label>
-        <select id="player1" required>
-          <option value="">選択してください</option>
-        </select>
+    
+    <!-- タブメニュー -->
+    <div class="tab-menu">
+      <button class="tab-btn active" data-tab="individual">個人戦</button>
+      <button class="tab-btn" data-tab="team">チーム戦</button>
+    </div>
+
+    <!-- 個人戦タブ -->
+    <div id="individual-tab" class="tab-content active">
+      <form id="matchForm">
+        <div class="form-group">
+          <label for="player1">プレイヤー 1</label>
+          <select id="player1" required>
+            <option value="">選択してください</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="player2">プレイヤー 2</label>
+          <select id="player2" required>
+            <option value="">選択してください</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="score">スコア</label>
+          <input type="text" id="score" placeholder="例: 6-3, 4-6, 7-5" required>
+        </div>
+        <button type="submit">試合を登録</button>
+      </form>
+      <ul id="matchList"></ul>
+    </div>
+
+    <!-- チーム戦タブ -->
+    <div id="team-tab" class="tab-content">
+      <div class="team-match-container">
+        <div class="current-round">
+          <h2>現在のラウンド</h2>
+          <div class="match-courts">
+            <div class="court">
+              <h3>コート 1</h3>
+              <div id="court1" class="court-match">
+                <select id="team1-court1" class="team-select">
+                  <option value="">チーム選択</option>
+                </select>
+                <span class="vs">vs</span>
+                <select id="team2-court1" class="team-select">
+                  <option value="">チーム選択</option>
+                </select>
+                <input type="text" id="score-court1" placeholder="スコア" class="score-input">
+                <button onclick="recordTeamMatch(1)" class="record-btn">記録</button>
+              </div>
+            </div>
+            
+            <div class="court">
+              <h3>コート 2</h3>
+              <div id="court2" class="court-match">
+                <select id="team1-court2" class="team-select">
+                  <option value="">チーム選択</option>
+                </select>
+                <span class="vs">vs</span>
+                <select id="team2-court2" class="team-select">
+                  <option value="">チーム選択</option>
+                </select>
+                <input type="text" id="score-court2" placeholder="スコア" class="score-input">
+                <button onclick="recordTeamMatch(2)" class="record-btn">記録</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="resting-team">
+            <h3>休憩チーム</h3>
+            <div id="restingTeam" class="resting-display">自動で決定されます</div>
+          </div>
+          
+          <button id="generateRound" class="generate-btn">次のラウンドを生成</button>
+        </div>
+        
+        <div class="team-results">
+          <h3>チーム戦績</h3>
+          <ul id="teamMatchHistory"></ul>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="player2">プレイヤー 2</label>
-        <select id="player2" required>
-          <option value="">選択してください</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="score">スコア</label>
-        <input type="text" id="score" placeholder="例: 6-3, 4-6, 7-5" required>
-      </div>
-      <button type="submit">試合を登録</button>
-    </form>
-    <ul id="matchList"></ul>
+    </div>
   </div>
   <script src="app.js"></script>
 </body>

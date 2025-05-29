@@ -1,19 +1,185 @@
-// 参加者リストを読み込んでセレクトボックスに反映
-fetch('players.json')
-  .then(res => res.json())
-  .then(players => {
-    const player1Select = document.getElementById('player1');
-    const player2Select = document.getElementById('player2');
-    players.forEach(name => {
-      const opt1 = document.createElement('option');
-      opt1.value = opt1.textContent = name;
-      player1Select.appendChild(opt1);
-      const opt2 = document.createElement('option');
-      opt2.value = opt2.textContent = name;
-      player2Select.appendChild(opt2);
+
+// グローバル変数
+let teams = [];
+let teamMatchHistory = [];
+let currentRoundTeams = [];
+
+// 初期化
+document.addEventListener('DOMContentLoaded', function() {
+  loadPlayersAndTeams();
+  initializeTabs();
+});
+
+// プレイヤーとチーム情報を読み込み
+async function loadPlayersAndTeams() {
+  try {
+    // 個人戦用のプレイヤー読み込み
+    const playersResponse = await fetch('players.json');
+    const players = await playersResponse.json();
+    populatePlayerSelects(players);
+    
+    // チーム戦用のチーム読み込み
+    const teamsResponse = await fetch('teams.json');
+    const teamsData = await teamsResponse.json();
+    teams = teamsData.teams;
+    populateTeamSelects();
+    generateNewRound();
+  } catch (error) {
+    console.error('データの読み込みに失敗しました:', error);
+  }
+}
+
+// プレイヤー選択肢を設定
+function populatePlayerSelects(players) {
+  const player1Select = document.getElementById('player1');
+  const player2Select = document.getElementById('player2');
+  
+  players.forEach(name => {
+    const opt1 = document.createElement('option');
+    opt1.value = opt1.textContent = name;
+    player1Select.appendChild(opt1);
+    
+    const opt2 = document.createElement('option');
+    opt2.value = opt2.textContent = name;
+    player2Select.appendChild(opt2);
+  });
+}
+
+// チーム選択肢を設定
+function populateTeamSelects() {
+  const teamSelects = document.querySelectorAll('.team-select');
+  
+  teamSelects.forEach(select => {
+    // 既存のオプションをクリア（最初のオプションは残す）
+    while (select.children.length > 1) {
+      select.removeChild(select.lastChild);
+    }
+    
+    teams.forEach(team => {
+      const option = document.createElement('option');
+      option.value = team.id;
+      option.textContent = `${team.name} (${team.members.join(', ')})`;
+      select.appendChild(option);
     });
   });
+}
 
+// タブ機能の初期化
+function initializeTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetTab = this.dataset.tab;
+      
+      // アクティブクラスを削除
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      // 選択されたタブをアクティブに
+      this.classList.add('active');
+      document.getElementById(`${targetTab}-tab`).classList.add('active');
+    });
+  });
+}
+
+// 新しいラウンドを生成
+function generateNewRound() {
+  // 利用可能なチームをシャッフル
+  const availableTeams = [...teams];
+  shuffleArray(availableTeams);
+  
+  // 2試合分のチーム（4チーム）を選択
+  const matchTeams = availableTeams.slice(0, 4);
+  const restingTeam = availableTeams[4];
+  
+  // コート1とコート2にチームを配置
+  setCourtTeams(1, matchTeams[0], matchTeams[1]);
+  setCourtTeams(2, matchTeams[2], matchTeams[3]);
+  
+  // 休憩チームを表示
+  document.getElementById('restingTeam').textContent = 
+    `${restingTeam.name} (${restingTeam.members.join(', ')})`;
+  
+  currentRoundTeams = {
+    court1: [matchTeams[0], matchTeams[1]],
+    court2: [matchTeams[2], matchTeams[3]],
+    resting: restingTeam
+  };
+}
+
+// コートにチームを設定
+function setCourtTeams(courtNum, team1, team2) {
+  document.getElementById(`team1-court${courtNum}`).value = team1.id;
+  document.getElementById(`team2-court${courtNum}`).value = team2.id;
+  document.getElementById(`score-court${courtNum}`).value = '';
+}
+
+// 配列をシャッフル
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// チーム戦の結果を記録
+function recordTeamMatch(courtNum) {
+  const team1Id = document.getElementById(`team1-court${courtNum}`).value;
+  const team2Id = document.getElementById(`team2-court${courtNum}`).value;
+  const score = document.getElementById(`score-court${courtNum}`).value.trim();
+  
+  if (!team1Id || !team2Id || !score) {
+    alert('チームとスコアを入力してください');
+    return;
+  }
+  
+  const team1 = teams.find(t => t.id == team1Id);
+  const team2 = teams.find(t => t.id == team2Id);
+  
+  const match = {
+    court: courtNum,
+    team1: team1.name,
+    team2: team2.name,
+    score: score,
+    timestamp: new Date().toLocaleString('ja-JP')
+  };
+  
+  addTeamMatch(match);
+  
+  // フォームをクリア
+  document.getElementById(`score-court${courtNum}`).value = '';
+}
+
+// チーム戦の結果をリストに追加
+function addTeamMatch(match) {
+  const list = document.getElementById('teamMatchHistory');
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <div class="match-info">
+      <div class="match-players">コート${match.court}: ${match.team1} vs ${match.team2}</div>
+      <div class="match-score">スコア: ${match.score} | ${match.timestamp}</div>
+    </div>
+  `;
+  li.style.opacity = 0;
+  li.style.transform = 'translateY(-20px)';
+  list.insertBefore(li, list.firstChild);
+  
+  setTimeout(() => { 
+    li.style.transition = 'all 0.5s ease';
+    li.style.opacity = 1;
+    li.style.transform = 'translateY(0)';
+  }, 10);
+  
+  teamMatchHistory.push(match);
+}
+
+// 次のラウンド生成ボタンのイベント
+document.getElementById('generateRound').addEventListener('click', generateNewRound);
+
+// 個人戦用の既存コード
 function addMatch(match) {
   const list = document.getElementById('matchList');
   const li = document.createElement('li');
@@ -34,6 +200,7 @@ function addMatch(match) {
   }, 10);
 }
 
+// 個人戦フォームのイベントリスナー
 document.getElementById('matchForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const player1 = document.getElementById('player1').value;

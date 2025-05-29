@@ -140,6 +140,196 @@ button[type="submit"]:active {
   font-size: 14px;
 }
 
+/* タブメニューのスタイル */
+.tab-menu {
+  display: flex;
+  margin-bottom: 32px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  padding: 8px;
+  gap: 8px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #4a5568;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* チーム戦のスタイル */
+.team-match-container {
+  display: grid;
+  gap: 32px;
+}
+
+.current-round {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.current-round h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #2d3748;
+  font-size: 1.5rem;
+}
+
+.match-courts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.court {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+}
+
+.court h3 {
+  text-align: center;
+  margin-bottom: 16px;
+  color: #667eea;
+  font-size: 1.2rem;
+}
+
+.court-match {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.team-select {
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  min-width: 150px;
+  text-align: center;
+}
+
+.vs {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.score-input {
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  text-align: center;
+  min-width: 150px;
+}
+
+.record-btn {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.record-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+}
+
+.resting-team {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.resting-team h3 {
+  color: #e53e3e;
+  margin-bottom: 12px;
+}
+
+.resting-display {
+  background: rgba(229, 62, 62, 0.1);
+  padding: 16px;
+  border-radius: 8px;
+  color: #e53e3e;
+  font-weight: 600;
+  border: 2px solid rgba(229, 62, 62, 0.2);
+}
+
+.generate-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.team-results {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.team-results h3 {
+  color: #2d3748;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+#teamMatchHistory {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#teamMatchHistory li {
+  background: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 @media (max-width: 768px) {
   body {
     padding: 10px;
@@ -173,5 +363,19 @@ button[type="submit"]:active {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+  
+  .match-courts {
+    grid-template-columns: 1fr;
+  }
+  
+  .court-match {
+    flex-direction: column;
+  }
+  
+  .team-select,
+  .score-input {
+    min-width: auto;
+    width: 100%;
   }
 }
