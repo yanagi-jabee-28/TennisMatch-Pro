@@ -12,10 +12,10 @@
 <body>
   <div class="container">
     <h1>🎾 Tennis Match Manager</h1>
-    
-    <!-- ナビゲーションタブ -->
+      <!-- ナビゲーションタブ -->
     <div class="tab-navigation">
       <button class="tab-button active" data-target="schedule-tab">スケジュール</button>
+      <button class="tab-button" data-target="standings-tab">順位表</button>
       <button class="tab-button" data-target="results-tab">試合結果</button>
     </div>
       <!-- スケジュールタブ -->
@@ -36,6 +36,37 @@
         <div id="all-rounds">
           <!-- JavaScriptで動的に生成されます -->
         </div>
+      </div>    </div>
+    
+    <!-- 順位表タブ -->
+    <div id="standings-tab" class="tab-content">
+      <div class="standings-container">
+        <h2>順位表</h2>
+        <div class="progress-info">
+          <div class="round-progress">
+            <span id="completedRounds">0</span> / <span id="totalRounds">5</span> ラウンド終了
+            <div class="progress-bar">
+              <div class="progress-fill" id="roundProgressFill"></div>
+            </div>
+          </div>
+        </div>
+        <table class="standings-table">
+          <thead>
+            <tr>
+              <th>順位</th>
+              <th>チーム</th>
+              <th>試合数</th>
+              <th>勝</th>
+              <th>敗</th>
+              <th>得点</th>
+              <th>失点</th>
+              <th>得失点差</th>
+            </tr>
+          </thead>
+          <tbody id="standingsTableBody">
+            <!-- JavaScriptで動的に生成 -->
+          </tbody>
+        </table>
       </div>
     </div>
     

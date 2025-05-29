@@ -780,7 +780,108 @@ button[type="submit"]:active {
   margin-bottom: var(--spacing-lg);
 }
 
-/* レスポンシブ改善 */
+/* 順位表スタイル */
+.standings-container {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 24px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.standings-table th,
+.standings-table td {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.standings-table th {
+  background: #4299e1;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: var(--font-sm);
+  letter-spacing: 0.5px;
+}
+
+.standings-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.standings-table tr:hover {
+  background-color: #ebf8ff;
+}
+
+.standings-table td:first-child {
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.progress-info {
+  margin: 24px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.round-progress {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: #2d3748;
+  text-align: center;
+  margin-bottom: 12px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.progress-bar {
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4299e1, #667eea);
+  border-radius: 6px;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+/* チーム成績の強調表示 */
+.top-team {
+  background-color: rgba(72, 187, 120, 0.1) !important;
+}
+
+.team-rank-1 td:first-child {
+  position: relative;
+}
+
+.team-rank-1 td:first-child::after {
+  content: "👑";
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  font-size: 16px;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: var(--spacing-lg) var(--spacing-md);
@@ -833,6 +934,21 @@ button[type="submit"]:active {
     width: 55px;
     height: 36px;
     font-size: var(--font-base);
+  }
+  
+  .standings-table {
+    font-size: var(--font-xs);
+  }
+  
+  .standings-table th,
+  .standings-table td {
+    padding: 10px 8px;
+  }
+  
+  .team-rank-1 td:first-child::after {
+    top: -5px;
+    right: 5px;
+    font-size: 12px;
   }
 }
 

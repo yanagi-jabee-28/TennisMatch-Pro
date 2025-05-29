@@ -355,16 +355,147 @@ function loadMatchResults() {
       teamMatchHistory.forEach(match => {
         addTeamMatchToDisplay(match);
       });
+      
+      // 順位表を更新
+      updateStandings();
     }
   } catch (error) {
     console.error('保存された試合結果の読み込みに失敗しました:', error);
   }
 }
 
+// チーム順位表データを生成
+function generateStandingsData() {
+  const standingsData = teams.map(team => {
+    return {
+      id: team.id,
+      name: team.name,
+      matches: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      pointsFor: 0,
+      pointsAgainst: 0,
+      pointsDiff: 0
+    };
+  });
+  
+  // すべての試合結果からデータを集計
+  teamMatchHistory.forEach(match => {
+    if (!match.score) return; // スコアがない場合はスキップ
+    
+    const [score1, score2] = match.score.split('-').map(Number);
+    
+    if (isNaN(score1) || isNaN(score2)) return; // スコアが不正な場合はスキップ
+    
+    // チーム1のデータ
+    const team1Data = standingsData.find(t => t.name === match.team1);
+    if (team1Data) {
+      team1Data.matches++;
+      team1Data.pointsFor += score1;
+      team1Data.pointsAgainst += score2;
+      
+      if (score1 > score2) {
+        team1Data.wins++;
+      } else if (score1 < score2) {
+        team1Data.losses++;
+      } else {
+        team1Data.draws++;
+      }
+    }
+    
+    // チーム2のデータ
+    const team2Data = standingsData.find(t => t.name === match.team2);
+    if (team2Data) {
+      team2Data.matches++;
+      team2Data.pointsFor += score2;
+      team2Data.pointsAgainst += score1;
+      
+      if (score2 > score1) {
+        team2Data.wins++;
+      } else if (score2 < score1) {
+        team2Data.losses++;
+      } else {
+        team2Data.draws++;
+      }
+    }
+  });
+  
+  // 得失点差を計算
+  standingsData.forEach(team => {
+    team.pointsDiff = team.pointsFor - team.pointsAgainst;
+  });
+  
+  // 順位付け（勝利数 → 得失点差 → 得点の順）
+  standingsData.sort((a, b) => {
+    if (a.wins !== b.wins) return b.wins - a.wins;
+    if (a.pointsDiff !== b.pointsDiff) return b.pointsDiff - a.pointsDiff;
+    return b.pointsFor - a.pointsFor;
+  });
+  
+  return standingsData;
+}
+
+// 順位表を更新
+function updateStandings() {
+  const standingsData = generateStandingsData();
+  const tableBody = document.getElementById('standingsTableBody');
+  
+  if (!tableBody) return;
+  
+  tableBody.innerHTML = '';
+  
+  standingsData.forEach((team, index) => {
+    const row = document.createElement('tr');
+    row.className = index === 0 ? 'team-rank-1' : '';
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${team.name}</td>
+      <td>${team.matches}</td>
+      <td>${team.wins}</td>
+      <td>${team.losses}</td>
+      <td>${team.pointsFor}</td>
+      <td>${team.pointsAgainst}</td>
+      <td>${team.pointsDiff}</td>
+    `;
+    
+    tableBody.appendChild(row);
+  });
+  
+  // 進行状況を更新
+  updateProgressBar();
+}
+
+// 進行状況バーを更新
+function updateProgressBar() {
+  const totalRounds = allMatchesData.length;
+  const completedMatches = teamMatchHistory.filter(match => match.score).length;
+  const totalMatches = teams.length * (teams.length - 1) / 2; // 総当たり戦の総試合数
+  
+  // 完了したラウンド数を計算（概算）
+  const matchesPerRound = totalMatches / totalRounds;
+  const completedRounds = Math.min(
+    totalRounds, 
+    Math.floor(completedMatches / matchesPerRound)
+  );
+  
+  // 進捗率計算
+  const progressPercent = totalRounds > 0 ? (completedRounds / totalRounds) * 100 : 0;
+  
+  // DOM要素を更新
+  document.getElementById('completedRounds').textContent = completedRounds;
+  document.getElementById('totalRounds').textContent = totalRounds;
+  document.getElementById('roundProgressFill').style.width = `${progressPercent}%`;
+}
+
 // チーム戦の結果をリストに追加
 function addTeamMatch(match) {
   teamMatchHistory.push(match);
   addTeamMatchToDisplay(match);
+  
+  // 順位表を更新
+  updateStandings();
+  
   saveMatchResults();
 }
 
@@ -468,3 +599,21 @@ function clearNotifications(container) {
     container.removeChild(notice);
   });
 }
+
+// ページロード時に順位表を更新
+document.addEventListener('DOMContentLoaded', function() {
+  // 既存のロードイベント処理を維持
+  loadTeamsAndMatches();
+  
+  // タブ切り替え時にアップデート
+  document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const targetId = button.getAttribute('data-target');
+      
+      // タブがスタンディングの場合、最新データに更新
+      if (targetId === 'standings-tab') {
+        updateStandings();
+      }
+    });
+  });
+});
