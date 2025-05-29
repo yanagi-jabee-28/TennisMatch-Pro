@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -20,6 +20,7 @@ body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   padding: 40px 32px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 95%;
 }
 
 h1 {
@@ -185,16 +186,18 @@ button[type="submit"]:active {
 
 .match-courts-horizontal {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
   margin-bottom: 16px;
 }
 
 .court {
   background: rgba(255, 255, 255, 0.8);
-  padding: 16px;
+  padding: 20px;
   border-radius: 12px;
   border: 2px solid #e2e8f0;
+  min-width: 300px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .court h3, .court h4 {
@@ -214,21 +217,22 @@ button[type="submit"]:active {
 .team-selector {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .team-selector .team-select {
   flex: 1;
-  min-width: 180px;
-  max-width: 220px;
+  min-width: 200px;
+  max-width: 280px;
 }
 
 .team-selector .vs {
   font-weight: bold;
   color: #667eea;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   flex-shrink: 0;
   margin: 0 8px;
 }
@@ -243,9 +247,10 @@ button[type="submit"]:active {
 .score-input-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .team-row {
@@ -270,10 +275,17 @@ button[type="submit"]:active {
   border-radius: 8px;
   font-size: 14px;
   background: white;
-  min-width: 150px;
+  min-width: 180px;
   text-align: center;
   width: 100%;
-  max-width: 220px;
+  max-width: 280px;
+  transition: all 0.3s ease;
+}
+
+.team-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .vs {
@@ -291,7 +303,14 @@ button[type="submit"]:active {
   background: white;
   text-align: center;
   width: 100%;
-  max-width: 150px;
+  max-width: 180px;
+  transition: all 0.3s ease;
+}
+
+.score-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .record-btn {
@@ -299,10 +318,12 @@ button[type="submit"]:active {
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  min-width: 80px;
 }
 
 .record-btn:hover {
@@ -374,6 +395,29 @@ button[type="submit"]:active {
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+/* タブレット向けの調整 */
+@media (max-width: 1024px) {
+  .container {
+    max-width: 95%;
+    padding: 32px 24px;
+  }
+  
+  .match-courts-horizontal {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .court {
+    min-width: 280px;
+    padding: 16px;
+  }
+  
+  .team-selector .team-select {
+    min-width: 160px;
+    max-width: 240px;
+  }
+}
+
 @media (max-width: 768px) {
   body {
     padding: 10px;
@@ -382,6 +426,7 @@ button[type="submit"]:active {
   .container {
     padding: 24px 16px;
     max-width: 100%;
+    width: 98%;
   }
   
   h1 {
@@ -414,13 +459,25 @@ button[type="submit"]:active {
     padding: 20px 16px;
     gap: 16px;
   }
-    .team-selector {
+  
+  .match-courts-horizontal {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .court {
+    min-width: unset;
+    padding: 16px;
+  }
+  
+  .team-selector {
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
   }
   
   .team-selector .vs {
     margin: 8px 0;
+    font-size: 1.1rem;
   }
   
   .team-selector .team-select {
@@ -433,14 +490,14 @@ button[type="submit"]:active {
     max-width: 100%;
   }
   
+  .score-input-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
   .record-btn {
     width: 100%;
     margin-top: 8px;
-  }
-  
-  .match-courts-horizontal {
-    grid-template-columns: 1fr;
-    gap: 16px;
   }
   
   .round-container {
@@ -454,13 +511,44 @@ button[type="submit"]:active {
   .court h4 {
     font-size: 1rem;
   }
-  
-  .score-input-container {
-    flex-direction: column;
-    width: 100%;
+}
+
+/* 小さなスマートフォン向け */
+@media (max-width: 480px) {
+  body {
+    padding: 5px;
   }
   
-  .score-input, .record-btn {
-    width: 100%;
+  .container {
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .team-match-container {
+    padding: 16px 12px;
+  }
+  
+  .round-container {
+    padding: 12px;
+  }
+  
+  .court {
+    padding: 12px;
+  }
+  
+  .team-selector .team-select,
+  .score-input {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+  
+  .record-btn {
+    padding: 10px 16px;
+    font-size: 14px;
   }
 }
