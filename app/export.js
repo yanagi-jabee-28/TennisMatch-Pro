@@ -126,10 +126,9 @@ function exportMatchAnalysis() {
 	csvContent += '\n# 設定情報\n';
 	csvContent += `マッチポイント,${appState.settings.matchPoint}\n`;
 	csvContent += `エクスポート日時,${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}:${('0' + now.getMinutes()).slice(-2)}\n`;
-
 	// 5. 大会情報の追加（config.jsonから）
 	try {
-		fetch('../config.json')
+		fetch('config.json')
 			.then(response => response.json())
 			.then(config => {
 				if (config.tournamentInfo) {
