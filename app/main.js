@@ -13,7 +13,8 @@ import { initializeScoreModalListeners } from './components/scoreModal.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 async function initializeApp() {
-	const config = await loadConfigData();	if (!config) {
+	const config = await loadConfigData();
+	if (!config) {
 		toast.error('設定ファイルの読み込みに失敗しました。Chrome、Firefox、Edge、Safariなどの最新ブラウザをご使用ください。また、ページの再読み込みをお試しください。');
 		return;
 	}

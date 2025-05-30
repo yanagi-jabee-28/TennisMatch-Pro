@@ -6,21 +6,7 @@ let configPromise = null;
 // 設定ファイルをキャッシュ付きで読み込む
 async function loadConfigData() {
 	if (configPromise) return configPromise;
-	
-	configPromise = (async () => {
-		try {
-			// まずセッションストレージからキャッシュを確認
-			try {
-				const cachedConfig = sessionStorage.getItem('tennisAppConfig');
-				if (cachedConfig) {
-					const config = JSON.parse(cachedConfig);
-					console.log('セッションストレージから設定を読み込みました');
-					return config;
-				}
-			} catch (e) {
-				console.error('セッションストレージからの読み込み中にエラーが発生しました:', e);
-			}
-			
+	configPromise = (async () => {		try {
 			console.log('設定ファイル読み込み開始...');
 			// Chrome対応のため、より単純なアプローチでパスを試す
 			let response = null;
@@ -56,15 +42,6 @@ async function loadConfigData() {
 			try {
 				const data = JSON.parse(text);
 				console.log('設定ファイルを正常に読み込みました');
-				
-				// 成功したらセッションストレージにキャッシュ
-				try {
-					sessionStorage.setItem('tennisAppConfig', JSON.stringify(data));
-					console.log('設定をセッションストレージにキャッシュしました');
-				} catch (cacheError) {
-					console.error('設定のキャッシュに失敗:', cacheError);
-				}
-				
 				return data;
 			} catch (jsonError) {
 				console.error('JSONのパースに失敗:', jsonError);
@@ -99,7 +76,6 @@ async function loadConfigData() {
 			};
 		}
 	})();
-	
 	return configPromise;
 }
 
