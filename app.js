@@ -42,6 +42,49 @@ const toast = {
     }
 };
 
+// カスタム確認ダイアログシステム
+const customConfirm = {
+    dialog: null,
+    titleElement: null,
+    messageElement: null,
+    yesButton: null,
+    noButton: null,
+    currentResolve: null,
+    
+    init() {
+        this.dialog = document.getElementById('confirm-dialog');
+        this.titleElement = document.getElementById('confirm-title');
+        this.messageElement = document.getElementById('confirm-message');
+        this.yesButton = document.getElementById('confirm-yes-btn');
+        this.noButton = document.getElementById('confirm-no-btn');
+        
+        // ボタンにイベントリスナーを追加
+        this.yesButton.addEventListener('click', () => this.handleConfirm(true));
+        this.noButton.addEventListener('click', () => this.handleConfirm(false));
+    },
+    
+    show(message, title = '確認') {
+        if (!this.dialog) this.init();
+        
+        this.titleElement.textContent = title;
+        this.messageElement.textContent = message;
+        this.dialog.classList.add('show');
+        
+        // Promiseを返して非同期で結果を処理できるようにする
+        return new Promise(resolve => {
+            this.currentResolve = resolve;
+        });
+    },
+    
+    handleConfirm(result) {
+        this.dialog.classList.remove('show');
+        if (this.currentResolve) {
+            this.currentResolve(result);
+            this.currentResolve = null;
+        }
+    }
+};
+
 // アプリケーション状態の管理
 const appState = {
 	teams: [],
@@ -464,12 +507,11 @@ function addNewMember() {
 
 		tempTeamMembers.push(newMemberName);
 		console.log(`新しいメンバー "${newMemberName}" を追加しました`);
-
 		// メンバーリストと未割り当てのメンバーリストを更新
 		renderMembersList();
 		renderUnassignedMembersList();
 	} else {
-		alert('追加するメンバーを選択してください');
+		toast.error('追加するメンバーを選択してください');
 	}
 }
 
@@ -484,10 +526,9 @@ function saveScore() {
 	// 入力値の取得
 	let team1Score = parseInt(score1Input.value);
 	let team2Score = parseInt(score2Input.value);
-
 	// 入力値のバリデーション
 	if (isNaN(team1Score) || isNaN(team2Score) || team1Score < 0 || team2Score < 0) {
-		alert('スコアは0以上の数字を入力してください');
+		toast.error('スコアは0以上の数字を入力してください');
 		return;
 	}
 
@@ -585,15 +626,18 @@ function handleTableClick(event) {
 	const rowTeamId = parseInt(cell.dataset.rowTeamId);
 	const colTeamId = parseInt(cell.dataset.colTeamId);
 	const matchId = cell.dataset.matchId;
-
 	// 試合結果が既に存在する場合は修正処理
 	if (appState.matches[matchId]) {
-		if (confirm('この試合結果を削除して再入力しますか？')) {
-			delete appState.matches[matchId];
-			saveMatchResults();
-			createMatchTable();
-			calculateStandings();
-		}
+		// カスタム確認ダイアログを使用
+		customConfirm.show('この試合結果を削除して再入力しますか？', '試合結果の修正')
+			.then(confirmed => {
+				if (confirmed) {
+					delete appState.matches[matchId];
+					saveMatchResults();
+					createMatchTable();
+					calculateStandings();
+				}
+			});
 	} else {
 		// 新しい試合のスコア入力
 		openScoreModal(rowTeamId, colTeamId, matchId);
@@ -768,10 +812,9 @@ function initializeSettingsForm() {
 		e.preventDefault();
 
 		const newMatchPoint = parseInt(matchPointInput.value);
-
 		// 入力値の検証
 		if (isNaN(newMatchPoint) || newMatchPoint < 1 || newMatchPoint > 99) {
-			alert('マッチポイントは1から99の間で設定してください');
+			toast.error('マッチポイントは1から99の間で設定してください');
 			return;
 		}
 		
@@ -782,15 +825,14 @@ function initializeSettingsForm() {
 		// 結果に影響するため、順位表を再計算
 		calculateStandings();
 
-		alert('設定を保存しました！');
+		toast.success('設定を保存しました！');
 	});
 }
 
 // 設定ファイルを読み込んでアプリケーションを初期化
-document.addEventListener('DOMContentLoaded', async () => {
-	const config = await loadConfig();
+document.addEventListener('DOMContentLoaded', async () => {	const config = await loadConfig();
 	if (!config) {
-		alert('設定ファイルの読み込みに失敗しました。ページを再読み込みしてください。');
+		toast.error('設定ファイルの読み込みに失敗しました。ページを再読み込みしてください。');
 		return;
 	}
 
@@ -819,10 +861,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// エクスポートボタンのイベントリスナーを追加
 	document.getElementById('export-results-btn').addEventListener('click', exportMatchAnalysis);
-
 	// チームメンバー編集用のモーダルのイベントリスナー設定
 	initializeTeamEditListeners();
 	initializeModalElements(); // モーダル要素の初期化を追加
+	
+	// カスタム確認ダイアログを初期化
+	customConfirm.init();
 
 	// リセットボタンのイベントリスナーを追加
 	const resetButton = document.getElementById('reset-teams-btn');
@@ -832,8 +876,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // オリジナルのチーム構成にリセットする機能
-function resetToOriginalTeams() {
-	if (confirm('すべてのチームをオリジナルの構成にリセットしますか？この操作は元に戻せません。')) {
+async function resetToOriginalTeams() {
+	const confirmed = await customConfirm.show('すべてのチームをオリジナルの構成にリセットしますか？この操作は元に戻せません。', 'リセット確認');
+	
+	if (confirmed) {
 		// オリジナルのチーム構成をコピー
 		appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
 
@@ -844,10 +890,9 @@ function resetToOriginalTeams() {
 		} catch (e) {
 			console.error('ローカルストレージからの削除に失敗しました:', e);
 		}
-
 		// UI更新
 		renderTeams();
-		alert('すべてのチームをオリジナルの構成にリセットしました');
+		toast.success('すべてのチームをオリジナルの構成にリセットしました');
 	}
 }
 
@@ -1015,7 +1060,7 @@ function downloadCSV(csvContent, filename) {
 		window.URL.revokeObjectURL(url);
 	}, 100);
 
-	alert('試合分析データをダウンロードしました！');
+	toast.success('試合分析データをダウンロードしました！');
 }
 
 // 未割り当てのメンバーリストを取得する関数
