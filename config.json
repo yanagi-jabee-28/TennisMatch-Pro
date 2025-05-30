@@ -36,12 +36,12 @@
 				"栁原 魁人"
 			]
 		}
-	],
-	"matchSettings": {
+	],	"matchSettings": {
 		"scoringSystem": "points",
 		"winCondition": "highestScore",
 		"maxSetsPerMatch": 3,
-		"pointsPerSet": 6
+		"pointsPerSet": 6,
+		"matchPoint": 7
 	},
 	"tournamentInfo": {
 		"name": "硬式テニス ダブルスチーム分け結果",

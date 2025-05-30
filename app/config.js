@@ -7,12 +7,21 @@ let configPromise = null;
 async function loadConfigData() {
 	if (configPromise) return configPromise;
 	configPromise = (async () => {
-		try {
-			const response = await fetch('config.json');
+	try {
+			console.log('設定ファイル読み込み開始...');
+			const response = await fetch('/config.json');
+			console.log('Fetch レスポンス:', response);
 			if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-			const data = await response.json();
-			console.log('設定ファイルを正常に読み込みました');
-			return data;
+			const text = await response.text();
+			console.log('レスポンステキスト:', text.substring(0, 100) + '...');
+			try {
+				const data = JSON.parse(text);
+				console.log('設定ファイルを正常に読み込みました');
+				return data;
+			} catch (jsonError) {
+				console.error('JSONのパースに失敗:', jsonError);
+				return null;
+			}
 		} catch (error) {
 			console.error('設定ファイルの読み込みに失敗しました:', error);
 			configPromise = null;
