@@ -116,58 +116,82 @@ const domCache = {
 	}
 };
 
-// ローカルストレージから試合結果を読み込む
-function loadMatchResults() {
-	const savedMatches = localStorage.getItem('tennisMatchResults');
-	if (savedMatches) {
+// 汎用ローカルストレージ操作関数
+function saveToLocalStorage(key, value) {
+	try {
+		localStorage.setItem(key, JSON.stringify(value));
+	} catch (e) {
+		console.error(`${key} の保存に失敗しました:`, e);
+	}
+}
+function loadFromLocalStorage(key, defaultValue = null) {
+	const saved = localStorage.getItem(key);
+	if (saved) {
 		try {
-			appState.matches = JSON.parse(savedMatches);
+			return JSON.parse(saved);
 		} catch (e) {
-			console.error('試合結果の読み込みに失敗しました:', e);
-			appState.matches = {};
+			console.error(`${key} の読み込みに失敗しました:`, e);
 		}
 	}
+	return defaultValue;
+}
+
+// ローカルストレージから試合結果を読み込む
+function loadMatchResults() {
+	appState.matches = loadFromLocalStorage('tennisMatchResults', {});
 }
 
 // ローカルストレージから設定を読み込む
 function loadSettings() {
-	const savedSettings = localStorage.getItem('tennisGameSettings');
-	if (savedSettings) {
-		try {
-			const settings = JSON.parse(savedSettings);
-			appState.settings = { ...appState.settings, ...settings };
-		} catch (e) {
-			console.error('設定の読み込みに失敗しました:', e);
-		}
+	const settings = loadFromLocalStorage('tennisGameSettings');
+	if (settings) {
+		appState.settings = { ...appState.settings, ...settings };
 	}
 }
 
 // ローカルストレージに試合結果を保存する
 function saveMatchResults() {
-	localStorage.setItem('tennisMatchResults', JSON.stringify(appState.matches));
+	saveToLocalStorage('tennisMatchResults', appState.matches);
 }
 
 // ローカルストレージに設定を保存する
 function saveSettings() {
-	localStorage.setItem('tennisGameSettings', JSON.stringify(appState.settings));
+	saveToLocalStorage('tennisGameSettings', appState.settings);
 }
 
 // ローカルストレージにカスタムチームメンバーを保存
 function saveTeamMembers() {
-	localStorage.setItem('tennisCustomTeams', JSON.stringify(appState.teams));
+	if (currentEditTeamId !== null && tempTeamMembers.length > 0) {
+		// 編集モーダルからの保存
+		const teamIndex = appState.teams.findIndex(t => t.id === currentEditTeamId);
+		if (teamIndex !== -1) {
+			// 重複チェック
+			const uniqueMembers = [...new Set(tempTeamMembers)];
+			if (uniqueMembers.length !== tempTeamMembers.length) {
+				toast.error('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
+				return;
+			}
+			appState.teams[teamIndex].members = [...tempTeamMembers];
+			saveToLocalStorage('tennisCustomTeams', appState.teams);
+			renderTeams();
+			closeTeamEditModal();
+			toast.success('チームメンバーを更新しました！');
+		} else {
+			toast.error('チーム情報の更新に失敗しました');
+		}
+	} else if (currentEditTeamId === null) {
+		// 通常の保存（全体保存）
+		saveToLocalStorage('tennisCustomTeams', appState.teams);
+	}
 }
 
 // ローカルストレージからカスタムチームメンバーを読み込む
 function loadTeamMembers() {
-	const savedTeams = localStorage.getItem('tennisCustomTeams');
+	const savedTeams = loadFromLocalStorage('tennisCustomTeams');
 	if (savedTeams) {
-		try {
-			appState.teams = JSON.parse(savedTeams);
-		} catch (e) {
-			console.error('チームメンバーの読み込みに失敗しました:', e);
-			// 読み込み失敗時は元のチームを使用
-			appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
-		}
+		appState.teams = savedTeams;
+	} else {
+		appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
 	}
 }
 
@@ -428,65 +452,6 @@ function renderMembersList() {
 			});
 		}
 	});
-}
-
-// チームメンバーの変更を保存
-function saveTeamMembers() {
-	console.log('チームメンバーの保存を試みます', currentEditTeamId, tempTeamMembers);
-
-	if (currentEditTeamId === null) {
-		console.error('現在編集中のチームIDがnullです');
-		toast.error('編集するチームが選択されていません');
-		return;
-	}
-
-	if (tempTeamMembers.length === 0) {
-		toast.error('メンバーを少なくとも1人は登録してください');
-		return;
-	}
-
-	// メンバーの重複チェック
-	const uniqueMembers = [...new Set(tempTeamMembers)];
-	if (uniqueMembers.length !== tempTeamMembers.length) {
-		toast.error('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
-		return;
-	}
-
-	// 変更を適用
-	const teamIndex = appState.teams.findIndex(t => t.id === currentEditTeamId);
-	if (teamIndex !== -1) {
-		appState.teams[teamIndex].members = [...tempTeamMembers];
-		console.log(`チーム${currentEditTeamId}のメンバーを更新しました:`, appState.teams[teamIndex].members);
-
-		// ローカルストレージに保存
-		try {
-			localStorage.setItem('tennisCustomTeams', JSON.stringify(appState.teams));
-			console.log('メンバー情報をローカルストレージに保存しました');
-		} catch (e) {
-			console.error('ローカルストレージへの保存に失敗しました:', e);
-		}
-
-		// UI更新
-		renderTeams();
-		// モーダルを閉じる
-		closeTeamEditModal();
-
-		toast.success('チームメンバーを更新しました！');
-	} else {
-		console.error(`チームID ${currentEditTeamId} が見つかりません`);
-		toast.error('チーム情報の更新に失敗しました');
-	}
-}
-
-// チームメンバー編集モーダルを閉じる
-function closeTeamEditModal() {
-	const teamEditModal = domCache.teamEditModal;
-	if (teamEditModal) {
-		teamEditModal.style.display = 'none';
-		console.log('チーム編集モーダルを閉じました');
-	}
-	currentEditTeamId = null;
-	tempTeamMembers = [];
 }
 
 // メンバーを追加
