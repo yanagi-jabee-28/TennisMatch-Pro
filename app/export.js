@@ -121,15 +121,24 @@ function exportMatchAnalysis() {
 			}
 		});
 	});
-
 	// 4. 設定情報の追加
 	csvContent += '\n# 設定情報\n';
 	csvContent += `マッチポイント,${appState.settings.matchPoint}\n`;
 	csvContent += `エクスポート日時,${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}:${('0' + now.getMinutes()).slice(-2)}\n`;
 	// 5. 大会情報の追加（config.jsonから）
 	try {
-		fetch('config.json')
-			.then(response => response.json())
+		// 複数のパスを順番に試す関数
+		const tryFetchConfig = () => {
+			return fetch('../config.json')
+				.catch(() => fetch('/config.json'))
+				.catch(() => fetch('config.json'))
+				.then(response => {
+					if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+					return response.json();
+				});
+		};
+		
+		tryFetchConfig()
 			.then(config => {
 				if (config.tournamentInfo) {
 					csvContent += '\n# 大会情報\n';
