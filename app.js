@@ -1,15 +1,6 @@
-// 設定ファイルのデータをロードする関数
+// 設定ファイルのデータをロードする関数（config.jsの関数を使用）
 async function loadConfig() {
-	try {
-		const response = await fetch('config.json');
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
-		}
-		return await response.json();
-	} catch (error) {
-		console.error('設定ファイルの読み込みに失敗しました:', error);
-		return null;
-	}
+	return await loadConfigData();
 }
 
 // アプリケーション状態の管理
@@ -21,6 +12,26 @@ const appState = {
 		matchPoint: 7       // マッチポイント（勝利と最大スコアを決定）
 	},
 	originalTeams: []      // オリジナルのチーム構成を保存
+};
+
+// DOM要素キャッシュ（パフォーマンス最適化）
+const domCache = {
+	teamsContainer: null,
+	tableHeader: null,
+	tableBody: null,
+	standingsBody: null,
+	scoreModal: null,
+	teamEditModal: null,
+	
+	// 初期化関数
+	init() {
+		this.teamsContainer = document.getElementById('teams-container');
+		this.tableHeader = document.getElementById('header-row');
+		this.tableBody = document.querySelector('#match-grid tbody');
+		this.standingsBody = document.getElementById('standings-body');
+		this.scoreModal = document.getElementById('score-modal');
+		this.teamEditModal = document.getElementById('team-edit-modal');
+	}
 };
 
 // ローカルストレージから試合結果を読み込む
@@ -78,10 +89,14 @@ function loadTeamMembers() {
 	}
 }
 
-// チーム情報を表示する関数
+// チーム情報を表示する関数（最適化版）
 function renderTeams() {
-	const teamsContainer = document.getElementById('teams-container');
+	const teamsContainer = domCache.teamsContainer;
+	if (!teamsContainer) return;
+	
 	teamsContainer.innerHTML = '';
+
+	const documentFragment = document.createDocumentFragment();
 
 	appState.teams.forEach(team => {
 		const teamCard = document.createElement('div');
@@ -99,25 +114,42 @@ function renderTeams() {
             </ul>
         `;
 
-		teamsContainer.appendChild(teamCard);
-
-		// 編集ボタンにイベントリスナーを追加
-		const editBtn = teamCard.querySelector('.edit-team-btn');
-		editBtn.addEventListener('click', () => openTeamEditModal(team.id));
+		documentFragment.appendChild(teamCard);
 	});
+
+	teamsContainer.appendChild(documentFragment);
+
+	// イベント委譲で編集ボタンのクリックイベントを処理
+	teamsContainer.removeEventListener('click', handleTeamEditClick);
+	teamsContainer.addEventListener('click', handleTeamEditClick);
 }
 
-// 対戦表を作成する関数
+// チーム編集ボタンのクリック処理（イベント委譲）
+function handleTeamEditClick(event) {
+	const editBtn = event.target.closest('.edit-team-btn');
+	if (!editBtn) return;
+	
+	const teamId = parseInt(editBtn.dataset.teamId);
+	openTeamEditModal(teamId);
+}
+
+// 対戦表を作成する関数（最適化版）
 function createMatchTable() {
-	const tableHeader = document.getElementById('header-row');
-	const tableBody = document.querySelector('#match-grid tbody');
+	const tableHeader = domCache.tableHeader;
+	const tableBody = domCache.tableBody;
+	
+	if (!tableHeader || !tableBody) return;
 
 	// ヘッダー行にチーム番号を追加
 	tableHeader.innerHTML = '<th class="empty-cell"></th>';
 	appState.teams.forEach(team => {
 		tableHeader.innerHTML += `<th>${team.id}</th>`;
-	});    // 対戦表の行を作成
+	});
+
+	// 対戦表の行を作成
 	tableBody.innerHTML = '';
+	const documentFragment = document.createDocumentFragment(); // パフォーマンス最適化
+
 	appState.teams.forEach((rowTeam, rowIndex) => {
 		const row = document.createElement('tr');
 
@@ -144,8 +176,8 @@ function createMatchTable() {
 				cell.classList.add('clickable-cell');
 
 				// 試合結果があれば表示
-				if (appState.matches[matchId]) {
-					const match = appState.matches[matchId];
+				const match = appState.matches[matchId];
+				if (match) {
 					// 勝者が存在するか引き分けかで表示スタイルを変更
 					let resultClass;
 					if (match.winner === null) {
@@ -164,33 +196,27 @@ function createMatchTable() {
 					}
 
 					cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
-
-					// 修正のためのクリックイベント追加
-					cell.addEventListener('click', function () {
-						if (confirm('この試合結果を削除して再入力しますか？')) {
-							delete appState.matches[matchId];
-							saveMatchResults();
-							createMatchTable();
-							calculateStandings();
-						}
-					});
 				} else {
 					cell.textContent = '未対戦';
-					// クリックイベントを追加
-					cell.addEventListener('click', handleCellClick);
 				}
 			}
 
 			row.appendChild(cell);
 		});
 
-		tableBody.appendChild(row);
+		documentFragment.appendChild(row);
 	});
+
+	tableBody.appendChild(documentFragment);
+
+	// イベントリスナーを一括で追加（イベント委譲を使用）
+	tableBody.removeEventListener('click', handleTableClick); // 既存のリスナーを削除
+	tableBody.addEventListener('click', handleTableClick);
 }
 
 // モーダルの要素（DOM読み込み時に初期化されます）
 
-// モーダルを開く関数
+// モーダルを開く関数（最適化版）
 function openScoreModal(rowTeamId, colTeamId, matchId) {
 	// モーダルのタイトルと入力ラベルを設定
 	document.getElementById('score-modal-title').textContent = `スコア入力`;
@@ -217,35 +243,29 @@ function openScoreModal(rowTeamId, colTeamId, matchId) {
 	};
 
 	// モーダルを表示
-	scoreModal.style.display = 'block';
+	const scoreModal = domCache.scoreModal;
+	if (scoreModal) {
+		scoreModal.style.display = 'block';
+	}
 }
 
-// モーダルを閉じる関数
+// モーダルを閉じる関数（最適化版）
 function closeScoreModal() {
-	scoreModal.style.display = 'none';
+	const scoreModal = domCache.scoreModal;
+	if (scoreModal) {
+		scoreModal.style.display = 'none';
+	}
 	currentMatchData = null;
 }
 
-// モーダル要素と関連データ（DOM読み込み時に初期化）
-let scoreModal;
-let teamEditModal;
+// モーダル関連データ（DOM読み込み時に初期化）
 let currentMatchData = null;
 let currentEditTeamId = null;
 let tempTeamMembers = [];
 
-// DOMが読み込まれた後にモーダル要素を初期化する関数
+// DOMが読み込まれた後にモーダル要素を初期化する関数（廃止済み）
 function initializeModalElements() {
-	console.log('モーダル要素を初期化します');
-
-	// スコア入力用モーダル
-	scoreModal = document.getElementById('score-modal');
-	if (!scoreModal) console.error('スコア入力モーダルが見つかりません');
-	else console.log('スコアモーダルを初期化しました');
-
-	// チームメンバー編集用モーダル
-	teamEditModal = document.getElementById('team-edit-modal');
-	if (!teamEditModal) console.error('チームメンバー編集モーダルが見つかりません');
-	else console.log('チームメンバー編集モーダルを初期化しました');
+	console.log('モーダル要素は domCache で管理されています');
 }
 
 // チームメンバー編集用モーダルを開く
@@ -277,11 +297,11 @@ function openTeamEditModal(teamId) {
 
 	// メンバーリストを表示
 	renderMembersList();
-
 	// 未割り当てのメンバーリストを表示
 	renderUnassignedMembersList();
 
 	// モーダルを表示
+	const teamEditModal = domCache.teamEditModal;
 	if (teamEditModal) {
 		teamEditModal.style.display = 'block';
 	} else {
@@ -457,9 +477,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// 閉じるボタン（×）のクリックイベント
 	document.querySelector('.close-modal').addEventListener('click', closeScoreModal);
-
 	// モーダル外をクリックした時に閉じる
 	window.addEventListener('click', function (event) {
+		const scoreModal = domCache.scoreModal;
 		if (event.target === scoreModal) {
 			closeScoreModal();
 		}
@@ -490,9 +510,9 @@ function initializeTeamEditListeners() {
 		closeModalBtn.addEventListener('click', closeTeamEditModal);
 		console.log('閉じるボタンのリスナーを設定しました');
 	}
-
 	// モーダル外をクリックした時に閉じる
 	window.addEventListener('click', function (event) {
+		const teamEditModal = domCache.teamEditModal;
 		if (event.target === teamEditModal) {
 			closeTeamEditModal();
 		}
@@ -519,50 +539,60 @@ function initializeTeamEditListeners() {
 	}
 }
 
-// セルクリック時の処理
-function handleCellClick(event) {
-	const cell = event.currentTarget;
+// イベント委譲によるテーブルクリック処理（最適化版）
+function handleTableClick(event) {
+	const cell = event.target.closest('td.clickable-cell');
+	if (!cell) return;
+
 	const rowTeamId = parseInt(cell.dataset.rowTeamId);
 	const colTeamId = parseInt(cell.dataset.colTeamId);
 	const matchId = cell.dataset.matchId;
 
-	// モーダルを開く
-	openScoreModal(rowTeamId, colTeamId, matchId);
+	// 試合結果が既に存在する場合は修正処理
+	if (appState.matches[matchId]) {
+		if (confirm('この試合結果を削除して再入力しますか？')) {
+			delete appState.matches[matchId];
+			saveMatchResults();
+			createMatchTable();
+			calculateStandings();
+		}
+	} else {
+		// 新しい試合のスコア入力
+		openScoreModal(rowTeamId, colTeamId, matchId);
+	}
 }
 
-// スコアを処理して結果を保存する関数
-function processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score) {
+// チームIDからチーム番号を取得する関数（現在は未使用）
+// function getTeamNameById(teamId) {
+//     return `${teamId}`;
+// }
+
+// app.js内の試合結果処理関数（モーダルベース）
+function processMatchScore(rowTeamId, colTeamId, matchId, scoreTeam1, scoreTeam2) {
+	// マッチポイントを取得（最大スコアとして使用）
+	const matchPoint = appState.settings.matchPoint;
+	
+	// スコアがマッチポイントを超えていたら上限を適用
+	if (scoreTeam1 > matchPoint) scoreTeam1 = matchPoint;
+	if (scoreTeam2 > matchPoint) scoreTeam2 = matchPoint;
+
 	// 勝者を決定
 	let winner;
-
-	// 同点の場合は引き分け
-	if (team1Score === team2Score) {
+	if (scoreTeam1 === scoreTeam2) {
+		// 同点は引き分け
 		winner = null;
-	} else if (team1Score > team2Score) {
-		// チーム1が点数が高い場合は勝ち
+	} else if (scoreTeam1 > scoreTeam2) {
+		// チーム1のスコアが高ければチーム1が勝ち
 		winner = rowTeamId;
 	} else {
-		// チーム2が点数が高い場合は勝ち
+		// チーム2のスコアが高ければチーム2が勝ち
 		winner = colTeamId;
 	}
 
-	// 小さいチームIDが先になるように調整（データの一貫性のため）
-	const firstTeamId = Math.min(rowTeamId, colTeamId);
-	const secondTeamId = Math.max(rowTeamId, colTeamId);
-
-	// スコアも正しい順序で保存
-	let scoreTeam1, scoreTeam2;
-	if (firstTeamId === rowTeamId) {
-		scoreTeam1 = team1Score;
-		scoreTeam2 = team2Score;
-	} else {
-		scoreTeam1 = team2Score;
-		scoreTeam2 = team1Score;
-	}
 	// 試合結果を保存
 	appState.matches[matchId] = {
-		team1: firstTeamId,
-		team2: secondTeamId,
+		team1: rowTeamId,
+		team2: colTeamId,
 		scoreTeam1: scoreTeam1,
 		scoreTeam2: scoreTeam2,
 		winner: winner
@@ -574,104 +604,6 @@ function processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score
 	// UI更新
 	createMatchTable();
 	calculateStandings();
-}
-
-// チームIDからチーム番号を取得する関数（現在は未使用）
-// function getTeamNameById(teamId) {
-//     return `${teamId}`;
-// }
-
-// チーム選択フォームを初期化
-function initializeResultForm() {
-	const team1Select = document.getElementById('team1-select');
-	const team2Select = document.getElementById('team2-select');
-
-	team1Select.innerHTML = '<option value="">チームを選択</option>';
-	team2Select.innerHTML = '<option value="">チームを選択</option>';
-
-	appState.teams.forEach(team => {
-		team1Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-		team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-	});
-
-	// チーム1の選択が変わったときに、チーム2の選択肢を更新
-	team1Select.addEventListener('change', () => {
-		const selectedTeam1 = team1Select.value;
-
-		// チーム2のオプションをリセット
-		team2Select.innerHTML = '<option value="">チームを選択</option>';
-
-		// 選択されていないチームのみ表示
-		appState.teams.forEach(team => {
-			if (team.id != selectedTeam1) {
-				team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-			}
-		});
-	});
-
-	// フォーム送信イベントのリスナー
-	document.getElementById('result-form').addEventListener('submit', function (e) {
-		e.preventDefault();
-
-		const team1Id = parseInt(team1Select.value);
-		const team2Id = parseInt(team2Select.value);
-
-		if (team1Id === team2Id) {
-			alert('異なるチームを選択してください');
-			return;
-		} let scoreTeam1 = parseInt(document.getElementById('score-team1').value);
-		let scoreTeam2 = parseInt(document.getElementById('score-team2').value);
-
-		// スコアがマッチポイントを超えていたら上限を適用
-		const matchPoint = appState.settings.matchPoint;
-		if (scoreTeam1 > matchPoint) scoreTeam1 = matchPoint;
-		if (scoreTeam2 > matchPoint) scoreTeam2 = matchPoint;
-
-		// 勝者を決定
-		let winner;
-
-		if (scoreTeam1 === scoreTeam2) {
-			// 同点は引き分け
-			winner = null;
-		} else if (scoreTeam1 > scoreTeam2) {
-			// チーム1のスコアが高ければチーム1が勝ち
-			winner = team1Id;
-		} else {
-			// チーム2のスコアが高ければチーム2が勝ち
-			winner = team2Id;
-		}
-
-		// matchIdを生成（小さい番号のチームが先）
-		const matchId = getMatchId(team1Id, team2Id);
-
-		// 試合結果を保存
-		appState.matches[matchId] = {
-			team1: team1Id,
-			team2: team2Id,
-			scoreTeam1: scoreTeam1,
-			scoreTeam2: scoreTeam2,
-			winner: winner
-		};
-
-		// ローカルストレージに保存
-		saveMatchResults();
-
-		// UI更新
-		createMatchTable();
-		calculateStandings();
-
-		// フォームをリセット
-		this.reset();
-		team1Select.innerHTML = '<option value="">チームを選択</option>';
-		team2Select.innerHTML = '<option value="">チームを選択</option>';
-
-		appState.teams.forEach(team => {
-			team1Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-			team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-		});
-
-		alert('試合結果を保存しました！');
-	});
 }
 
 // マッチIDを生成（小さい番号のチームが先）
@@ -751,10 +683,14 @@ function calculateStandings() {
 	renderStandings();
 }
 
-// 順位表を表示する関数
+// 順位表を表示する関数（最適化版）
 function renderStandings() {
-	const standingsBody = document.getElementById('standings-body');
+	const standingsBody = domCache.standingsBody;
+	if (!standingsBody) return;
+	
 	standingsBody.innerHTML = '';
+	
+	const documentFragment = document.createDocumentFragment();
 
 	appState.standings.forEach((team, index) => {
 		const row = document.createElement('tr');
@@ -775,22 +711,16 @@ function renderStandings() {
             <td>${(team.winRate * 100).toFixed(1)}%</td>
         `;
 
-		standingsBody.appendChild(row);
+		documentFragment.appendChild(row);
 	});
+	
+	standingsBody.appendChild(documentFragment);
 }
 
-// 試合設定フォームの初期化と処理
+// 試合設定フォームの初期化と処理（最適化版）
 function initializeSettingsForm() {
 	const settingsForm = document.getElementById('header-settings-form');
 	const matchPointInput = document.getElementById('header-match-point');
-
-	// スコア入力欄の最大値を設定
-	const scoreTeam1Input = document.getElementById('score-team1');
-	const scoreTeam2Input = document.getElementById('score-team2');
-	if (scoreTeam1Input && scoreTeam2Input) {
-		scoreTeam1Input.max = appState.settings.matchPoint;
-		scoreTeam2Input.max = appState.settings.matchPoint;
-	}
 
 	// 現在の設定を表示
 	matchPointInput.value = appState.settings.matchPoint;
@@ -806,17 +736,10 @@ function initializeSettingsForm() {
 			alert('マッチポイントは1から99の間で設定してください');
 			return;
 		}
+		
 		// 設定を保存
 		appState.settings.matchPoint = newMatchPoint;
 		saveSettings();
-
-		// スコア入力欄の最大値を更新
-		const scoreTeam1Input = document.getElementById('score-team1');
-		const scoreTeam2Input = document.getElementById('score-team2');
-		if (scoreTeam1Input && scoreTeam2Input) {
-			scoreTeam1Input.max = newMatchPoint;
-			scoreTeam2Input.max = newMatchPoint;
-		}
 
 		// 結果に影響するため、順位表を再計算
 		calculateStandings();
@@ -843,16 +766,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 	if (config.matchSettings) {
 		appState.settings.matchPoint = config.matchSettings.matchPoint || 7;
 	}
-
 	// 保存された設定と試合結果を読み込む
 	loadSettings();
 	loadMatchResults();
 	loadTeamMembers(); // カスタムチームメンバーがあれば読み込む
 
+	// DOM要素キャッシュを初期化
+	domCache.init();
 	// UI初期化
 	renderTeams();
 	createMatchTable();
-	initializeResultForm();
 	initializeSettingsForm();
 	calculateStandings();
 
