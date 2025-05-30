@@ -1,579 +1,589 @@
 /* 全体のスタイリング */
 :root {
-    --primary-color: #1a73e8;
-    --secondary-color: #f1f3f4;
-    --accent-color: #fbbc04;
-    --text-color: #202124;
-    --light-text: #5f6368;
-    --border-color: #dadce0;
-    --success-color: #34a853;
-    --error-color: #ea4335;
+	--primary-color: #1a73e8;
+	--secondary-color: #f1f3f4;
+	--accent-color: #fbbc04;
+	--text-color: #202124;
+	--light-text: #5f6368;
+	--border-color: #dadce0;
+	--success-color: #34a853;
+	--error-color: #ea4335;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: #f9f9f9;
+	font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+	line-height: 1.6;
+	color: var(--text-color);
+	background-color: #f9f9f9;
 }
 
 header {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	background-color: var(--primary-color);
+	color: white;
+	padding: 1.5rem;
+	text-align: center;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 2rem;
 }
 
 section {
-    margin-bottom: 3rem;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
+	margin-bottom: 3rem;
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	padding: 1.5rem;
 }
 
 h2 {
-    margin-bottom: 1.5rem;
-    color: var(--primary-color);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
+	margin-bottom: 1.5rem;
+	color: var(--primary-color);
+	border-bottom: 1px solid var(--border-color);
+	padding-bottom: 0.5rem;
 }
 
 footer {
-    text-align: center;
-    padding: 1.5rem;
-    color: var(--light-text);
-    background-color: var(--secondary-color);
-    border-top: 1px solid var(--border-color);
+	text-align: center;
+	padding: 1.5rem;
+	color: var(--light-text);
+	background-color: var(--secondary-color);
+	border-top: 1px solid var(--border-color);
 }
 
 /* チーム情報のスタイル */
 #teams-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 1.5rem;
 }
 
 /* チームカードのスタイル */
 .team-card {
-    background-color: white;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+	background-color: white;
+	border-radius: 8px;
+	padding: 15px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
 }
 
 .team-card h3 {
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
+	color: var(--primary-color);
+	margin-bottom: 0.5rem;
 }
 
 .team-members {
-    list-style-type: none;
+	list-style-type: none;
 }
 
 .team-members li {
-    padding: 0.25rem 0;
+	padding: 0.25rem 0;
 }
 
 /* チームヘッダーのスタイル（タイトルと編集ボタン）*/
 .team-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
 }
 
 .edit-team-btn {
-    background-color: var(--secondary-color);
-    color: var(--primary-color);
-    border: 1px solid var(--border-color);
-    padding: 4px 8px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: background-color 0.2s ease;
+	background-color: var(--secondary-color);
+	color: var(--primary-color);
+	border: 1px solid var(--border-color);
+	padding: 4px 8px;
+	font-size: 14px;
+	cursor: pointer;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	transition: background-color 0.2s ease;
 }
 
 .edit-team-btn:hover {
-    background-color: #e8eaed;
+	background-color: #e8eaed;
 }
 
 .edit-icon {
-    font-size: 12px;
+	font-size: 12px;
 }
 
 /* 対戦表のスタイル */
 .table-container {
-    overflow-x: auto;
+	overflow-x: auto;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1rem;
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 1rem;
 }
 
-th, td {
-    padding: 0.75rem;
-    text-align: center;
-    border: 1px solid var(--border-color);
+th,
+td {
+	padding: 0.75rem;
+	text-align: center;
+	border: 1px solid var(--border-color);
 }
 
 thead th {
-    background-color: var(--primary-color);
-    color: white;
+	background-color: var(--primary-color);
+	color: white;
 }
 
 th.empty-cell {
-    background-color: white;
-    border: none;
+	background-color: white;
+	border: none;
 }
 
 .analysis-controls {
-    margin-bottom: 15px;
-    text-align: right;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+	margin-bottom: 15px;
+	text-align: right;
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
 }
 
 #export-results-btn {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.2s ease;
+	background-color: var(--primary-color);
+	color: white;
+	padding: 8px 15px;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	transition: background-color 0.2s ease;
 }
 
 #export-results-btn:hover {
-    background-color: #0d5bcd;
+	background-color: #0d5bcd;
 }
 
 #export-results-btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.4);
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.4);
 }
 
 .diagonal-line {
-    position: relative;
-    background-color: var(--secondary-color);
+	position: relative;
+	background-color: var(--secondary-color);
 }
 
 .diagonal-line::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom right, transparent calc(50% - 1px), var(--border-color), transparent calc(50% + 1px));
-    pointer-events: none;
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(to bottom right, transparent calc(50% - 1px), var(--border-color), transparent calc(50% + 1px));
+	pointer-events: none;
 }
 
 .match-result {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 .winner {
-    color: var(--success-color);
+	color: var(--success-color);
 }
 
 .loser {
-    color: var(--error-color);
+	color: var(--error-color);
 }
 
 .clickable-cell {
-    cursor: pointer;
-    transition: background-color 0.2s;
+	cursor: pointer;
+	transition: background-color 0.2s;
 }
 
 .clickable-cell:hover {
-    background-color: rgba(26, 115, 232, 0.15);
+	background-color: rgba(26, 115, 232, 0.15);
 }
 
 td {
-    position: relative;
+	position: relative;
 }
 
 /* フォームのスタイル */
 .form-container {
-    max-width: 500px;
-    margin: 0 auto;
+	max-width: 500px;
+	margin: 0 auto;
 }
 
 /* クリック情報のスタイル */
 .info-box {
-    background-color: #e8f0fe;
-    border-left: 4px solid var(--primary-color);
-    padding: 12px 16px;
-    margin-bottom: 20px;
-    border-radius: 4px;
+	background-color: #e8f0fe;
+	border-left: 4px solid var(--primary-color);
+	padding: 12px 16px;
+	margin-bottom: 20px;
+	border-radius: 4px;
 }
 
 .click-info {
-    color: var(--text-color);
-    font-size: 1rem;
-    margin: 0;
+	color: var(--text-color);
+	font-size: 1rem;
+	margin: 0;
 }
 
 .form-group {
-    margin-bottom: 1rem;
+	margin-bottom: 1rem;
 }
 
 label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--light-text);
+	display: block;
+	margin-bottom: 0.5rem;
+	color: var(--light-text);
 }
 
-select, input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 1rem;
+select,
+input {
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	font-size: 1rem;
 }
 
 .btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.2s;
+	background-color: var(--primary-color);
+	color: white;
+	border: none;
+	padding: 0.75rem 1.5rem;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 1rem;
+	transition: background-color 0.2s;
 }
 
 .btn:hover {
-    background-color: #0d5bba;
+	background-color: #0d5bba;
 }
 
 /* 順位表のスタイル */
-#standings-table td, #standings-table th {
-    padding: 0.75rem 1rem;
+#standings-table td,
+#standings-table th {
+	padding: 0.75rem 1rem;
 }
 
 #standings-table tr:nth-child(even) {
-    background-color: var(--secondary-color);
+	background-color: var(--secondary-color);
 }
 
 #standings-table tbody tr:hover {
-    background-color: rgba(26, 115, 232, 0.1);
+	background-color: rgba(26, 115, 232, 0.1);
 }
 
 /* ヘッダー設定パネルのスタイル */
 .settings-panel {
-    margin-top: 1rem;
-    background-color: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 0.75rem;
+	margin-top: 1rem;
+	background-color: rgba(255, 255, 255, 0.15);
+	border-radius: 8px;
+	padding: 0.75rem;
 }
 
 .inline-form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
 }
 
 .form-group.inline {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0;
-    gap: 0.5rem;
+	display: flex;
+	align-items: center;
+	margin-bottom: 0;
+	gap: 0.5rem;
 }
 
 .form-group.inline label {
-    margin-bottom: 0;
-    color: white;
-    white-space: nowrap;
+	margin-bottom: 0;
+	color: white;
+	white-space: nowrap;
 }
 
 .form-group.inline input {
-    width: 4rem;
-    padding: 0.5rem;
-    margin-bottom: 0;
+	width: 4rem;
+	padding: 0.5rem;
+	margin-bottom: 0;
 }
 
 .btn-small {
-    padding: 0.5rem 1rem;
-    margin-left: 0.5rem;
-    background-color: white;
-    color: var(--primary-color);
-    font-weight: bold;
+	padding: 0.5rem 1rem;
+	margin-left: 0.5rem;
+	background-color: white;
+	color: var(--primary-color);
+	font-weight: bold;
 }
 
 .btn-small:hover {
-    background-color: var(--secondary-color);
+	background-color: var(--secondary-color);
 }
 
 .draw {
-    color: #888;
+	color: #888;
 }
 
 /* モーダルスタイル */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.5);
+	display: none;
+	position: fixed;
+	z-index: 1000;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal-content {
-    position: relative;
-    background-color: #fff;
-    margin: 15% auto;
-    padding: 0;
-    width: 400px;
-    max-width: 90%;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    animation: modalFade 0.3s;
+	position: relative;
+	background-color: #fff;
+	margin: 15% auto;
+	padding: 0;
+	width: 400px;
+	max-width: 90%;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	animation: modalFade 0.3s;
 }
 
 @keyframes modalFade {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--border-color);
-    border-radius: 8px 8px 0 0;
-    background-color: var(--primary-color);
-    color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px 20px;
+	border-bottom: 1px solid var(--border-color);
+	border-radius: 8px 8px 0 0;
+	background-color: var(--primary-color);
+	color: white;
 }
 
 .modal-header h3 {
-    margin: 0;
-    font-size: 18px;
+	margin: 0;
+	font-size: 18px;
 }
 
 .close-modal {
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
+	color: white;
+	font-size: 24px;
+	font-weight: bold;
+	cursor: pointer;
 }
 
 .modal-body {
-    padding: 20px;
+	padding: 20px;
 }
 
 .score-input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
 }
 
 .team-score-input {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
 
 .team-score-input label {
-    font-weight: 500;
-    flex: 1;
+	font-weight: 500;
+	flex: 1;
 }
 
 .team-score-input input {
-    width: 80px;
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
+	width: 80px;
+	padding: 8px;
+	font-size: 16px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
 }
 
 .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 15px 20px;
-    border-top: 1px solid var(--border-color);
-    gap: 10px;
+	display: flex;
+	justify-content: flex-end;
+	padding: 15px 20px;
+	border-top: 1px solid var(--border-color);
+	gap: 10px;
 }
 
 .btn-secondary {
-    background-color: #f1f3f4;
-    color: var(--text-color);
+	background-color: #f1f3f4;
+	color: var(--text-color);
 }
 
 .btn-secondary:hover {
-    background-color: #e8eaed;
+	background-color: #e8eaed;
 }
 
 /* チームメンバー編集モーダルのスタイル */
 .team-edit-container {
-    padding: 10px 0;
+	padding: 10px 0;
 }
 
 .team-info {
-    margin-bottom: 15px;
-    font-size: 16px;
+	margin-bottom: 15px;
+	font-size: 16px;
 }
 
 .member-list-container {
-    background-color: var(--secondary-color);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 15px;
+	background-color: var(--secondary-color);
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	padding: 10px;
+	margin-bottom: 15px;
 }
 
 #edit-members-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0 0 15px 0;
-    max-height: 200px;
-    overflow-y: auto;
+	list-style-type: none;
+	padding: 0;
+	margin: 0 0 15px 0;
+	max-height: 200px;
+	overflow-y: auto;
 }
 
 .member-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    background-color: white;
-    border-radius: 4px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px 10px;
+	margin-bottom: 5px;
+	background-color: white;
+	border-radius: 4px;
 }
 
 .member-name {
-    flex: 1;
+	flex: 1;
 }
 
 .remove-member-btn {
-    background-color: var(--error-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 14px;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	background-color: var(--error-color);
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	font-size: 14px;
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .member-actions {
-    display: flex;
-    margin-top: 12px;
-    align-items: center;
+	display: flex;
+	margin-top: 12px;
+	align-items: center;
 }
 
 #new-member-name {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
+	flex: 1;
+	padding: 8px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
 }
 
 #unassigned-members-select {
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    flex-grow: 1;
-    margin-right: 8px;
-    font-size: 14px;
+	padding: 8px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	flex-grow: 1;
+	margin-right: 8px;
+	font-size: 14px;
 }
 
 .original-member {
-    font-weight: bold;
-    color: #1a73e8;
+	font-weight: bold;
+	color: #1a73e8;
 }
 
 #unassigned-members-select option[value=""] {
-    font-style: italic;
-    color: #666;
+	font-style: italic;
+	color: #666;
 }
 
 /* チーム情報セクションのコントロール */
 .team-controls {
-    margin-bottom: 1rem;
-    display: flex;
-    justify-content: flex-end;
+	margin-bottom: 1rem;
+	display: flex;
+	justify-content: flex-end;
 }
 
 #reset-teams-btn {
-    background-color: #f5f5f5;
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-size: 0.9rem;
+	background-color: #f5f5f5;
+	border: 1px solid var(--border-color);
+	color: var(--text-color);
+	font-size: 0.9rem;
 }
 
 #reset-teams-btn:hover {
-    background-color: #e8e8e8;
+	background-color: #e8e8e8;
 }
 
 .reset-icon {
-    font-weight: bold;
-    margin-right: 4px;
+	font-weight: bold;
+	margin-right: 4px;
 }
 
 /* 得失点差の表示スタイル */
 .positive-diff {
-    color: var(--success-color);
-    font-weight: bold;
+	color: var(--success-color);
+	font-weight: bold;
 }
 
 .negative-diff {
-    color: var(--error-color);
-    font-weight: bold;
+	color: var(--error-color);
+	font-weight: bold;
 }
 
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
-    main {
-        padding: 1rem;
-    }
-    
-    #teams-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-container {
-        width: 100%;
-    }
-    
-    .inline-form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .form-group.inline {
-        justify-content: space-between;
-    }
+	main {
+		padding: 1rem;
+	}
+
+	#teams-container {
+		grid-template-columns: 1fr;
+	}
+
+	.form-container {
+		width: 100%;
+	}
+
+	.inline-form {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.form-group.inline {
+		justify-content: space-between;
+	}
 }

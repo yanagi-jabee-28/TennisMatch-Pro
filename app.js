@@ -1,93 +1,93 @@
 // 設定ファイルのデータをロードする関数
 async function loadConfig() {
-    try {
-        const response = await fetch('config.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('設定ファイルの読み込みに失敗しました:', error);
-        return null;
-    }
+	try {
+		const response = await fetch('config.json');
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		return await response.json();
+	} catch (error) {
+		console.error('設定ファイルの読み込みに失敗しました:', error);
+		return null;
+	}
 }
 
 // アプリケーション状態の管理
 const appState = {
-    teams: [],
-    matches: {},
-    standings: [],
-    settings: {
-        matchPoint: 7       // マッチポイント（勝利と最大スコアを決定）
-    },
-    originalTeams: []      // オリジナルのチーム構成を保存
+	teams: [],
+	matches: {},
+	standings: [],
+	settings: {
+		matchPoint: 7       // マッチポイント（勝利と最大スコアを決定）
+	},
+	originalTeams: []      // オリジナルのチーム構成を保存
 };
 
 // ローカルストレージから試合結果を読み込む
 function loadMatchResults() {
-    const savedMatches = localStorage.getItem('tennisMatchResults');
-    if (savedMatches) {
-        try {
-            appState.matches = JSON.parse(savedMatches);
-        } catch (e) {
-            console.error('試合結果の読み込みに失敗しました:', e);
-            appState.matches = {};
-        }
-    }
+	const savedMatches = localStorage.getItem('tennisMatchResults');
+	if (savedMatches) {
+		try {
+			appState.matches = JSON.parse(savedMatches);
+		} catch (e) {
+			console.error('試合結果の読み込みに失敗しました:', e);
+			appState.matches = {};
+		}
+	}
 }
 
 // ローカルストレージから設定を読み込む
 function loadSettings() {
-    const savedSettings = localStorage.getItem('tennisGameSettings');
-    if (savedSettings) {
-        try {
-            const settings = JSON.parse(savedSettings);
-            appState.settings = {...appState.settings, ...settings};
-        } catch (e) {
-            console.error('設定の読み込みに失敗しました:', e);
-        }
-    }
+	const savedSettings = localStorage.getItem('tennisGameSettings');
+	if (savedSettings) {
+		try {
+			const settings = JSON.parse(savedSettings);
+			appState.settings = { ...appState.settings, ...settings };
+		} catch (e) {
+			console.error('設定の読み込みに失敗しました:', e);
+		}
+	}
 }
 
 // ローカルストレージに試合結果を保存する
 function saveMatchResults() {
-    localStorage.setItem('tennisMatchResults', JSON.stringify(appState.matches));
+	localStorage.setItem('tennisMatchResults', JSON.stringify(appState.matches));
 }
 
 // ローカルストレージに設定を保存する
 function saveSettings() {
-    localStorage.setItem('tennisGameSettings', JSON.stringify(appState.settings));
+	localStorage.setItem('tennisGameSettings', JSON.stringify(appState.settings));
 }
 
 // ローカルストレージにカスタムチームメンバーを保存
 function saveTeamMembers() {
-    localStorage.setItem('tennisCustomTeams', JSON.stringify(appState.teams));
+	localStorage.setItem('tennisCustomTeams', JSON.stringify(appState.teams));
 }
 
 // ローカルストレージからカスタムチームメンバーを読み込む
 function loadTeamMembers() {
-    const savedTeams = localStorage.getItem('tennisCustomTeams');
-    if (savedTeams) {
-        try {
-            appState.teams = JSON.parse(savedTeams);
-        } catch (e) {
-            console.error('チームメンバーの読み込みに失敗しました:', e);
-            // 読み込み失敗時は元のチームを使用
-            appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
-        }
-    }
+	const savedTeams = localStorage.getItem('tennisCustomTeams');
+	if (savedTeams) {
+		try {
+			appState.teams = JSON.parse(savedTeams);
+		} catch (e) {
+			console.error('チームメンバーの読み込みに失敗しました:', e);
+			// 読み込み失敗時は元のチームを使用
+			appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
+		}
+	}
 }
 
 // チーム情報を表示する関数
 function renderTeams() {
-    const teamsContainer = document.getElementById('teams-container');
-    teamsContainer.innerHTML = '';
+	const teamsContainer = document.getElementById('teams-container');
+	teamsContainer.innerHTML = '';
 
-    appState.teams.forEach(team => {
-        const teamCard = document.createElement('div');
-        teamCard.className = 'team-card';
-        
-        teamCard.innerHTML = `
+	appState.teams.forEach(team => {
+		const teamCard = document.createElement('div');
+		teamCard.className = 'team-card';
+
+		teamCard.innerHTML = `
             <div class="team-header">
                 <h3>チーム${team.id}</h3>
                 <button class="edit-team-btn btn-small" data-team-id="${team.id}">
@@ -98,132 +98,132 @@ function renderTeams() {
                 ${team.members.map(member => `<li>${member}</li>`).join('')}
             </ul>
         `;
-        
-        teamsContainer.appendChild(teamCard);
-        
-        // 編集ボタンにイベントリスナーを追加
-        const editBtn = teamCard.querySelector('.edit-team-btn');
-        editBtn.addEventListener('click', () => openTeamEditModal(team.id));
-    });
+
+		teamsContainer.appendChild(teamCard);
+
+		// 編集ボタンにイベントリスナーを追加
+		const editBtn = teamCard.querySelector('.edit-team-btn');
+		editBtn.addEventListener('click', () => openTeamEditModal(team.id));
+	});
 }
 
 // 対戦表を作成する関数
 function createMatchTable() {
-    const tableHeader = document.getElementById('header-row');
-    const tableBody = document.querySelector('#match-grid tbody');
-    
-    // ヘッダー行にチーム番号を追加
-    tableHeader.innerHTML = '<th class="empty-cell"></th>';
-    appState.teams.forEach(team => {
-        tableHeader.innerHTML += `<th>${team.id}</th>`;
-    });    // 対戦表の行を作成
-    tableBody.innerHTML = '';
-    appState.teams.forEach((rowTeam, rowIndex) => {
-        const row = document.createElement('tr');
-        
-        // 行の最初のセルにチーム番号
-        const firstCell = document.createElement('th');
-        firstCell.textContent = rowTeam.id;
-        row.appendChild(firstCell);
-        
-        // 各対戦相手との結果セルを作成
-        appState.teams.forEach((colTeam, colIndex) => {
-            const cell = document.createElement('td');
-            
-            if (rowIndex === colIndex) {
-                // 同じチーム同士の対戦はない（対角線を引く）
-                cell.className = 'diagonal-line';
-            } else {
-                // 対戦カードのIDを作成（小さい番号が先）
-                const matchId = getMatchId(rowTeam.id, colTeam.id);
-                
-                // データ属性を追加してクリックイベントで使用
-                cell.dataset.rowTeamId = rowTeam.id;
-                cell.dataset.colTeamId = colTeam.id;
-                cell.dataset.matchId = matchId;
-                cell.classList.add('clickable-cell');
-                
-                // 試合結果があれば表示
-                if (appState.matches[matchId]) {
-                    const match = appState.matches[matchId];
-                      // 勝者が存在するか引き分けかで表示スタイルを変更
-                    let resultClass;
-                    if (match.winner === null) {
-                        resultClass = 'draw';
-                    } else {
-                        resultClass = match.winner === rowTeam.id ? 'winner' : 'loser';
-                    }
-                    
-                    // 行側のチーム（自チーム）を常に左側に表示するため、
-                    // 適切な順序でスコアを表示
-                    let displayScore;
-                    if (match.team1 === rowTeam.id) {
-                        displayScore = `${match.scoreTeam1}-${match.scoreTeam2}`;
-                    } else {
-                        displayScore = `${match.scoreTeam2}-${match.scoreTeam1}`;
-                    }
-                    
-                    cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
-                    
-                    // 修正のためのクリックイベント追加
-                    cell.addEventListener('click', function() {
-                        if (confirm('この試合結果を削除して再入力しますか？')) {
-                            delete appState.matches[matchId];
-                            saveMatchResults();
-                            createMatchTable();
-                            calculateStandings();
-                        }
-                    });
-                } else {
-                    cell.textContent = '未対戦';
-                    // クリックイベントを追加
-                    cell.addEventListener('click', handleCellClick);
-                }
-            }
-            
-            row.appendChild(cell);
-        });
-        
-        tableBody.appendChild(row);
-    });
+	const tableHeader = document.getElementById('header-row');
+	const tableBody = document.querySelector('#match-grid tbody');
+
+	// ヘッダー行にチーム番号を追加
+	tableHeader.innerHTML = '<th class="empty-cell"></th>';
+	appState.teams.forEach(team => {
+		tableHeader.innerHTML += `<th>${team.id}</th>`;
+	});    // 対戦表の行を作成
+	tableBody.innerHTML = '';
+	appState.teams.forEach((rowTeam, rowIndex) => {
+		const row = document.createElement('tr');
+
+		// 行の最初のセルにチーム番号
+		const firstCell = document.createElement('th');
+		firstCell.textContent = rowTeam.id;
+		row.appendChild(firstCell);
+
+		// 各対戦相手との結果セルを作成
+		appState.teams.forEach((colTeam, colIndex) => {
+			const cell = document.createElement('td');
+
+			if (rowIndex === colIndex) {
+				// 同じチーム同士の対戦はない（対角線を引く）
+				cell.className = 'diagonal-line';
+			} else {
+				// 対戦カードのIDを作成（小さい番号が先）
+				const matchId = getMatchId(rowTeam.id, colTeam.id);
+
+				// データ属性を追加してクリックイベントで使用
+				cell.dataset.rowTeamId = rowTeam.id;
+				cell.dataset.colTeamId = colTeam.id;
+				cell.dataset.matchId = matchId;
+				cell.classList.add('clickable-cell');
+
+				// 試合結果があれば表示
+				if (appState.matches[matchId]) {
+					const match = appState.matches[matchId];
+					// 勝者が存在するか引き分けかで表示スタイルを変更
+					let resultClass;
+					if (match.winner === null) {
+						resultClass = 'draw';
+					} else {
+						resultClass = match.winner === rowTeam.id ? 'winner' : 'loser';
+					}
+
+					// 行側のチーム（自チーム）を常に左側に表示するため、
+					// 適切な順序でスコアを表示
+					let displayScore;
+					if (match.team1 === rowTeam.id) {
+						displayScore = `${match.scoreTeam1}-${match.scoreTeam2}`;
+					} else {
+						displayScore = `${match.scoreTeam2}-${match.scoreTeam1}`;
+					}
+
+					cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
+
+					// 修正のためのクリックイベント追加
+					cell.addEventListener('click', function () {
+						if (confirm('この試合結果を削除して再入力しますか？')) {
+							delete appState.matches[matchId];
+							saveMatchResults();
+							createMatchTable();
+							calculateStandings();
+						}
+					});
+				} else {
+					cell.textContent = '未対戦';
+					// クリックイベントを追加
+					cell.addEventListener('click', handleCellClick);
+				}
+			}
+
+			row.appendChild(cell);
+		});
+
+		tableBody.appendChild(row);
+	});
 }
 
 // モーダルの要素（DOM読み込み時に初期化されます）
 
 // モーダルを開く関数
 function openScoreModal(rowTeamId, colTeamId, matchId) {
-    // モーダルのタイトルと入力ラベルを設定
-    document.getElementById('score-modal-title').textContent = `スコア入力`;
-    document.getElementById('team1-label').textContent = `チーム${rowTeamId}:`;
-    document.getElementById('team2-label').textContent = `チーム${colTeamId}:`;
-    
-    // 入力欄の初期化と最大値設定
-    const score1Input = document.getElementById('modal-score-team1');
-    const score2Input = document.getElementById('modal-score-team2');
-    
-    score1Input.value = 0;
-    score2Input.value = 0;
-    
-    // マッチポイントを取得（最大スコアとして使用）
-    const matchPoint = appState.settings.matchPoint;
-    score1Input.max = matchPoint;
-    score2Input.max = matchPoint;
-    
-    // 現在の試合データを保存
-    currentMatchData = {
-        rowTeamId: rowTeamId,
-        colTeamId: colTeamId,
-        matchId: matchId
-    };
-    
-    // モーダルを表示
-    scoreModal.style.display = 'block';
+	// モーダルのタイトルと入力ラベルを設定
+	document.getElementById('score-modal-title').textContent = `スコア入力`;
+	document.getElementById('team1-label').textContent = `チーム${rowTeamId}:`;
+	document.getElementById('team2-label').textContent = `チーム${colTeamId}:`;
+
+	// 入力欄の初期化と最大値設定
+	const score1Input = document.getElementById('modal-score-team1');
+	const score2Input = document.getElementById('modal-score-team2');
+
+	score1Input.value = 0;
+	score2Input.value = 0;
+
+	// マッチポイントを取得（最大スコアとして使用）
+	const matchPoint = appState.settings.matchPoint;
+	score1Input.max = matchPoint;
+	score2Input.max = matchPoint;
+
+	// 現在の試合データを保存
+	currentMatchData = {
+		rowTeamId: rowTeamId,
+		colTeamId: colTeamId,
+		matchId: matchId
+	};
+
+	// モーダルを表示
+	scoreModal.style.display = 'block';
 }
 
 // モーダルを閉じる関数
 function closeScoreModal() {
-    scoreModal.style.display = 'none';
-    currentMatchData = null;
+	scoreModal.style.display = 'none';
+	currentMatchData = null;
 }
 
 // モーダル要素と関連データ（DOM読み込み時に初期化）
@@ -235,346 +235,346 @@ let tempTeamMembers = [];
 
 // DOMが読み込まれた後にモーダル要素を初期化する関数
 function initializeModalElements() {
-    console.log('モーダル要素を初期化します');
-    
-    // スコア入力用モーダル
-    scoreModal = document.getElementById('score-modal');
-    if (!scoreModal) console.error('スコア入力モーダルが見つかりません');
-    else console.log('スコアモーダルを初期化しました');
-    
-    // チームメンバー編集用モーダル
-    teamEditModal = document.getElementById('team-edit-modal');
-    if (!teamEditModal) console.error('チームメンバー編集モーダルが見つかりません');
-    else console.log('チームメンバー編集モーダルを初期化しました');
+	console.log('モーダル要素を初期化します');
+
+	// スコア入力用モーダル
+	scoreModal = document.getElementById('score-modal');
+	if (!scoreModal) console.error('スコア入力モーダルが見つかりません');
+	else console.log('スコアモーダルを初期化しました');
+
+	// チームメンバー編集用モーダル
+	teamEditModal = document.getElementById('team-edit-modal');
+	if (!teamEditModal) console.error('チームメンバー編集モーダルが見つかりません');
+	else console.log('チームメンバー編集モーダルを初期化しました');
 }
 
 // チームメンバー編集用モーダルを開く
 function openTeamEditModal(teamId) {
-    console.log(`チーム${teamId}の編集モーダルを開きます`);
-    currentEditTeamId = teamId;
-    
-    // モーダルのタイトルを設定
-    const modalTitle = document.getElementById('team-edit-modal-title');
-    if (modalTitle) {
-        modalTitle.textContent = `チーム${teamId} メンバー編集`;
-    }
-    
-    const teamIdElement = document.getElementById('edit-team-id');
-    if (teamIdElement) {
-        teamIdElement.textContent = `チーム${teamId}`;
-    }
-    
-    // 現在のチームメンバーを取得
-    const team = appState.teams.find(t => t.id === teamId);
-    if (!team) {
-        console.error(`チームID ${teamId} が見つかりません`);
-        return;
-    }
-    
-    // 一時的なメンバーリストにコピー
-    tempTeamMembers = [...team.members];
-    console.log('メンバーリストをコピーしました:', tempTeamMembers);
-    
-    // メンバーリストを表示
-    renderMembersList();
-    
-    // 未割り当てのメンバーリストを表示
-    renderUnassignedMembersList();
-    
-    // モーダルを表示
-    if (teamEditModal) {
-        teamEditModal.style.display = 'block';
-    } else {
-        console.error('チーム編集モーダル要素が見つかりません');
-    }
+	console.log(`チーム${teamId}の編集モーダルを開きます`);
+	currentEditTeamId = teamId;
+
+	// モーダルのタイトルを設定
+	const modalTitle = document.getElementById('team-edit-modal-title');
+	if (modalTitle) {
+		modalTitle.textContent = `チーム${teamId} メンバー編集`;
+	}
+
+	const teamIdElement = document.getElementById('edit-team-id');
+	if (teamIdElement) {
+		teamIdElement.textContent = `チーム${teamId}`;
+	}
+
+	// 現在のチームメンバーを取得
+	const team = appState.teams.find(t => t.id === teamId);
+	if (!team) {
+		console.error(`チームID ${teamId} が見つかりません`);
+		return;
+	}
+
+	// 一時的なメンバーリストにコピー
+	tempTeamMembers = [...team.members];
+	console.log('メンバーリストをコピーしました:', tempTeamMembers);
+
+	// メンバーリストを表示
+	renderMembersList();
+
+	// 未割り当てのメンバーリストを表示
+	renderUnassignedMembersList();
+
+	// モーダルを表示
+	if (teamEditModal) {
+		teamEditModal.style.display = 'block';
+	} else {
+		console.error('チーム編集モーダル要素が見つかりません');
+	}
 }
 
 // メンバーリストをレンダリング
 function renderMembersList() {
-    const membersList = document.getElementById('edit-members-list');
-    if (!membersList) {
-        console.error('メンバーリスト要素が見つかりません');
-        return;
-    }
-    
-    membersList.innerHTML = '';
-    console.log('メンバーリストを描画します:', tempTeamMembers);
-    
-    tempTeamMembers.forEach((member, index) => {
-        const li = document.createElement('li');
-        li.className = 'member-item';
-        li.innerHTML = `
+	const membersList = document.getElementById('edit-members-list');
+	if (!membersList) {
+		console.error('メンバーリスト要素が見つかりません');
+		return;
+	}
+
+	membersList.innerHTML = '';
+	console.log('メンバーリストを描画します:', tempTeamMembers);
+
+	tempTeamMembers.forEach((member, index) => {
+		const li = document.createElement('li');
+		li.className = 'member-item';
+		li.innerHTML = `
             <span class="member-name">${member}</span>
             <button class="remove-member-btn" data-index="${index}">×</button>
         `;
-        membersList.appendChild(li);
-          // 削除ボタンにイベントリスナーを追加
-        const removeBtn = li.querySelector('.remove-member-btn');
-        if (removeBtn) {
-            removeBtn.addEventListener('click', () => {
-                // 削除されるメンバーを保存
-                const removedMember = tempTeamMembers[index];
-                console.log(`メンバー "${removedMember}" を削除します`);
-                
-                // チームメンバーリストから削除
-                tempTeamMembers.splice(index, 1);
-                
-                // リストを更新
-                renderMembersList();
-                // メンバーが削除されたら、未割り当てのメンバーリストも更新
-                renderUnassignedMembersList();
-            });
-        }
-    });
+		membersList.appendChild(li);
+		// 削除ボタンにイベントリスナーを追加
+		const removeBtn = li.querySelector('.remove-member-btn');
+		if (removeBtn) {
+			removeBtn.addEventListener('click', () => {
+				// 削除されるメンバーを保存
+				const removedMember = tempTeamMembers[index];
+				console.log(`メンバー "${removedMember}" を削除します`);
+
+				// チームメンバーリストから削除
+				tempTeamMembers.splice(index, 1);
+
+				// リストを更新
+				renderMembersList();
+				// メンバーが削除されたら、未割り当てのメンバーリストも更新
+				renderUnassignedMembersList();
+			});
+		}
+	});
 }
 
 // チームメンバーの変更を保存
 function saveTeamMembers() {
-    console.log('チームメンバーの保存を試みます', currentEditTeamId, tempTeamMembers);
-    
-    if (currentEditTeamId === null) {
-        console.error('現在編集中のチームIDがnullです');
-        alert('編集するチームが選択されていません');
-        return;
-    }
-    
-    if (tempTeamMembers.length === 0) {
-        alert('メンバーを少なくとも1人は登録してください');
-        return;
-    }
-    
-    // メンバーの重複チェック
-    const uniqueMembers = [...new Set(tempTeamMembers)];
-    if (uniqueMembers.length !== tempTeamMembers.length) {
-        alert('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
-        return;
-    }
-    
-    // 変更を適用
-    const teamIndex = appState.teams.findIndex(t => t.id === currentEditTeamId);
-    if (teamIndex !== -1) {
-        appState.teams[teamIndex].members = [...tempTeamMembers];
-        console.log(`チーム${currentEditTeamId}のメンバーを更新しました:`, appState.teams[teamIndex].members);
-        
-        // ローカルストレージに保存
-        try {
-            localStorage.setItem('tennisCustomTeams', JSON.stringify(appState.teams));
-            console.log('メンバー情報をローカルストレージに保存しました');
-        } catch (e) {
-            console.error('ローカルストレージへの保存に失敗しました:', e);
-        }
-        
-        // UI更新
-        renderTeams();
-        
-        // モーダルを閉じる
-        closeTeamEditModal();
-        
-        alert('チームメンバーを更新しました！');
-    } else {
-        console.error(`チームID ${currentEditTeamId} が見つかりません`);
-        alert('チーム情報の更新に失敗しました');
-    }
+	console.log('チームメンバーの保存を試みます', currentEditTeamId, tempTeamMembers);
+
+	if (currentEditTeamId === null) {
+		console.error('現在編集中のチームIDがnullです');
+		alert('編集するチームが選択されていません');
+		return;
+	}
+
+	if (tempTeamMembers.length === 0) {
+		alert('メンバーを少なくとも1人は登録してください');
+		return;
+	}
+
+	// メンバーの重複チェック
+	const uniqueMembers = [...new Set(tempTeamMembers)];
+	if (uniqueMembers.length !== tempTeamMembers.length) {
+		alert('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
+		return;
+	}
+
+	// 変更を適用
+	const teamIndex = appState.teams.findIndex(t => t.id === currentEditTeamId);
+	if (teamIndex !== -1) {
+		appState.teams[teamIndex].members = [...tempTeamMembers];
+		console.log(`チーム${currentEditTeamId}のメンバーを更新しました:`, appState.teams[teamIndex].members);
+
+		// ローカルストレージに保存
+		try {
+			localStorage.setItem('tennisCustomTeams', JSON.stringify(appState.teams));
+			console.log('メンバー情報をローカルストレージに保存しました');
+		} catch (e) {
+			console.error('ローカルストレージへの保存に失敗しました:', e);
+		}
+
+		// UI更新
+		renderTeams();
+
+		// モーダルを閉じる
+		closeTeamEditModal();
+
+		alert('チームメンバーを更新しました！');
+	} else {
+		console.error(`チームID ${currentEditTeamId} が見つかりません`);
+		alert('チーム情報の更新に失敗しました');
+	}
 }
 
 // チームメンバー編集モーダルを閉じる
 function closeTeamEditModal() {
-    if (teamEditModal) {
-        teamEditModal.style.display = 'none';
-        console.log('チーム編集モーダルを閉じました');
-    }
-    currentEditTeamId = null;
-    tempTeamMembers = [];
+	if (teamEditModal) {
+		teamEditModal.style.display = 'none';
+		console.log('チーム編集モーダルを閉じました');
+	}
+	currentEditTeamId = null;
+	tempTeamMembers = [];
 }
 
 // メンバーを追加
 function addNewMember() {
-    const unassignedMembersSelect = document.getElementById('unassigned-members-select');
-    if (!unassignedMembersSelect) {
-        console.error('未割り当てメンバー選択リストが見つかりません');
-        return;
-    }
-    
-    const newMemberName = unassignedMembersSelect.value;
-    
-    if (newMemberName) {
-        // 重複チェック（念のため）
-        if (tempTeamMembers.includes(newMemberName)) {
-            alert('同じ名前のメンバーが既に存在します');
-            return;
-        }
-        
-        tempTeamMembers.push(newMemberName);
-        console.log(`新しいメンバー "${newMemberName}" を追加しました`);
-        
-        // メンバーリストと未割り当てのメンバーリストを更新
-        renderMembersList();
-        renderUnassignedMembersList();
-    } else {
-        alert('追加するメンバーを選択してください');
-    }
+	const unassignedMembersSelect = document.getElementById('unassigned-members-select');
+	if (!unassignedMembersSelect) {
+		console.error('未割り当てメンバー選択リストが見つかりません');
+		return;
+	}
+
+	const newMemberName = unassignedMembersSelect.value;
+
+	if (newMemberName) {
+		// 重複チェック（念のため）
+		if (tempTeamMembers.includes(newMemberName)) {
+			alert('同じ名前のメンバーが既に存在します');
+			return;
+		}
+
+		tempTeamMembers.push(newMemberName);
+		console.log(`新しいメンバー "${newMemberName}" を追加しました`);
+
+		// メンバーリストと未割り当てのメンバーリストを更新
+		renderMembersList();
+		renderUnassignedMembersList();
+	} else {
+		alert('追加するメンバーを選択してください');
+	}
 }
 
 // スコアを保存する関数
 function saveScore() {
-    if (!currentMatchData) return;
-    
-    const { rowTeamId, colTeamId, matchId } = currentMatchData;
-    const score1Input = document.getElementById('modal-score-team1');
-    const score2Input = document.getElementById('modal-score-team2');
-    
-    // 入力値の取得
-    let team1Score = parseInt(score1Input.value);
-    let team2Score = parseInt(score2Input.value);
-    
-    // 入力値のバリデーション
-    if (isNaN(team1Score) || isNaN(team2Score) || team1Score < 0 || team2Score < 0) {
-        alert('スコアは0以上の数字を入力してください');
-        return;
-    }
-    
-    // マッチポイントを取得（最大スコアとして使用）
-    const matchPoint = appState.settings.matchPoint;
-    
-    // マッチポイントを超える場合は自動的に上限を設定
-    if (team1Score > matchPoint) team1Score = matchPoint;
-    if (team2Score > matchPoint) team2Score = matchPoint;
-    
-    // スコアを保存
-    processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score);
-    
-    // モーダルを閉じる
-    closeScoreModal();
+	if (!currentMatchData) return;
+
+	const { rowTeamId, colTeamId, matchId } = currentMatchData;
+	const score1Input = document.getElementById('modal-score-team1');
+	const score2Input = document.getElementById('modal-score-team2');
+
+	// 入力値の取得
+	let team1Score = parseInt(score1Input.value);
+	let team2Score = parseInt(score2Input.value);
+
+	// 入力値のバリデーション
+	if (isNaN(team1Score) || isNaN(team2Score) || team1Score < 0 || team2Score < 0) {
+		alert('スコアは0以上の数字を入力してください');
+		return;
+	}
+
+	// マッチポイントを取得（最大スコアとして使用）
+	const matchPoint = appState.settings.matchPoint;
+
+	// マッチポイントを超える場合は自動的に上限を設定
+	if (team1Score > matchPoint) team1Score = matchPoint;
+	if (team2Score > matchPoint) team2Score = matchPoint;
+
+	// スコアを保存
+	processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score);
+
+	// モーダルを閉じる
+	closeScoreModal();
 }
 
 // モーダルのイベントリスナー設定
-document.addEventListener('DOMContentLoaded', function() {
-    // 保存ボタンのクリックイベント
-    document.getElementById('save-score-btn').addEventListener('click', saveScore);
-    
-    // キャンセルボタンのクリックイベント
-    document.getElementById('cancel-score-btn').addEventListener('click', closeScoreModal);
-    
-    // 閉じるボタン（×）のクリックイベント
-    document.querySelector('.close-modal').addEventListener('click', closeScoreModal);
-    
-    // モーダル外をクリックした時に閉じる
-    window.addEventListener('click', function(event) {
-        if (event.target === scoreModal) {
-            closeScoreModal();
-        }
-    });
+document.addEventListener('DOMContentLoaded', function () {
+	// 保存ボタンのクリックイベント
+	document.getElementById('save-score-btn').addEventListener('click', saveScore);
+
+	// キャンセルボタンのクリックイベント
+	document.getElementById('cancel-score-btn').addEventListener('click', closeScoreModal);
+
+	// 閉じるボタン（×）のクリックイベント
+	document.querySelector('.close-modal').addEventListener('click', closeScoreModal);
+
+	// モーダル外をクリックした時に閉じる
+	window.addEventListener('click', function (event) {
+		if (event.target === scoreModal) {
+			closeScoreModal();
+		}
+	});
 });
 
 // チームメンバー編集モーダルのイベントリスナーを初期化
 function initializeTeamEditListeners() {
-    console.log('チームメンバー編集モーダルのイベントリスナーを初期化します');
-    
-    // モーダルの保存ボタンのクリックイベント
-    const saveTeamBtn = document.getElementById('save-team-btn');
-    if (saveTeamBtn) {
-        saveTeamBtn.addEventListener('click', saveTeamMembers);
-        console.log('保存ボタンのリスナーを設定しました');
-    }
-    
-    // キャンセルボタンのクリックイベント
-    const cancelTeamBtn = document.getElementById('cancel-team-btn');
-    if (cancelTeamBtn) {
-        cancelTeamBtn.addEventListener('click', closeTeamEditModal);
-        console.log('キャンセルボタンのリスナーを設定しました');
-    }
-    
-    // 閉じるボタン（×）のクリックイベント - チームメンバー編集モーダル内の閉じるボタンを特定
-    const closeModalBtn = document.querySelector('#team-edit-modal .close-modal');
-    if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', closeTeamEditModal);
-        console.log('閉じるボタンのリスナーを設定しました');
-    }
-    
-    // モーダル外をクリックした時に閉じる
-    window.addEventListener('click', function(event) {
-        if (event.target === teamEditModal) {
-            closeTeamEditModal();
-        }
-    });
-    
-    // 新しいメンバーを追加するボタンのクリックイベント
-    const addMemberBtn = document.getElementById('add-member-btn');
-    if (addMemberBtn) {
-        addMemberBtn.addEventListener('click', addNewMember);
-        console.log('追加ボタンのリスナーを設定しました');
-    }
-    
-    // 選択リストが変更されたときのイベント
-    const unassignedMembersSelect = document.getElementById('unassigned-members-select');
-    if (unassignedMembersSelect) {
-        unassignedMembersSelect.addEventListener('change', function() {
-            // 選択されたらボタンにフォーカスを移動（使いやすさのため）
-            if (this.value) {
-                const addMemberBtn = document.getElementById('add-member-btn');
-                if (addMemberBtn) addMemberBtn.focus();
-            }
-        });
-        console.log('未割り当てメンバー選択リストのリスナーを設定しました');
-    }
+	console.log('チームメンバー編集モーダルのイベントリスナーを初期化します');
+
+	// モーダルの保存ボタンのクリックイベント
+	const saveTeamBtn = document.getElementById('save-team-btn');
+	if (saveTeamBtn) {
+		saveTeamBtn.addEventListener('click', saveTeamMembers);
+		console.log('保存ボタンのリスナーを設定しました');
+	}
+
+	// キャンセルボタンのクリックイベント
+	const cancelTeamBtn = document.getElementById('cancel-team-btn');
+	if (cancelTeamBtn) {
+		cancelTeamBtn.addEventListener('click', closeTeamEditModal);
+		console.log('キャンセルボタンのリスナーを設定しました');
+	}
+
+	// 閉じるボタン（×）のクリックイベント - チームメンバー編集モーダル内の閉じるボタンを特定
+	const closeModalBtn = document.querySelector('#team-edit-modal .close-modal');
+	if (closeModalBtn) {
+		closeModalBtn.addEventListener('click', closeTeamEditModal);
+		console.log('閉じるボタンのリスナーを設定しました');
+	}
+
+	// モーダル外をクリックした時に閉じる
+	window.addEventListener('click', function (event) {
+		if (event.target === teamEditModal) {
+			closeTeamEditModal();
+		}
+	});
+
+	// 新しいメンバーを追加するボタンのクリックイベント
+	const addMemberBtn = document.getElementById('add-member-btn');
+	if (addMemberBtn) {
+		addMemberBtn.addEventListener('click', addNewMember);
+		console.log('追加ボタンのリスナーを設定しました');
+	}
+
+	// 選択リストが変更されたときのイベント
+	const unassignedMembersSelect = document.getElementById('unassigned-members-select');
+	if (unassignedMembersSelect) {
+		unassignedMembersSelect.addEventListener('change', function () {
+			// 選択されたらボタンにフォーカスを移動（使いやすさのため）
+			if (this.value) {
+				const addMemberBtn = document.getElementById('add-member-btn');
+				if (addMemberBtn) addMemberBtn.focus();
+			}
+		});
+		console.log('未割り当てメンバー選択リストのリスナーを設定しました');
+	}
 }
 
 // セルクリック時の処理
 function handleCellClick(event) {
-    const cell = event.currentTarget;    
-    const rowTeamId = parseInt(cell.dataset.rowTeamId);
-    const colTeamId = parseInt(cell.dataset.colTeamId);
-    const matchId = cell.dataset.matchId;
-    
-    // モーダルを開く
-    openScoreModal(rowTeamId, colTeamId, matchId);
+	const cell = event.currentTarget;
+	const rowTeamId = parseInt(cell.dataset.rowTeamId);
+	const colTeamId = parseInt(cell.dataset.colTeamId);
+	const matchId = cell.dataset.matchId;
+
+	// モーダルを開く
+	openScoreModal(rowTeamId, colTeamId, matchId);
 }
 
 // スコアを処理して結果を保存する関数
 function processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score) {
-    // 勝者を決定
-    let winner;
-    
-    // 同点の場合は引き分け
-    if (team1Score === team2Score) {
-        winner = null;
-    } else if (team1Score > team2Score) {
-        // チーム1が点数が高い場合は勝ち
-        winner = rowTeamId;
-    } else {
-        // チーム2が点数が高い場合は勝ち
-        winner = colTeamId;
-    }
-    
-    // 小さいチームIDが先になるように調整（データの一貫性のため）
-    const firstTeamId = Math.min(rowTeamId, colTeamId);
-    const secondTeamId = Math.max(rowTeamId, colTeamId);
-    
-    // スコアも正しい順序で保存
-    let scoreTeam1, scoreTeam2;
-    if (firstTeamId === rowTeamId) {
-        scoreTeam1 = team1Score;
-        scoreTeam2 = team2Score;
-    } else {
-        scoreTeam1 = team2Score;
-        scoreTeam2 = team1Score;
-    }
-      // 試合結果を保存
-    appState.matches[matchId] = {
-        team1: firstTeamId,
-        team2: secondTeamId,
-        scoreTeam1: scoreTeam1,
-        scoreTeam2: scoreTeam2,
-        winner: winner
-    };
-    
-    // ローカルストレージに保存
-    saveMatchResults();
-    
-    // UI更新
-    createMatchTable();
-    calculateStandings();
-  }
+	// 勝者を決定
+	let winner;
+
+	// 同点の場合は引き分け
+	if (team1Score === team2Score) {
+		winner = null;
+	} else if (team1Score > team2Score) {
+		// チーム1が点数が高い場合は勝ち
+		winner = rowTeamId;
+	} else {
+		// チーム2が点数が高い場合は勝ち
+		winner = colTeamId;
+	}
+
+	// 小さいチームIDが先になるように調整（データの一貫性のため）
+	const firstTeamId = Math.min(rowTeamId, colTeamId);
+	const secondTeamId = Math.max(rowTeamId, colTeamId);
+
+	// スコアも正しい順序で保存
+	let scoreTeam1, scoreTeam2;
+	if (firstTeamId === rowTeamId) {
+		scoreTeam1 = team1Score;
+		scoreTeam2 = team2Score;
+	} else {
+		scoreTeam1 = team2Score;
+		scoreTeam2 = team1Score;
+	}
+	// 試合結果を保存
+	appState.matches[matchId] = {
+		team1: firstTeamId,
+		team2: secondTeamId,
+		scoreTeam1: scoreTeam1,
+		scoreTeam2: scoreTeam2,
+		winner: winner
+	};
+
+	// ローカルストレージに保存
+	saveMatchResults();
+
+	// UI更新
+	createMatchTable();
+	calculateStandings();
+}
 
 // チームIDからチーム番号を取得する関数（現在は未使用）
 // function getTeamNameById(teamId) {
@@ -583,188 +583,188 @@ function processMatchScore(rowTeamId, colTeamId, matchId, team1Score, team2Score
 
 // チーム選択フォームを初期化
 function initializeResultForm() {
-    const team1Select = document.getElementById('team1-select');
-    const team2Select = document.getElementById('team2-select');
-    
-    team1Select.innerHTML = '<option value="">チームを選択</option>';
-    team2Select.innerHTML = '<option value="">チームを選択</option>';
-    
-    appState.teams.forEach(team => {
-        team1Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-        team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-    });
-    
-    // チーム1の選択が変わったときに、チーム2の選択肢を更新
-    team1Select.addEventListener('change', () => {
-        const selectedTeam1 = team1Select.value;
-        
-        // チーム2のオプションをリセット
-        team2Select.innerHTML = '<option value="">チームを選択</option>';
-        
-        // 選択されていないチームのみ表示
-        appState.teams.forEach(team => {
-            if (team.id != selectedTeam1) {
-                team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-            }
-        });
-    });
-    
-    // フォーム送信イベントのリスナー
-    document.getElementById('result-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const team1Id = parseInt(team1Select.value);
-        const team2Id = parseInt(team2Select.value);
-        
-        if (team1Id === team2Id) {
-            alert('異なるチームを選択してください');
-            return;
-        }          let scoreTeam1 = parseInt(document.getElementById('score-team1').value);
-        let scoreTeam2 = parseInt(document.getElementById('score-team2').value);
-        
-        // スコアがマッチポイントを超えていたら上限を適用
-        const matchPoint = appState.settings.matchPoint;
-        if (scoreTeam1 > matchPoint) scoreTeam1 = matchPoint;
-        if (scoreTeam2 > matchPoint) scoreTeam2 = matchPoint;
-        
-        // 勝者を決定
-        let winner;
-        
-        if (scoreTeam1 === scoreTeam2) {
-            // 同点は引き分け
-            winner = null;
-        } else if (scoreTeam1 > scoreTeam2) {
-            // チーム1のスコアが高ければチーム1が勝ち
-            winner = team1Id;
-        } else {
-            // チーム2のスコアが高ければチーム2が勝ち
-            winner = team2Id;
-        }
-        
-        // matchIdを生成（小さい番号のチームが先）
-        const matchId = getMatchId(team1Id, team2Id);
-        
-        // 試合結果を保存
-        appState.matches[matchId] = {
-            team1: team1Id,
-            team2: team2Id,
-            scoreTeam1: scoreTeam1,
-            scoreTeam2: scoreTeam2,
-            winner: winner
-        };
-        
-        // ローカルストレージに保存
-        saveMatchResults();
-        
-        // UI更新
-        createMatchTable();
-        calculateStandings();
-        
-        // フォームをリセット
-        this.reset();
-        team1Select.innerHTML = '<option value="">チームを選択</option>';
-        team2Select.innerHTML = '<option value="">チームを選択</option>';
-        
-        appState.teams.forEach(team => {
-            team1Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-            team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
-        });
-        
-        alert('試合結果を保存しました！');
-    });
+	const team1Select = document.getElementById('team1-select');
+	const team2Select = document.getElementById('team2-select');
+
+	team1Select.innerHTML = '<option value="">チームを選択</option>';
+	team2Select.innerHTML = '<option value="">チームを選択</option>';
+
+	appState.teams.forEach(team => {
+		team1Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+		team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+	});
+
+	// チーム1の選択が変わったときに、チーム2の選択肢を更新
+	team1Select.addEventListener('change', () => {
+		const selectedTeam1 = team1Select.value;
+
+		// チーム2のオプションをリセット
+		team2Select.innerHTML = '<option value="">チームを選択</option>';
+
+		// 選択されていないチームのみ表示
+		appState.teams.forEach(team => {
+			if (team.id != selectedTeam1) {
+				team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+			}
+		});
+	});
+
+	// フォーム送信イベントのリスナー
+	document.getElementById('result-form').addEventListener('submit', function (e) {
+		e.preventDefault();
+
+		const team1Id = parseInt(team1Select.value);
+		const team2Id = parseInt(team2Select.value);
+
+		if (team1Id === team2Id) {
+			alert('異なるチームを選択してください');
+			return;
+		} let scoreTeam1 = parseInt(document.getElementById('score-team1').value);
+		let scoreTeam2 = parseInt(document.getElementById('score-team2').value);
+
+		// スコアがマッチポイントを超えていたら上限を適用
+		const matchPoint = appState.settings.matchPoint;
+		if (scoreTeam1 > matchPoint) scoreTeam1 = matchPoint;
+		if (scoreTeam2 > matchPoint) scoreTeam2 = matchPoint;
+
+		// 勝者を決定
+		let winner;
+
+		if (scoreTeam1 === scoreTeam2) {
+			// 同点は引き分け
+			winner = null;
+		} else if (scoreTeam1 > scoreTeam2) {
+			// チーム1のスコアが高ければチーム1が勝ち
+			winner = team1Id;
+		} else {
+			// チーム2のスコアが高ければチーム2が勝ち
+			winner = team2Id;
+		}
+
+		// matchIdを生成（小さい番号のチームが先）
+		const matchId = getMatchId(team1Id, team2Id);
+
+		// 試合結果を保存
+		appState.matches[matchId] = {
+			team1: team1Id,
+			team2: team2Id,
+			scoreTeam1: scoreTeam1,
+			scoreTeam2: scoreTeam2,
+			winner: winner
+		};
+
+		// ローカルストレージに保存
+		saveMatchResults();
+
+		// UI更新
+		createMatchTable();
+		calculateStandings();
+
+		// フォームをリセット
+		this.reset();
+		team1Select.innerHTML = '<option value="">チームを選択</option>';
+		team2Select.innerHTML = '<option value="">チームを選択</option>';
+
+		appState.teams.forEach(team => {
+			team1Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+			team2Select.innerHTML += `<option value="${team.id}">${team.name}</option>`;
+		});
+
+		alert('試合結果を保存しました！');
+	});
 }
 
 // マッチIDを生成（小さい番号のチームが先）
 function getMatchId(team1Id, team2Id) {
-    return team1Id < team2Id ? `${team1Id}-${team2Id}` : `${team2Id}-${team1Id}`;
+	return team1Id < team2Id ? `${team1Id}-${team2Id}` : `${team2Id}-${team1Id}`;
 }
 
 // 順位表を計算して表示する関数
 function calculateStandings() {
-    // チームごとの成績を初期化
-    const teamStats = {};
-    
-    appState.teams.forEach(team => {
-        teamStats[team.id] = {
-            teamId: team.id,
-            wins: 0,
-            losses: 0,
-            draws: 0,
-            totalScore: 0,
-            totalConceded: 0, // 失点の合計を追加
-            scoreDifference: 0, // 得失点差を追加
-            winRate: 0
-        };
-    });
-    
-    // 試合結果から勝敗を集計
-    Object.values(appState.matches).forEach(match => {
-        if (match.winner) {
-            // 勝者が存在する場合
-            teamStats[match.winner].wins++;
-            
-            // 負けたチームを特定
-            const loserId = match.winner === match.team1 ? match.team2 : match.team1;
-            teamStats[loserId].losses++;
-            
-            // スコアも加算（得点と失点両方を記録）
-            if (match.team1 === match.winner) {
-                teamStats[match.team1].totalScore += match.scoreTeam1;
-                teamStats[match.team1].totalConceded += match.scoreTeam2;
-                teamStats[match.team2].totalScore += match.scoreTeam2;
-                teamStats[match.team2].totalConceded += match.scoreTeam1;
-            } else {
-                teamStats[match.team1].totalScore += match.scoreTeam1;
-                teamStats[match.team1].totalConceded += match.scoreTeam2;
-                teamStats[match.team2].totalScore += match.scoreTeam2;
-                teamStats[match.team2].totalConceded += match.scoreTeam1;
-            }
-        } else {
-            // 引き分けの場合
-            teamStats[match.team1].draws++;
-            teamStats[match.team2].draws++;
-            
-            // スコアを加算（得点と失点両方を記録）
-            teamStats[match.team1].totalScore += match.scoreTeam1;
-            teamStats[match.team1].totalConceded += match.scoreTeam2;
-            teamStats[match.team2].totalScore += match.scoreTeam2;
-            teamStats[match.team2].totalConceded += match.scoreTeam1;
-        }
-    });
-    
-    // 勝率と得失点差を計算
-    Object.values(teamStats).forEach(stats => {
-        const totalMatches = stats.wins + stats.losses + stats.draws;
-        stats.winRate = totalMatches > 0 ? Math.round((stats.wins / totalMatches) * 1000) / 1000 : 0;
-        stats.scoreDifference = stats.totalScore - stats.totalConceded; // 得失点差を計算
-    });
-    
-    // 順位付け（勝利数 → 得失点差 → 得点合計 → 勝率の順）
-    appState.standings = Object.values(teamStats).sort((a, b) => {
-        if (b.wins !== a.wins) return b.wins - a.wins;
-        if (b.scoreDifference !== a.scoreDifference) return b.scoreDifference - a.scoreDifference; // 得失点差で比較
-        if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
-        return b.winRate - a.winRate;
-    });
-    
-    // 順位表の表示
-    renderStandings();
+	// チームごとの成績を初期化
+	const teamStats = {};
+
+	appState.teams.forEach(team => {
+		teamStats[team.id] = {
+			teamId: team.id,
+			wins: 0,
+			losses: 0,
+			draws: 0,
+			totalScore: 0,
+			totalConceded: 0, // 失点の合計を追加
+			scoreDifference: 0, // 得失点差を追加
+			winRate: 0
+		};
+	});
+
+	// 試合結果から勝敗を集計
+	Object.values(appState.matches).forEach(match => {
+		if (match.winner) {
+			// 勝者が存在する場合
+			teamStats[match.winner].wins++;
+
+			// 負けたチームを特定
+			const loserId = match.winner === match.team1 ? match.team2 : match.team1;
+			teamStats[loserId].losses++;
+
+			// スコアも加算（得点と失点両方を記録）
+			if (match.team1 === match.winner) {
+				teamStats[match.team1].totalScore += match.scoreTeam1;
+				teamStats[match.team1].totalConceded += match.scoreTeam2;
+				teamStats[match.team2].totalScore += match.scoreTeam2;
+				teamStats[match.team2].totalConceded += match.scoreTeam1;
+			} else {
+				teamStats[match.team1].totalScore += match.scoreTeam1;
+				teamStats[match.team1].totalConceded += match.scoreTeam2;
+				teamStats[match.team2].totalScore += match.scoreTeam2;
+				teamStats[match.team2].totalConceded += match.scoreTeam1;
+			}
+		} else {
+			// 引き分けの場合
+			teamStats[match.team1].draws++;
+			teamStats[match.team2].draws++;
+
+			// スコアを加算（得点と失点両方を記録）
+			teamStats[match.team1].totalScore += match.scoreTeam1;
+			teamStats[match.team1].totalConceded += match.scoreTeam2;
+			teamStats[match.team2].totalScore += match.scoreTeam2;
+			teamStats[match.team2].totalConceded += match.scoreTeam1;
+		}
+	});
+
+	// 勝率と得失点差を計算
+	Object.values(teamStats).forEach(stats => {
+		const totalMatches = stats.wins + stats.losses + stats.draws;
+		stats.winRate = totalMatches > 0 ? Math.round((stats.wins / totalMatches) * 1000) / 1000 : 0;
+		stats.scoreDifference = stats.totalScore - stats.totalConceded; // 得失点差を計算
+	});
+
+	// 順位付け（勝利数 → 得失点差 → 得点合計 → 勝率の順）
+	appState.standings = Object.values(teamStats).sort((a, b) => {
+		if (b.wins !== a.wins) return b.wins - a.wins;
+		if (b.scoreDifference !== a.scoreDifference) return b.scoreDifference - a.scoreDifference; // 得失点差で比較
+		if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+		return b.winRate - a.winRate;
+	});
+
+	// 順位表の表示
+	renderStandings();
 }
 
 // 順位表を表示する関数
 function renderStandings() {
-    const standingsBody = document.getElementById('standings-body');
-    standingsBody.innerHTML = '';
-    
-    appState.standings.forEach((team, index) => {
-        const row = document.createElement('tr');
-        
-        // 得失点差を表示する列を追加
-        const scoreDifferenceClass = team.scoreDifference > 0 ? 'positive-diff' : 
-                                     team.scoreDifference < 0 ? 'negative-diff' : '';
-        const scoreDifferenceDisplay = team.scoreDifference > 0 ? `+${team.scoreDifference}` : team.scoreDifference;
-        
-        row.innerHTML = `
+	const standingsBody = document.getElementById('standings-body');
+	standingsBody.innerHTML = '';
+
+	appState.standings.forEach((team, index) => {
+		const row = document.createElement('tr');
+
+		// 得失点差を表示する列を追加
+		const scoreDifferenceClass = team.scoreDifference > 0 ? 'positive-diff' :
+			team.scoreDifference < 0 ? 'negative-diff' : '';
+		const scoreDifferenceDisplay = team.scoreDifference > 0 ? `+${team.scoreDifference}` : team.scoreDifference;
+
+		row.innerHTML = `
             <td>${index + 1}</td>
             <td>${team.teamId}</td>
             <td>${team.wins}</td>
@@ -774,363 +774,363 @@ function renderStandings() {
             <td class="${scoreDifferenceClass}">${scoreDifferenceDisplay}</td>
             <td>${(team.winRate * 100).toFixed(1)}%</td>
         `;
-        
-        standingsBody.appendChild(row);
-    });
+
+		standingsBody.appendChild(row);
+	});
 }
 
 // 試合設定フォームの初期化と処理
 function initializeSettingsForm() {
-    const settingsForm = document.getElementById('header-settings-form');
-    const matchPointInput = document.getElementById('header-match-point');
-    
-    // スコア入力欄の最大値を設定
-    const scoreTeam1Input = document.getElementById('score-team1');
-    const scoreTeam2Input = document.getElementById('score-team2');
-    if (scoreTeam1Input && scoreTeam2Input) {
-        scoreTeam1Input.max = appState.settings.matchPoint;
-        scoreTeam2Input.max = appState.settings.matchPoint;
-    }
-    
-    // 現在の設定を表示
-    matchPointInput.value = appState.settings.matchPoint;
-    
-    // 設定変更時の処理
-    settingsForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const newMatchPoint = parseInt(matchPointInput.value);
-        
-        // 入力値の検証
-        if (isNaN(newMatchPoint) || newMatchPoint < 1 || newMatchPoint > 99) {
-            alert('マッチポイントは1から99の間で設定してください');
-            return;
-        }
-          // 設定を保存
-        appState.settings.matchPoint = newMatchPoint;
-        saveSettings();
-        
-        // スコア入力欄の最大値を更新
-        const scoreTeam1Input = document.getElementById('score-team1');
-        const scoreTeam2Input = document.getElementById('score-team2');
-        if (scoreTeam1Input && scoreTeam2Input) {
-            scoreTeam1Input.max = newMatchPoint;
-            scoreTeam2Input.max = newMatchPoint;
-        }
-        
-        // 結果に影響するため、順位表を再計算
-        calculateStandings();
-        
-        alert('設定を保存しました！');
-    });
+	const settingsForm = document.getElementById('header-settings-form');
+	const matchPointInput = document.getElementById('header-match-point');
+
+	// スコア入力欄の最大値を設定
+	const scoreTeam1Input = document.getElementById('score-team1');
+	const scoreTeam2Input = document.getElementById('score-team2');
+	if (scoreTeam1Input && scoreTeam2Input) {
+		scoreTeam1Input.max = appState.settings.matchPoint;
+		scoreTeam2Input.max = appState.settings.matchPoint;
+	}
+
+	// 現在の設定を表示
+	matchPointInput.value = appState.settings.matchPoint;
+
+	// 設定変更時の処理
+	settingsForm.addEventListener('submit', (e) => {
+		e.preventDefault();
+
+		const newMatchPoint = parseInt(matchPointInput.value);
+
+		// 入力値の検証
+		if (isNaN(newMatchPoint) || newMatchPoint < 1 || newMatchPoint > 99) {
+			alert('マッチポイントは1から99の間で設定してください');
+			return;
+		}
+		// 設定を保存
+		appState.settings.matchPoint = newMatchPoint;
+		saveSettings();
+
+		// スコア入力欄の最大値を更新
+		const scoreTeam1Input = document.getElementById('score-team1');
+		const scoreTeam2Input = document.getElementById('score-team2');
+		if (scoreTeam1Input && scoreTeam2Input) {
+			scoreTeam1Input.max = newMatchPoint;
+			scoreTeam2Input.max = newMatchPoint;
+		}
+
+		// 結果に影響するため、順位表を再計算
+		calculateStandings();
+
+		alert('設定を保存しました！');
+	});
 }
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 document.addEventListener('DOMContentLoaded', async () => {
-    const config = await loadConfig();
-    if (!config) {
-        alert('設定ファイルの読み込みに失敗しました。ページを再読み込みしてください。');
-        return;
-    }
-    
-    // オリジナルのチーム構成を保存（リセット用）
-    appState.originalTeams = JSON.parse(JSON.stringify(config.teams));
-    
-    // 初期データとして設定
-    appState.teams = JSON.parse(JSON.stringify(config.teams));
-      
-    // 設定ファイルから初期設定を読み込み
-    if (config.matchSettings) {
-        appState.settings.matchPoint = config.matchSettings.matchPoint || 7;
-    }
-    
-    // 保存された設定と試合結果を読み込む
-    loadSettings();
-    loadMatchResults();
-    loadTeamMembers(); // カスタムチームメンバーがあれば読み込む
-    
-    // UI初期化
-    renderTeams();
-    createMatchTable();
-    initializeResultForm();
-    initializeSettingsForm();
-    calculateStandings();
-    
-    // エクスポートボタンのイベントリスナーを追加
-    document.getElementById('export-results-btn').addEventListener('click', exportMatchAnalysis);
-    
-    // チームメンバー編集用のモーダルのイベントリスナー設定
-    initializeTeamEditListeners();
-    initializeModalElements(); // モーダル要素の初期化を追加
-    
-    // リセットボタンのイベントリスナーを追加
-    const resetButton = document.getElementById('reset-teams-btn');
-    if (resetButton) {
-        resetButton.addEventListener('click', resetToOriginalTeams);
-    }
+	const config = await loadConfig();
+	if (!config) {
+		alert('設定ファイルの読み込みに失敗しました。ページを再読み込みしてください。');
+		return;
+	}
+
+	// オリジナルのチーム構成を保存（リセット用）
+	appState.originalTeams = JSON.parse(JSON.stringify(config.teams));
+
+	// 初期データとして設定
+	appState.teams = JSON.parse(JSON.stringify(config.teams));
+
+	// 設定ファイルから初期設定を読み込み
+	if (config.matchSettings) {
+		appState.settings.matchPoint = config.matchSettings.matchPoint || 7;
+	}
+
+	// 保存された設定と試合結果を読み込む
+	loadSettings();
+	loadMatchResults();
+	loadTeamMembers(); // カスタムチームメンバーがあれば読み込む
+
+	// UI初期化
+	renderTeams();
+	createMatchTable();
+	initializeResultForm();
+	initializeSettingsForm();
+	calculateStandings();
+
+	// エクスポートボタンのイベントリスナーを追加
+	document.getElementById('export-results-btn').addEventListener('click', exportMatchAnalysis);
+
+	// チームメンバー編集用のモーダルのイベントリスナー設定
+	initializeTeamEditListeners();
+	initializeModalElements(); // モーダル要素の初期化を追加
+
+	// リセットボタンのイベントリスナーを追加
+	const resetButton = document.getElementById('reset-teams-btn');
+	if (resetButton) {
+		resetButton.addEventListener('click', resetToOriginalTeams);
+	}
 });
 
 // オリジナルのチーム構成にリセットする機能
 function resetToOriginalTeams() {
-    if (confirm('すべてのチームをオリジナルの構成にリセットしますか？この操作は元に戻せません。')) {
-        // オリジナルのチーム構成をコピー
-        appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
-        
-        // ローカルストレージから現在のカスタム設定を削除
-        try {
-            localStorage.removeItem('tennisCustomTeams');
-            console.log('カスタムチーム設定をローカルストレージから削除しました');
-        } catch (e) {
-            console.error('ローカルストレージからの削除に失敗しました:', e);
-        }
-        
-        // UI更新
-        renderTeams();
-        alert('すべてのチームをオリジナルの構成にリセットしました');
-    }
+	if (confirm('すべてのチームをオリジナルの構成にリセットしますか？この操作は元に戻せません。')) {
+		// オリジナルのチーム構成をコピー
+		appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
+
+		// ローカルストレージから現在のカスタム設定を削除
+		try {
+			localStorage.removeItem('tennisCustomTeams');
+			console.log('カスタムチーム設定をローカルストレージから削除しました');
+		} catch (e) {
+			console.error('ローカルストレージからの削除に失敗しました:', e);
+		}
+
+		// UI更新
+		renderTeams();
+		alert('すべてのチームをオリジナルの構成にリセットしました');
+	}
 }
 
 // 試合分析データをエクスポートする関数
 function exportMatchAnalysis() {
-    // 現在の日時をフォーマットしてファイル名に使用
-    const now = new Date();
-    const dateStr = now.getFullYear() + 
-                    ('0' + (now.getMonth() + 1)).slice(-2) + 
-                    ('0' + now.getDate()).slice(-2) + '_' + 
-                    ('0' + now.getHours()).slice(-2) + 
-                    ('0' + now.getMinutes()).slice(-2);
-    const filename = `テニス対戦結果_${dateStr}.csv`;
-    
-    // CSVヘッダー
-    let csvContent = '\ufeff'; // BOMを追加してExcelで日本語を正しく表示
-    
-    // 0. チームメンバー情報のエクスポート
-    csvContent += '# チームメンバー情報\n';
-    csvContent += 'チームID,メンバー\n';
-    
-    appState.teams.forEach(team => {
-        team.members.forEach(member => {
-            csvContent += `チーム${team.id},${member}\n`;
-        });
-    });
-    
-    csvContent += '\n';
-    
-    // 1. 対戦表データのエクスポート
-    csvContent += '# 対戦表データ\n';
-    csvContent += 'チーム1,チーム2,チーム1スコア,チーム2スコア,勝者,引き分け\n';
-    
-    // 対戦結果をCSVに変換
-    Object.values(appState.matches).forEach(match => {
-        // 勝者の表示方法を決定
-        let winnerDisplay = '';
-        let drawDisplay = 'FALSE';
-        
-        if (match.winner === null) {
-            drawDisplay = 'TRUE';
-        } else {
-            winnerDisplay = `チーム${match.winner}`;
-        }
-        
-        csvContent += `チーム${match.team1},チーム${match.team2},${match.scoreTeam1},${match.scoreTeam2},${winnerDisplay},${drawDisplay}\n`;
-    });
-      // 2. 順位表データのエクスポート
-    csvContent += '\n# 順位表データ\n';
-    csvContent += '順位,チーム,勝利数,敗北数,引分,得点,得失点差,勝率\n';
-    
-    appState.standings.forEach((team, index) => {
-        const scoreDifferenceDisplay = team.scoreDifference > 0 ? `+${team.scoreDifference}` : team.scoreDifference;
-        csvContent += `${index + 1},チーム${team.teamId},${team.wins},${team.losses},${team.draws},${team.totalScore},${scoreDifferenceDisplay},${(team.winRate * 100).toFixed(1)}%\n`;
-    });
-    
-    // 3. 対戦分析データの追加
-    csvContent += '\n# 対戦分析データ\n';
-    csvContent += 'チーム,対戦相手,勝利数,敗北数,引分,得点,失点,得失点差\n';
-    
-    // チームごとの対戦成績を集計
-    appState.teams.forEach(team => {
-        const teamId = team.id;
-        
-        // 他の各チームとの対戦成績
-        appState.teams.forEach(opponent => {
-            if (teamId === opponent.id) return; // 自分自身との対戦はスキップ
-            
-            const opponentId = opponent.id;
-            const matchId = getMatchId(teamId, opponentId);
-            const match = appState.matches[matchId];
-            
-            if (match) {
-                let wins = 0;
-                let losses = 0;
-                let draws = 0;
-                let scoredPoints = 0;
-                let concededPoints = 0;
-                
-                if (match.winner === null) {
-                    draws = 1;
-                    // チームのスコアを正しく取得
-                    if (match.team1 === teamId) {
-                        scoredPoints = match.scoreTeam1;
-                        concededPoints = match.scoreTeam2;
-                    } else {
-                        scoredPoints = match.scoreTeam2;
-                        concededPoints = match.scoreTeam1;
-                    }
-                } else if (match.winner === teamId) {
-                    wins = 1;
-                    // チームのスコアを正しく取得
-                    if (match.team1 === teamId) {
-                        scoredPoints = match.scoreTeam1;
-                        concededPoints = match.scoreTeam2;
-                    } else {
-                        scoredPoints = match.scoreTeam2;
-                        concededPoints = match.scoreTeam1;
-                    }
-                } else {
-                    losses = 1;
-                    // チームのスコアを正しく取得
-                    if (match.team1 === teamId) {
-                        scoredPoints = match.scoreTeam1;
-                        concededPoints = match.scoreTeam2;
-                    } else {
-                        scoredPoints = match.scoreTeam2;
-                        concededPoints = match.scoreTeam1;
-                    }
-                }
-                
-                const pointDiff = scoredPoints - concededPoints;
-                csvContent += `チーム${teamId},チーム${opponentId},${wins},${losses},${draws},${scoredPoints},${concededPoints},${pointDiff}\n`;
-            } else {
-                // 対戦していない場合
-                csvContent += `チーム${teamId},チーム${opponentId},0,0,0,0,0,0\n`;
-            }
-        });
-    });
-      // 4. 設定情報の追加
-    csvContent += '\n# 設定情報\n';
-    csvContent += `マッチポイント,${appState.settings.matchPoint}\n`;
-    csvContent += `エクスポート日時,${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}:${('0' + now.getMinutes()).slice(-2)}\n`;
-    
-    // 5. 大会情報の追加（config.jsonから）
-    try {
-        fetch('config.json')
-            .then(response => response.json())
-            .then(config => {
-                if (config.tournamentInfo) {
-                    csvContent += '\n# 大会情報\n';
-                    csvContent += `大会名,${config.tournamentInfo.name || '不明'}\n`;
-                    csvContent += `開催日,${config.tournamentInfo.date || '不明'}\n`;
-                    csvContent += `場所,${config.tournamentInfo.location || '不明'}\n`;
-                    csvContent += `形式,${config.tournamentInfo.format || '不明'}\n`;
-                }
-                
-                // データを準備した後でダウンロードを実行
-                downloadCSV(csvContent, filename);
-            });
-    } catch (error) {
-        console.error('大会情報の取得に失敗しました:', error);
-        // エラーが発生しても基本データはダウンロードできるようにする
-        downloadCSV(csvContent, filename);
-    }
+	// 現在の日時をフォーマットしてファイル名に使用
+	const now = new Date();
+	const dateStr = now.getFullYear() +
+		('0' + (now.getMonth() + 1)).slice(-2) +
+		('0' + now.getDate()).slice(-2) + '_' +
+		('0' + now.getHours()).slice(-2) +
+		('0' + now.getMinutes()).slice(-2);
+	const filename = `テニス対戦結果_${dateStr}.csv`;
+
+	// CSVヘッダー
+	let csvContent = '\ufeff'; // BOMを追加してExcelで日本語を正しく表示
+
+	// 0. チームメンバー情報のエクスポート
+	csvContent += '# チームメンバー情報\n';
+	csvContent += 'チームID,メンバー\n';
+
+	appState.teams.forEach(team => {
+		team.members.forEach(member => {
+			csvContent += `チーム${team.id},${member}\n`;
+		});
+	});
+
+	csvContent += '\n';
+
+	// 1. 対戦表データのエクスポート
+	csvContent += '# 対戦表データ\n';
+	csvContent += 'チーム1,チーム2,チーム1スコア,チーム2スコア,勝者,引き分け\n';
+
+	// 対戦結果をCSVに変換
+	Object.values(appState.matches).forEach(match => {
+		// 勝者の表示方法を決定
+		let winnerDisplay = '';
+		let drawDisplay = 'FALSE';
+
+		if (match.winner === null) {
+			drawDisplay = 'TRUE';
+		} else {
+			winnerDisplay = `チーム${match.winner}`;
+		}
+
+		csvContent += `チーム${match.team1},チーム${match.team2},${match.scoreTeam1},${match.scoreTeam2},${winnerDisplay},${drawDisplay}\n`;
+	});
+	// 2. 順位表データのエクスポート
+	csvContent += '\n# 順位表データ\n';
+	csvContent += '順位,チーム,勝利数,敗北数,引分,得点,得失点差,勝率\n';
+
+	appState.standings.forEach((team, index) => {
+		const scoreDifferenceDisplay = team.scoreDifference > 0 ? `+${team.scoreDifference}` : team.scoreDifference;
+		csvContent += `${index + 1},チーム${team.teamId},${team.wins},${team.losses},${team.draws},${team.totalScore},${scoreDifferenceDisplay},${(team.winRate * 100).toFixed(1)}%\n`;
+	});
+
+	// 3. 対戦分析データの追加
+	csvContent += '\n# 対戦分析データ\n';
+	csvContent += 'チーム,対戦相手,勝利数,敗北数,引分,得点,失点,得失点差\n';
+
+	// チームごとの対戦成績を集計
+	appState.teams.forEach(team => {
+		const teamId = team.id;
+
+		// 他の各チームとの対戦成績
+		appState.teams.forEach(opponent => {
+			if (teamId === opponent.id) return; // 自分自身との対戦はスキップ
+
+			const opponentId = opponent.id;
+			const matchId = getMatchId(teamId, opponentId);
+			const match = appState.matches[matchId];
+
+			if (match) {
+				let wins = 0;
+				let losses = 0;
+				let draws = 0;
+				let scoredPoints = 0;
+				let concededPoints = 0;
+
+				if (match.winner === null) {
+					draws = 1;
+					// チームのスコアを正しく取得
+					if (match.team1 === teamId) {
+						scoredPoints = match.scoreTeam1;
+						concededPoints = match.scoreTeam2;
+					} else {
+						scoredPoints = match.scoreTeam2;
+						concededPoints = match.scoreTeam1;
+					}
+				} else if (match.winner === teamId) {
+					wins = 1;
+					// チームのスコアを正しく取得
+					if (match.team1 === teamId) {
+						scoredPoints = match.scoreTeam1;
+						concededPoints = match.scoreTeam2;
+					} else {
+						scoredPoints = match.scoreTeam2;
+						concededPoints = match.scoreTeam1;
+					}
+				} else {
+					losses = 1;
+					// チームのスコアを正しく取得
+					if (match.team1 === teamId) {
+						scoredPoints = match.scoreTeam1;
+						concededPoints = match.scoreTeam2;
+					} else {
+						scoredPoints = match.scoreTeam2;
+						concededPoints = match.scoreTeam1;
+					}
+				}
+
+				const pointDiff = scoredPoints - concededPoints;
+				csvContent += `チーム${teamId},チーム${opponentId},${wins},${losses},${draws},${scoredPoints},${concededPoints},${pointDiff}\n`;
+			} else {
+				// 対戦していない場合
+				csvContent += `チーム${teamId},チーム${opponentId},0,0,0,0,0,0\n`;
+			}
+		});
+	});
+	// 4. 設定情報の追加
+	csvContent += '\n# 設定情報\n';
+	csvContent += `マッチポイント,${appState.settings.matchPoint}\n`;
+	csvContent += `エクスポート日時,${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}:${('0' + now.getMinutes()).slice(-2)}\n`;
+
+	// 5. 大会情報の追加（config.jsonから）
+	try {
+		fetch('config.json')
+			.then(response => response.json())
+			.then(config => {
+				if (config.tournamentInfo) {
+					csvContent += '\n# 大会情報\n';
+					csvContent += `大会名,${config.tournamentInfo.name || '不明'}\n`;
+					csvContent += `開催日,${config.tournamentInfo.date || '不明'}\n`;
+					csvContent += `場所,${config.tournamentInfo.location || '不明'}\n`;
+					csvContent += `形式,${config.tournamentInfo.format || '不明'}\n`;
+				}
+
+				// データを準備した後でダウンロードを実行
+				downloadCSV(csvContent, filename);
+			});
+	} catch (error) {
+		console.error('大会情報の取得に失敗しました:', error);
+		// エラーが発生しても基本データはダウンロードできるようにする
+		downloadCSV(csvContent, filename);
+	}
 }
 
 // CSVデータをダウンロードする関数
 function downloadCSV(csvContent, filename) {
-    // BlobオブジェクトとURLを作成
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    
-    // ダウンロードリンクを作成して実行
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', filename);
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
+	// BlobオブジェクトとURLを作成
+	const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+	const url = window.URL.createObjectURL(blob);
 
-    // クリーンアップ
-    setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    }, 100);
+	// ダウンロードリンクを作成して実行
+	const link = document.createElement('a');
+	link.href = url;
+	link.setAttribute('download', filename);
+	link.style.display = 'none';
+	document.body.appendChild(link);
+	link.click();
 
-    alert('試合分析データをダウンロードしました！');
+	// クリーンアップ
+	setTimeout(() => {
+		document.body.removeChild(link);
+		window.URL.revokeObjectURL(url);
+	}, 100);
+
+	alert('試合分析データをダウンロードしました！');
 }
 
 // 未割り当てのメンバーリストを取得する関数
 function getUnassignedMembers() {
-    // 全チームのメンバーを取得
-    const allAssignedMembers = [];
-    
-    // 現在編集中のチーム以外の全てのチームのメンバーを取得
-    appState.teams.forEach(team => {
-        if (team.id !== currentEditTeamId) {
-            allAssignedMembers.push(...team.members);
-        }
-    });
-    
-    // オリジナルの全メンバーリストを取得
-    const allOriginalMembers = [];
-    appState.originalTeams.forEach(team => {
-        allOriginalMembers.push(...team.members);
-    });
-    
-    // 編集中のチームのオリジナルメンバーを取得
-    const originalTeam = appState.originalTeams.find(team => team.id === currentEditTeamId);
-    const originalTeamMembers = originalTeam ? originalTeam.members : [];
-    
-    // 未割り当てのメンバー = オリジナルの全メンバー - 他のチームに割り当て済みのメンバー
-    const unassignedMembers = allOriginalMembers.filter(member => {
-        // 他のチームに割り当て済みでないメンバー、もしくは
-        // 元々現在のチームにいたメンバー（これにより削除されたメンバーも未割当として表示される）
-        return !allAssignedMembers.includes(member) || originalTeamMembers.includes(member);
-    });
-    
-    // 現在編集中のチームに既に割り当てられているメンバーは除外（重複を防ぐ）
-    return unassignedMembers.filter(member => !tempTeamMembers.includes(member));
+	// 全チームのメンバーを取得
+	const allAssignedMembers = [];
+
+	// 現在編集中のチーム以外の全てのチームのメンバーを取得
+	appState.teams.forEach(team => {
+		if (team.id !== currentEditTeamId) {
+			allAssignedMembers.push(...team.members);
+		}
+	});
+
+	// オリジナルの全メンバーリストを取得
+	const allOriginalMembers = [];
+	appState.originalTeams.forEach(team => {
+		allOriginalMembers.push(...team.members);
+	});
+
+	// 編集中のチームのオリジナルメンバーを取得
+	const originalTeam = appState.originalTeams.find(team => team.id === currentEditTeamId);
+	const originalTeamMembers = originalTeam ? originalTeam.members : [];
+
+	// 未割り当てのメンバー = オリジナルの全メンバー - 他のチームに割り当て済みのメンバー
+	const unassignedMembers = allOriginalMembers.filter(member => {
+		// 他のチームに割り当て済みでないメンバー、もしくは
+		// 元々現在のチームにいたメンバー（これにより削除されたメンバーも未割当として表示される）
+		return !allAssignedMembers.includes(member) || originalTeamMembers.includes(member);
+	});
+
+	// 現在編集中のチームに既に割り当てられているメンバーは除外（重複を防ぐ）
+	return unassignedMembers.filter(member => !tempTeamMembers.includes(member));
 }
 
 // 未割り当てのメンバーリストを表示する関数
 function renderUnassignedMembersList() {
-    const unassignedMembersSelect = document.getElementById('unassigned-members-select');
-    if (!unassignedMembersSelect) {
-        console.error('未割り当てメンバー選択リストが見つかりません');
-        return;
-    }
-    
-    // 選択リストをリセット
-    unassignedMembersSelect.innerHTML = '<option value="">-- 未割り当てのメンバーを選択 --</option>';
-    
-    // 未割り当てのメンバーを取得
-    const unassignedMembers = getUnassignedMembers();
-    console.log('未割り当てのメンバー:', unassignedMembers);
-    
-    // 未割り当てのメンバーがない場合
-    if (unassignedMembers.length === 0) {
-        const option = document.createElement('option');
-        option.value = "";
-        option.disabled = true;
-        option.textContent = "利用可能なメンバーがありません";
-        unassignedMembersSelect.appendChild(option);
-    } else {
-        // オリジナルチームの情報を取得
-        const originalTeam = appState.originalTeams.find(team => team.id === currentEditTeamId);
-        const originalTeamMembers = originalTeam ? originalTeam.members : [];
-        
-        // 未割り当てのメンバーをリストに追加
-        unassignedMembers.forEach(member => {
-            const option = document.createElement('option');
-            option.value = member;
-            
-            // 元々このチームのメンバーだった場合、特別に表示
-            if (originalTeamMembers.includes(member)) {
-                option.textContent = `${member} (元のメンバー)`;
-                option.classList.add('original-member');
-            } else {
-                option.textContent = member;
-            }
-            
-            unassignedMembersSelect.appendChild(option);
-        });
-    }
+	const unassignedMembersSelect = document.getElementById('unassigned-members-select');
+	if (!unassignedMembersSelect) {
+		console.error('未割り当てメンバー選択リストが見つかりません');
+		return;
+	}
+
+	// 選択リストをリセット
+	unassignedMembersSelect.innerHTML = '<option value="">-- 未割り当てのメンバーを選択 --</option>';
+
+	// 未割り当てのメンバーを取得
+	const unassignedMembers = getUnassignedMembers();
+	console.log('未割り当てのメンバー:', unassignedMembers);
+
+	// 未割り当てのメンバーがない場合
+	if (unassignedMembers.length === 0) {
+		const option = document.createElement('option');
+		option.value = "";
+		option.disabled = true;
+		option.textContent = "利用可能なメンバーがありません";
+		unassignedMembersSelect.appendChild(option);
+	} else {
+		// オリジナルチームの情報を取得
+		const originalTeam = appState.originalTeams.find(team => team.id === currentEditTeamId);
+		const originalTeamMembers = originalTeam ? originalTeam.members : [];
+
+		// 未割り当てのメンバーをリストに追加
+		unassignedMembers.forEach(member => {
+			const option = document.createElement('option');
+			option.value = member;
+
+			// 元々このチームのメンバーだった場合、特別に表示
+			if (originalTeamMembers.includes(member)) {
+				option.textContent = `${member} (元のメンバー)`;
+				option.classList.add('original-member');
+			} else {
+				option.textContent = member;
+			}
+
+			unassignedMembersSelect.appendChild(option);
+		});
+	}
 }
