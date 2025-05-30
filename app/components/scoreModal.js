@@ -18,8 +18,15 @@ function openScoreModal(rowTeamId, colTeamId, matchId) {
 	const score1Input = document.getElementById('modal-score-team1');
 	const score2Input = document.getElementById('modal-score-team2');
 
-	score1Input.value = 0;
-	score2Input.value = 0;
+	// 既存のデータがある場合は、それを表示する
+	if (appState.matches[matchId]) {
+		score1Input.value = appState.matches[matchId].scoreTeam1;
+		score2Input.value = appState.matches[matchId].scoreTeam2;
+	} else {
+		// 新規入力の場合は0で初期化
+		score1Input.value = 0;
+		score2Input.value = 0;
+	}
 
 	// マッチポイントを取得（最大スコアとして使用）
 	const matchPoint = appState.settings.matchPoint;

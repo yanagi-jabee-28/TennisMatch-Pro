@@ -131,8 +131,7 @@ function createMatchTable() {
 	tableBody.removeEventListener('click', handleTableClick); // 既存のリスナーを削除
 	tableBody.addEventListener('click', handleTableClick);
 }
-
-// イベント委譲によるテーブルクリック処理
+	// イベント委譲によるテーブルクリック処理
 function handleTableClick(event) {
 	const cell = event.target.closest('td.clickable-cell');
 	if (!cell) return;
@@ -141,23 +140,9 @@ function handleTableClick(event) {
 	const colTeamId = parseInt(cell.dataset.colTeamId);
 	const matchId = cell.dataset.matchId;
 	
-	// 試合結果が既に存在する場合は修正処理
-	if (appState.matches[matchId]) {
-		// カスタム確認ダイアログを使用
-		customConfirm.show('この試合結果を削除して再入力しますか？', '試合結果の修正')
-			.then(confirmed => {
-				if (confirmed) {
-					delete appState.matches[matchId];
-					saveMatchResults();
-					createMatchTable();
-					// ここでcalculateStandingsを呼び出す必要がある
-					// 外部から提供される関数として期待
-				}
-			});
-	} else {
-		// 新しい試合のスコア入力
-		openScoreModal(rowTeamId, colTeamId, matchId);
-	}
+	// 常に直接スコア入力モーダルを開く
+	// 既存データがある場合は編集モードで開く
+	openScoreModal(rowTeamId, colTeamId, matchId);
 }
 
 export { renderTeams, createMatchTable, handleTeamEditClick, handleTableClick };
