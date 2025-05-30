@@ -1,0 +1,93 @@
+/* テーブル関連のスタイル */
+
+/* 基本テーブルスタイル */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 1rem;
+}
+
+th,
+td {
+	padding: 0.75rem;
+	text-align: center;
+	border: 1px solid var(--border-color);
+}
+
+thead th {
+	background-color: var(--primary-color);
+	color: white;
+}
+
+/* 対戦表の対角線スタイル */
+.diagonal-line {
+	position: relative;
+	background-color: var(--secondary-color);
+}
+
+.diagonal-line::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(to bottom right, transparent calc(50% - 1px), var(--border-color), transparent calc(50% + 1px));
+	pointer-events: none;
+}
+
+/* クリック可能なセル */
+.clickable-cell {
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.clickable-cell:hover {
+	background-color: rgba(26, 115, 232, 0.15);
+}
+
+td {
+	position: relative;
+}
+
+/* 試合結果表示 */
+.match-result {
+	font-weight: bold;
+}
+
+.winner {
+	color: var(--success-color);
+}
+
+.loser {
+	color: var(--error-color);
+}
+
+.draw {
+	color: #888;
+}
+
+/* 順位表のスタイル */
+#standings-table td,
+#standings-table th {
+	padding: 0.75rem 1rem;
+}
+
+#standings-table tr:nth-child(even) {
+	background-color: var(--secondary-color);
+}
+
+#standings-table tbody tr:hover {
+	background-color: rgba(26, 115, 232, 0.1);
+}
+
+/* 得失点差の表示スタイル */
+.positive-diff {
+	color: var(--success-color);
+	font-weight: bold;
+}
+
+.negative-diff {
+	color: var(--error-color);
+	font-weight: bold;
+}

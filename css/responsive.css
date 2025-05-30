@@ -1,0 +1,80 @@
+/* レスポンシブデザインのスタイル */
+
+@media (max-width: 768px) {
+	main {
+		padding: 1rem;
+	}
+
+	#teams-container {
+		grid-template-columns: 1fr;
+	}
+
+	.form-container {
+		width: 100%;
+	}
+
+	.inline-form {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.form-group.inline {
+		justify-content: space-between;
+	}
+	
+	/* モーダルの調整 */
+	.modal-content {
+		width: 95%;
+		margin: 10% auto;
+	}
+	
+	/* テーブル調整 */
+	.table-container {
+		margin: 0 -1rem;
+		width: calc(100% + 2rem);
+	}
+	
+	/* 各セクションの内部余白を小さく */
+	section {
+		padding: 1rem;
+	}
+}
+
+/* より小さい画面向け */
+@media (max-width: 480px) {
+	.team-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+	
+	.modal-content {
+		margin: 5% auto;
+	}
+	
+	/* ボタンを縦に配置 */
+	.modal-footer {
+		flex-direction: column;
+		gap: 8px;
+	}
+	
+	.modal-footer button {
+		width: 100%;
+	}
+	
+	/* 設定パネルの調整 */
+	.settings-panel {
+		padding: 0.5rem;
+	}
+	
+	/* 分析コントロールの調整 */
+	.analysis-controls {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	
+	#export-results-btn {
+		width: 100%;
+		justify-content: center;
+	}
+}

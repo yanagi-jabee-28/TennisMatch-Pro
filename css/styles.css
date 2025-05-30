@@ -1,0 +1,19 @@
+/* メインスタイルシート - 他のすべてのCSSファイルをインポートします */
+
+/* 基本スタイル */
+@import url('base.css');
+
+/* レイアウト */
+@import url('layout.css');
+
+/* コンポーネント */
+@import url('components/buttons.css');
+@import url('components/forms.css');
+@import url('components/tables.css');
+@import url('components/modals.css');
+@import url('components/toast.css');
+@import url('components/dialog.css');
+@import url('components/teams.css');
+
+/* レスポンシブデザイン */
+@import url('responsive.css');

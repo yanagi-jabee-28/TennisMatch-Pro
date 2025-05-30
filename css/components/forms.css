@@ -1,0 +1,70 @@
+/* フォーム要素のスタイル */
+
+/* フォームコンテナ */
+.form-container {
+	max-width: 500px;
+	margin: 0 auto;
+}
+
+/* フォームグループ */
+.form-group {
+	margin-bottom: 1rem;
+}
+
+/* ラベル */
+label {
+	display: block;
+	margin-bottom: 0.5rem;
+	color: var(--light-text);
+}
+
+/* インラインフォームのラベル */
+.form-group.inline label {
+	margin-bottom: 0;
+	color: white;
+	white-space: nowrap;
+}
+
+/* フォーム入力要素 */
+select,
+input {
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	font-size: 1rem;
+}
+
+/* インライン入力フィールド */
+.form-group.inline input {
+	width: 4rem;
+	padding: 0.5rem;
+	margin-bottom: 0;
+}
+
+/* チーム編集モーダルの入力 */
+#new-member-name {
+	flex: 1;
+	padding: 8px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+}
+
+#unassigned-members-select {
+	padding: 8px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	flex-grow: 1;
+	margin-right: 8px;
+	font-size: 14px;
+}
+
+.original-member {
+	font-weight: bold;
+	color: #1a73e8;
+}
+
+#unassigned-members-select option[value=""] {
+	font-style: italic;
+	color: #666;
+}

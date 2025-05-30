@@ -1,0 +1,45 @@
+// カスタム確認ダイアログシステム
+
+const customConfirm = {
+    dialog: null,
+    titleElement: null,
+    messageElement: null,
+    yesButton: null,
+    noButton: null,
+    currentResolve: null,
+    
+    init() {
+        this.dialog = document.getElementById('confirm-dialog');
+        this.titleElement = document.getElementById('confirm-title');
+        this.messageElement = document.getElementById('confirm-message');
+        this.yesButton = document.getElementById('confirm-yes-btn');
+        this.noButton = document.getElementById('confirm-no-btn');
+        
+        // ボタンにイベントリスナーを追加
+        this.yesButton.addEventListener('click', () => this.handleConfirm(true));
+        this.noButton.addEventListener('click', () => this.handleConfirm(false));
+    },
+    
+    show(message, title = '確認') {
+        if (!this.dialog) this.init();
+        
+        this.titleElement.textContent = title;
+        this.messageElement.textContent = message;
+        this.dialog.classList.add('show');
+        
+        // Promiseを返して非同期で結果を処理できるようにする
+        return new Promise(resolve => {
+            this.currentResolve = resolve;
+        });
+    },
+    
+    handleConfirm(result) {
+        this.dialog.classList.remove('show');
+        if (this.currentResolve) {
+            this.currentResolve(result);
+            this.currentResolve = null;
+        }
+    }
+};
+
+export { customConfirm };
