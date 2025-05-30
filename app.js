@@ -399,6 +399,7 @@ function saveTeamMembers() {
 
 // チームメンバー編集モーダルを閉じる
 function closeTeamEditModal() {
+	const teamEditModal = domCache.teamEditModal;
 	if (teamEditModal) {
 		teamEditModal.style.display = 'none';
 		console.log('チーム編集モーダルを閉じました');
@@ -475,8 +476,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	// キャンセルボタンのクリックイベント
 	document.getElementById('cancel-score-btn').addEventListener('click', closeScoreModal);
 
-	// 閉じるボタン（×）のクリックイベント
-	document.querySelector('.close-modal').addEventListener('click', closeScoreModal);
+	// 閉じるボタン（×）のクリックイベント - スコア入力モーダルの閉じるボタンを特定
+	document.querySelector('#score-modal .close-modal').addEventListener('click', closeScoreModal);
 	// モーダル外をクリックした時に閉じる
 	window.addEventListener('click', function (event) {
 		const scoreModal = domCache.scoreModal;
