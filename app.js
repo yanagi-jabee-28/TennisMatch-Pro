@@ -3,6 +3,45 @@ async function loadConfig() {
 	return await loadConfigData();
 }
 
+// トースト通知システム
+const toast = {
+    // トースト通知を表示する
+    show(message, type = 'info', duration = 3000) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        // トースト要素を作成
+        const toastElement = document.createElement('div');
+        toastElement.className = `toast toast-${type}`;
+        toastElement.textContent = message;
+        
+        // コンテナに追加
+        container.appendChild(toastElement);
+        
+        // 自動削除
+        setTimeout(() => {
+            if (toastElement && toastElement.parentElement) {
+                toastElement.parentElement.removeChild(toastElement);
+            }
+        }, duration);
+    },
+    
+    // 成功通知
+    success(message, duration) {
+        this.show(message, 'success', duration);
+    },
+    
+    // エラー通知
+    error(message, duration) {
+        this.show(message, 'error', duration);
+    },
+    
+    // 情報通知
+    info(message, duration) {
+        this.show(message, 'info', duration);
+    }
+};
+
 // アプリケーション状態の管理
 const appState = {
 	teams: [],
@@ -354,19 +393,19 @@ function saveTeamMembers() {
 
 	if (currentEditTeamId === null) {
 		console.error('現在編集中のチームIDがnullです');
-		alert('編集するチームが選択されていません');
+		toast.error('編集するチームが選択されていません');
 		return;
 	}
 
 	if (tempTeamMembers.length === 0) {
-		alert('メンバーを少なくとも1人は登録してください');
+		toast.error('メンバーを少なくとも1人は登録してください');
 		return;
 	}
 
 	// メンバーの重複チェック
 	const uniqueMembers = [...new Set(tempTeamMembers)];
 	if (uniqueMembers.length !== tempTeamMembers.length) {
-		alert('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
+		toast.error('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
 		return;
 	}
 
@@ -386,14 +425,13 @@ function saveTeamMembers() {
 
 		// UI更新
 		renderTeams();
-
 		// モーダルを閉じる
 		closeTeamEditModal();
 
-		alert('チームメンバーを更新しました！');
+		toast.success('チームメンバーを更新しました！');
 	} else {
 		console.error(`チームID ${currentEditTeamId} が見つかりません`);
-		alert('チーム情報の更新に失敗しました');
+		toast.error('チーム情報の更新に失敗しました');
 	}
 }
 
@@ -417,11 +455,10 @@ function addNewMember() {
 	}
 
 	const newMemberName = unassignedMembersSelect.value;
-
 	if (newMemberName) {
 		// 重複チェック（念のため）
 		if (tempTeamMembers.includes(newMemberName)) {
-			alert('同じ名前のメンバーが既に存在します');
+			toast.error('同じ名前のメンバーが既に存在します');
 			return;
 		}
 
