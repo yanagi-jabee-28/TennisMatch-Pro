@@ -11,6 +11,7 @@ import { exportMatchAnalysis } from './export.js';
 import { initializeTeamEditListeners } from './components/teamEditor.js';
 import { initializeScoreModalListeners } from './components/scoreModal.js';
 import { initializeDebugListeners } from './debug.js';
+import { DisplayModeManager } from './components/displayMode.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 async function initializeApp() {
@@ -47,14 +48,23 @@ async function initializeApp() {
 
 	// エクスポートボタンのイベントリスナーを追加
 	document.getElementById('export-results-btn').addEventListener('click', exportMatchAnalysis);
-	
-	// チームメンバー編集用のモーダルのイベントリスナー設定
+		// チームメンバー編集用のモーダルのイベントリスナー設定
 	initializeTeamEditListeners(renderTeams);
 		// スコアモーダルのイベントリスナー設定
 	initializeScoreModalListeners(createMatchTable, calculateStandings);
 	
 	// デバッグ機能のイベントリスナー設定
 	initializeDebugListeners(createMatchTable, calculateStandings);
+	
+	// 表示モード切り替え機能を初期化
+	const displayModeManager = new DisplayModeManager();
+	
+	// ウィンドウリサイズ時の処理
+	window.addEventListener('resize', () => {
+		displayModeManager.handleResize();
+		// DOMキャッシュのスクロール案内も更新
+		domCache.initMobileScrollHint();
+	});
 	
 	// カスタム確認ダイアログを初期化
 	customConfirm.init();
