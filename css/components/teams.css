@@ -7,6 +7,37 @@
 	padding: 15px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	margin-bottom: 20px;
+	/* タッチデバイス向け改善 */
+	transition: box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+	.team-card:hover {
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	}
+}
+
+/* スマホ向けチームカード改善 */
+@media (max-width: 768px) {
+	.team-card {
+		padding: 20px;
+		margin-bottom: 15px;
+	}
+	
+	.team-card h3 {
+		font-size: 1.2rem;
+		margin-bottom: 0.75rem;
+	}
+	
+	.team-members li {
+		padding: 0.5rem 0;
+		font-size: 1rem;
+		border-bottom: 1px solid #f0f0f0;
+	}
+	
+	.team-members li:last-child {
+		border-bottom: none;
+	}
 }
 
 .team-card h3 {

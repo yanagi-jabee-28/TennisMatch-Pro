@@ -108,3 +108,76 @@
 	border-top: 1px solid var(--border-color);
 	gap: 10px;
 }
+
+/* スマホ向けモーダル改善 */
+@media (max-width: 768px) {
+	.modal-content {
+		margin: 10% auto;
+		width: 95%;
+		max-height: 90vh;
+		overflow-y: auto;
+	}
+	
+	/* スコア入力フィールドを大きく */
+	.team-score-input input {
+		width: 100px;
+		padding: 12px;
+		font-size: 18px;
+		min-height: 44px; /* タッチターゲット最小サイズ */
+	}
+	
+	/* ボタンをタッチしやすく */
+	.modal-footer button {
+		padding: 12px 24px;
+		font-size: 16px;
+		min-height: 44px;
+	}
+	
+	/* クローズボタンを大きく */
+	.close-modal {
+		font-size: 28px;
+		padding: 4px;
+		min-width: 44px;
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+}
+
+@media (max-width: 480px) {
+	.modal-content {
+		margin: 5% auto;
+		width: 98%;
+	}
+	
+	/* ボタンを縦に配置 */
+	.modal-footer {
+		flex-direction: column;
+		gap: 12px;
+	}
+	
+	.modal-footer button {
+		width: 100%;
+		padding: 14px;
+		font-size: 16px;
+	}
+	
+	/* スコア入力レイアウトを改善 */
+	.team-score-input {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 8px;
+	}
+	
+	.team-score-input label {
+		text-align: center;
+		font-size: 16px;
+	}
+	
+	.team-score-input input {
+		width: 100%;
+		max-width: 120px;
+		margin: 0 auto;
+	}
+}

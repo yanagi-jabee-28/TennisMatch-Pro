@@ -9,11 +9,29 @@
 	border-radius: 4px;
 	cursor: pointer;
 	font-size: 1rem;
-	transition: background-color 0.2s;
+	transition: background-color 0.2s ease-in-out;
+	/* タッチデバイス対応 */
+	-webkit-tap-highlight-color: transparent;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	min-height: 44px; /* タッチターゲット最小サイズ */
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.btn:hover {
-	background-color: #0d5bba;
+/* ホバー効果をタッチデバイスで調整 */
+@media (hover: hover) {
+	.btn:hover {
+		background-color: #0d5bba;
+	}
+}
+
+.btn:active {
+	background-color: #0a4a9a;
+	transform: scale(0.98);
 }
 
 /* セカンダリボタン */
@@ -22,8 +40,14 @@
 	color: var(--text-color);
 }
 
-.btn-secondary:hover {
-	background-color: #e8eaed;
+@media (hover: hover) {
+	.btn-secondary:hover {
+		background-color: #e8eaed;
+	}
+}
+
+.btn-secondary:active {
+	background-color: #dadce0;
 }
 
 /* 小さいボタン */
@@ -33,10 +57,17 @@
 	background-color: white;
 	color: var(--primary-color);
 	font-weight: bold;
+	min-height: 40px; /* タッチターゲットサイズ */
 }
 
-.btn-small:hover {
-	background-color: var(--secondary-color);
+@media (hover: hover) {
+	.btn-small:hover {
+		background-color: var(--secondary-color);
+	}
+}
+
+.btn-small:active {
+	background-color: #e8eaed;
 }
 
 /* チーム編集ボタン */
@@ -44,18 +75,24 @@
 	background-color: var(--secondary-color);
 	color: var(--primary-color);
 	border: 1px solid var(--border-color);
-	padding: 4px 8px;
+	padding: 8px 12px; /* タッチしやすいサイズに調整 */
 	font-size: 14px;
 	cursor: pointer;
 	border-radius: 4px;
-	display: flex;
-	align-items: center;
+	display: flex;	align-items: center;
 	gap: 5px;
 	transition: background-color 0.2s ease;
+	min-height: 40px; /* タッチターゲットサイズ */
 }
 
-.edit-team-btn:hover {
-	background-color: #e8eaed;
+@media (hover: hover) {
+	.edit-team-btn:hover {
+		background-color: #e8eaed;
+	}
+}
+
+.edit-team-btn:active {
+	background-color: #dadce0;
 }
 
 /* エクスポートボタン */

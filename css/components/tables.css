@@ -12,6 +12,13 @@ table {
 	table-layout: fixed;
 	width: auto;
 	margin: 0 auto;
+	touch-action: pan-x pan-y; /* スクロール操作を許可 */
+}
+
+.table-container {
+	/* スクロール改善 */
+	scroll-behavior: smooth;
+	-webkit-overflow-scrolling: touch;
 }
 
 th,
@@ -19,6 +26,11 @@ td {
 	padding: 0.75rem;
 	text-align: center;
 	border: 1px solid var(--border-color);
+}
+
+td,
+th {
+	border: 2px solid var(--border-color);
 }
 
 thead th {
@@ -49,26 +61,34 @@ thead th {
 	width: 80px;
 	min-width: 80px;
 	max-width: 80px;
+	height: 60px;
 	box-sizing: border-box;
 	word-wrap: break-word;
 	overflow: hidden;
+	position: relative;
 }
 
-/* 対戦表の行ヘッダー（チーム番号）*/
-#match-grid th:first-child {
-	background-color: var(--primary-color);
-	color: white;
-	font-weight: bold;
-}
-
-/* クリック可能なセル */
+/* クリック可能なセル - タッチデバイス対応 */
 .clickable-cell {
 	cursor: pointer;
-	transition: background-color 0.2s;
+	transition: background-color 0.2s ease-in-out;
+	-webkit-tap-highlight-color: rgba(26, 115, 232, 0.3); /* タッチ時のハイライト */
+	user-select: none; /* テキスト選択を防ぐ */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
 }
 
-.clickable-cell:hover {
-	background-color: rgba(26, 115, 232, 0.15);
+/* ホバー効果をタッチデバイスで無効化し、アクティブ状態を追加 */
+@media (hover: hover) {
+	.clickable-cell:hover {
+		background-color: rgba(26, 115, 232, 0.15);
+	}
+}
+
+.clickable-cell:active {
+	background-color: rgba(26, 115, 232, 0.25);
+	transform: scale(0.98);
 }
 
 td {
@@ -78,6 +98,8 @@ td {
 /* 試合結果表示 */
 .match-result {
 	font-weight: bold;
+	font-size: 1.1em;
+	line-height: 1.2;
 }
 
 .winner {
@@ -90,6 +112,13 @@ td {
 
 .draw {
 	color: #888;
+}
+
+/* 対戦表の行ヘッダー（チーム番号）*/
+#match-grid th:first-child {
+	background-color: var(--primary-color);
+	color: white;
+	font-weight: bold;
 }
 
 /* 順位表のスタイル */

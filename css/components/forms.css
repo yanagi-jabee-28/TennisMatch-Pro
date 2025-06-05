@@ -34,6 +34,28 @@ input {
 	border-radius: 4px;
 	font-size: 1rem;
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	/* タッチデバイス対応 */
+	min-height: 44px; /* タッチターゲット最小サイズ */
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+/* スマホでの入力改善 */
+@media (max-width: 768px) {
+	select,
+	input {
+		font-size: 16px; /* iOS のズーム防止 */
+		padding: 0.875rem;
+	}
+	
+	/* インライン入力フィールドもタッチしやすく */
+	.form-group.inline input {
+		width: 5rem;
+		padding: 0.75rem 0.5rem;
+		font-size: 16px;
+		min-height: 44px;
+	}
 }
 
 /* フォーカス時のスタイル */

@@ -75,3 +75,23 @@ th.empty-cell {
 .edit-icon {
 	font-size: 12px;
 }
+
+/* スマホ向けレイアウト改善 */
+@media (max-width: 768px) {
+	/* チーム情報グリッドをシンプルに */
+	#teams-container {
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+	
+	/* セクション間のスペースを調整 */
+	section {
+		margin-bottom: 1.5rem;
+	}
+	
+	/* ヘッダー設定を見やすく */
+	.settings-panel {
+		margin-top: 0.5rem;
+		padding: 1rem;
+	}
+}
