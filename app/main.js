@@ -24,7 +24,6 @@ import {
 	monitorNetworkStatus, 
 	enhanceSmartphoneExperience 
 } from './components/advancedMobile.js';
-import { DarkModeManager } from './components/themeManager.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 async function initializeApp() {
@@ -88,6 +87,7 @@ async function initializeApp() {
 			}
 		});
 	}
+
 	// モバイル機能拡張の初期化
 	initMobileEnhancements();
 	addSwipeGestures();
@@ -100,9 +100,6 @@ async function initializeApp() {
 	handlePowerSavingMode();
 	monitorNetworkStatus();
 	enhanceSmartphoneExperience();
-
-	// ダークモード管理の初期化
-	const darkModeManager = new DarkModeManager();
 
 	// ビューポート高さの動的計算（iOS Safari対応）
 	const setVhProperty = () => {

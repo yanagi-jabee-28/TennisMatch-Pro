@@ -161,21 +161,6 @@
 	}
 }
 
-/* ダークモード対応は darkmode.css で統一管理 */
-/* モバイル特有のダークモード調整のみここに記載 */
-@media (prefers-color-scheme: dark) {
-	.table-container::after {
-		background-color: rgba(60, 64, 67, 0.9);
-		color: var(--light-text);
-		border-radius: 0 0 8px 8px;
-	}
-	
-	/* モバイルでのタッチフィードバック改善 */
-	#match-grid td:active {
-		background-color: rgba(138, 180, 248, 0.3) !important;
-	}
-}
-
 /* 高コントラストモード対応 */
 @media (prefers-contrast: high) {
 	.btn {
@@ -266,15 +251,4 @@
 .focused {
 	outline: 2px solid var(--primary-color);
 	outline-offset: 2px;
-}
-
-/* ダークモード追加調整 */
-.dark-mode .context-menu {
-	background: var(--modal-background);
-	border-color: var(--border-color);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-}
-
-.dark-mode .context-menu-item:hover {
-	background-color: var(--surface-hover);
 }

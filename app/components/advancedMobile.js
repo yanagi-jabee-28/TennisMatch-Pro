@@ -197,19 +197,6 @@ export function monitorNetworkStatus() {
 
 // スマートフォン特有の操作改善
 export function enhanceSmartphoneExperience() {
-    // 画面の明度調整（ダークモード対応の改善）
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleColorSchemeChange = (e) => {
-        if (e.matches) {
-            document.body.classList.add('dark-mode');
-        } else {
-            document.body.classList.remove('dark-mode');
-        }
-    };
-
-    mediaQuery.addListener(handleColorSchemeChange);
-    handleColorSchemeChange(mediaQuery);
-
     // フォーカス管理の改善
     document.addEventListener('focusin', (e) => {
         if (e.target.matches('input, textarea, select')) {
