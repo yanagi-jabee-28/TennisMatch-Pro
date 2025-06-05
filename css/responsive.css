@@ -1,5 +1,49 @@
 /* レスポンシブデザインのスタイル */
 
+/* タッチデバイス向けの基本設定 */
+* {
+	-webkit-tap-highlight-color: rgba(26, 115, 232, 0.3);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+/* 入力要素は選択可能にする */
+input, textarea {
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
+}
+
+/* スクロールの改善 */
+.table-container {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	scroll-behavior: smooth;
+}
+
+/* タッチフレンドリーなボタンサイズ */
+.btn, .edit-team-btn, .close-modal {
+	min-height: 44px;
+	min-width: 44px;
+	touch-action: manipulation;
+}
+
+/* 対戦表のセルをタッチしやすく */
+#match-grid td {
+	cursor: pointer;
+	touch-action: manipulation;
+	position: relative;
+}
+
+#match-grid td:active {
+	background-color: rgba(26, 115, 232, 0.1);
+	transform: scale(0.98);
+}
+
 @media (max-width: 768px) {
 	main {
 		padding: 1rem;
@@ -25,25 +69,51 @@
 	/* モーダルの調整 */
 	.modal-content {
 		width: 95%;
-		margin: 10% auto;
+		margin: 5% auto;
+		max-height: 90vh;
+		overflow-y: auto;
 	}
-		/* テーブル調整 */
+
+	/* テーブル調整 */
 	.table-container {
 		margin: 0 -1rem;
 		width: calc(100% + 2rem);
+		position: relative;
+	}
+
+	/* テーブルにスワイプインジケーターを追加 */
+	.table-container::after {
+		content: "← 左右にスワイプできます →";
+		display: block;
+		text-align: center;
+		font-size: 0.8rem;
+		color: var(--light-text);
+		padding: 0.5rem;
+		background-color: rgba(241, 243, 244, 0.8);
+		border-radius: 0 0 8px 8px;
 	}
 	
 	/* 対戦表のセル幅をモバイルで調整 */
 	#match-grid td,
 	#match-grid th {
-		width: 60px;
-		min-width: 60px;
-		max-width: 60px;
-		font-size: 0.85rem;
+		width: 70px;
+		min-width: 70px;
+		max-width: 70px;
+		font-size: 0.9rem;
+		padding: 0.75rem 0.5rem;
+		min-height: 48px;
 	}
-		/* 各セクションの内部余白を小さく */
-	section {
-		padding: 1rem;
+
+	/* タッチターゲットサイズの改善 */
+	.btn {
+		min-height: 48px;
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+	}
+
+	.edit-team-btn {
+		min-height: 40px;
+		padding: 0.5rem 0.75rem;
 	}
 	
 	/* ボタンコントロールをモバイル対応 */
@@ -63,6 +133,21 @@
 
 /* より小さい画面向け */
 @media (max-width: 480px) {
+	/* ヘッダーの調整 */
+	header {
+		padding: 1rem;
+	}
+
+	header h1 {
+		font-size: 1.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.settings-panel {
+		margin-top: 1rem;
+		padding: 0.5rem;
+	}
+
 	.team-header {
 		flex-direction: column;
 		align-items: flex-start;
@@ -72,47 +157,157 @@
 	/* 対戦表のセル幅をより小さく */
 	#match-grid td,
 	#match-grid th {
-		width: 50px;
-		min-width: 50px;
-		max-width: 50px;
-		font-size: 0.8rem;
+		width: 60px;
+		min-width: 60px;
+		max-width: 60px;
+		font-size: 0.85rem;
 		padding: 0.5rem 0.25rem;
+		min-height: 44px;
+	}
+
+	/* より大きなタッチターゲット */
+	.btn {
+		min-height: 52px;
+		font-size: 1.1rem;
+		padding: 1rem 1.5rem;
 	}
 	
 	/* ボタンのフォントサイズを小さく */
 	.match-controls .btn,
 	.analysis-controls .btn {
-		font-size: 0.85rem;
-		padding: 0.6rem 1rem;
+		font-size: 1rem;
+		padding: 0.75rem 1rem;
+		min-height: 52px;
 	}
 	
 	.modal-content {
-		margin: 5% auto;
+		margin: 2% auto;
+		width: 98%;
+		max-height: 96vh;
+	}
+
+	/* スコア入力の改善 */
+	.team-score-input input {
+		font-size: 18px;
+		padding: 12px;
+		min-height: 48px;
+		width: 100px;
+	}
+
+	/* モーダルヘッダーのクローズボタンを大きく */
+	.close-modal {
+		font-size: 28px;
+		min-height: 44px;
+		min-width: 44px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	
 	/* ボタンを縦に配置 */
 	.modal-footer {
 		flex-direction: column;
-		gap: 8px;
+		gap: 12px;
+		padding: 1rem;
 	}
 	
 	.modal-footer button {
 		width: 100%;
+		min-height: 52px;
+		font-size: 1.1rem;
 	}
-	
-	/* 設定パネルの調整 */
-	.settings-panel {
+
+	/* 設定フォームの改善 */
+	#header-match-point {
+		font-size: 18px;
+		padding: 12px;
+		min-height: 48px;
+		width: 80px;
+	}
+
+	/* チーム編集モーダルの改善 */
+	.team-member-item {
+		padding: 0.75rem;
+		min-height: 48px;
+	}
+
+	.member-input {
+		font-size: 16px;
+		padding: 12px;
+		min-height: 48px;
+	}
+
+	/* スワイプヒントの追加 */
+	.modal-content::before {
+		content: "";
+		position: absolute;
+		top: 10px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 40px;
+		height: 4px;
+		background-color: #ccc;
+		border-radius: 2px;
+		z-index: 1001;
+	}
+
+	/* 振動フィードバック対応クラス */
+	.vibrate-on-tap {
+		transition: all 0.1s ease;
+	}
+}
+
+/* 設定パネルの調整 */
+.settings-panel {
+	padding: 0.5rem;
+}
+
+/* 分析コントロールの調整 */
+.analysis-controls {
+	flex-direction: column;
+	align-items: stretch;
+}
+
+#export-results-btn {
+	width: 100%;
+	justify-content: center;
+}
+
+/* 横画面対応 */
+@media (orientation: landscape) and (max-height: 500px) {
+	.modal-content {
+		margin: 1% auto;
+		max-height: 98vh;
+	}
+
+	header {
+		padding: 0.5rem 1rem;
+	}
+
+	header h1 {
+		font-size: 1.3rem;
+		margin-bottom: 0.5rem;
+	}
+
+	main {
 		padding: 0.5rem;
 	}
-	
-	/* 分析コントロールの調整 */
-	.analysis-controls {
-		flex-direction: column;
-		align-items: stretch;
+
+	section {
+		padding: 1rem;
+		margin-bottom: 1.5rem;
 	}
-	
-	#export-results-btn {
-		width: 100%;
-		justify-content: center;
+}
+
+/* ビューポート単位での高さ調整（iOS Safari対応） */
+@supports (-webkit-touch-callout: none) {
+	.modal {
+		height: 100vh;
+		height: -webkit-fill-available;
+	}
+
+	.modal-content {
+		max-height: 90vh;
+		max-height: calc(-webkit-fill-available * 0.9);
 	}
 }

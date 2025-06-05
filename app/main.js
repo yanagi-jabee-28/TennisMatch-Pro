@@ -11,6 +11,19 @@ import { exportMatchAnalysis } from './export.js';
 import { initializeTeamEditListeners } from './components/teamEditor.js';
 import { initializeScoreModalListeners } from './components/scoreModal.js';
 import { initializeDebugListeners } from './debug.js';
+import { 
+	initMobileEnhancements, 
+	addSwipeGestures, 
+	handleOrientationChange, 
+	optimizePerformance 
+} from './components/mobileEnhancements.js';
+import { 
+	addHapticFeedback, 
+	addPWAFeatures, 
+	handlePowerSavingMode, 
+	monitorNetworkStatus, 
+	enhanceSmartphoneExperience 
+} from './components/advancedMobile.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 async function initializeApp() {
@@ -74,6 +87,31 @@ async function initializeApp() {
 			}
 		});
 	}
+
+	// モバイル機能拡張の初期化
+	initMobileEnhancements();
+	addSwipeGestures();
+	handleOrientationChange();
+	optimizePerformance();
+
+	// 高度なモバイル機能の初期化
+	addHapticFeedback();
+	addPWAFeatures();
+	handlePowerSavingMode();
+	monitorNetworkStatus();
+	enhanceSmartphoneExperience();
+
+	// ビューポート高さの動的計算（iOS Safari対応）
+	const setVhProperty = () => {
+		const vh = window.innerHeight * 0.01;
+		document.documentElement.style.setProperty('--vh', `${vh}px`);
+	};
+	
+	setVhProperty();
+	window.addEventListener('resize', setVhProperty);
+	window.addEventListener('orientationchange', () => {
+		setTimeout(setVhProperty, 100);
+	});
 }
 
 // DOMが読み込まれた後にアプリケーションを初期化

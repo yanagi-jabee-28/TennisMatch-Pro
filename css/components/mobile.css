@@ -1,0 +1,305 @@
+/* スマホ専用タッチ操作の改善 */
+
+/* CSS カスタムプロパティでビューポート高さを管理 */
+:root {
+	--vh: 1vh;
+}
+
+/* キーボード表示時の調整用クラス */
+.keyboard-visible {
+	height: 100vh;
+	height: calc(var(--vh, 1vh) * 100);
+	overflow: hidden;
+}
+
+.keyboard-visible .modal {
+	height: 100vh;
+	height: calc(var(--vh, 1vh) * 100);
+}
+
+/* スマートフォン特有のタッチ改善 */
+@media (pointer: coarse) {
+	/* すべてのクリッカブル要素のタッチターゲットを最適化 */
+	.btn, button, 
+	#match-grid td[data-match-id],
+	.edit-team-btn,
+	.close-modal,
+	input[type="number"],
+	input[type="text"] {
+		min-height: 44px;
+		min-width: 44px;
+	}
+
+	/* ホバー効果をタッチ用に調整 */
+	.btn:hover {
+		background-color: initial;
+	}
+
+	.btn:active {
+		background-color: #0d5bba;
+		transform: scale(0.95);
+		transition: all 0.1s ease;
+	}
+
+	/* 対戦表のタッチフィードバック強化 */
+	#match-grid td[data-match-id]:active {
+		background-color: rgba(26, 115, 232, 0.2);
+		transform: scale(0.95);
+		transition: all 0.1s ease;
+	}
+
+	/* スコア入力時のタッチ改善 */
+	.team-score-input input:focus {
+		transform: scale(1.05);
+		transition: transform 0.2s ease;
+	}
+}
+
+/* タッチ専用のスクロール改善 */
+@media (hover: none) and (pointer: coarse) {
+	/* テーブルスクロールのタッチ改善 */
+	.table-container {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scroll-snap-type: x proximity;
+		padding-bottom: 10px;
+	}
+
+	/* スクロールインジケーター */
+	.table-container::-webkit-scrollbar {
+		height: 8px;
+	}
+
+	.table-container::-webkit-scrollbar-track {
+		background: rgba(241, 243, 244, 0.5);
+		border-radius: 4px;
+	}
+
+	.table-container::-webkit-scrollbar-thumb {
+		background: var(--primary-color);
+		border-radius: 4px;
+		opacity: 0.7;
+	}
+
+	.table-container::-webkit-scrollbar-thumb:hover {
+		opacity: 1;
+	}
+
+	/* プルトゥリフレッシュ防止 */
+	body {
+		overscroll-behavior-y: contain;
+	}
+
+	/* チーム情報のスクロール改善 */
+	#teams-container {
+		scroll-snap-type: y mandatory;
+	}
+
+	.team {
+		scroll-snap-align: start;
+	}
+}
+
+/* 画面回転対応 */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+	/* 横画面時のコンパクト表示 */
+	header {
+		padding: 0.5rem 1rem;
+	}
+
+	header h1 {
+		font-size: 1.2rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.settings-panel {
+		margin-top: 0.5rem;
+	}
+
+	main {
+		padding: 0.5rem;
+	}
+
+	section {
+		padding: 0.75rem;
+		margin-bottom: 1rem;
+	}
+
+	/* モーダルを画面に合わせて調整 */
+	.modal-content {
+		margin: 1% auto;
+		max-height: 95vh;
+		width: 90%;
+	}
+
+	.modal-body {
+		padding: 1rem;
+	}
+
+	/* 対戦表のセルサイズ調整 */
+	#match-grid td,
+	#match-grid th {
+		padding: 0.25rem;
+		font-size: 0.8rem;
+	}
+}
+
+/* キーボード表示時の調整（iOS Safari対応） */
+@media screen and (max-height: 500px) {
+	.modal-content {
+		position: fixed;
+		top: 2%;
+		left: 50%;
+		transform: translateX(-50%);
+		margin: 0;
+		max-height: 96vh;
+		overflow-y: auto;
+	}
+
+	.modal-body {
+		padding: 1rem 1rem 2rem;
+	}
+}
+
+/* ダークモード対応（システム設定に合わせる） */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--primary-color: #4285f4;
+		--text-color: #e8eaed;
+		--light-text: #9aa0a6;
+		--border-color: #5f6368;
+		--secondary-color: #3c4043;
+	}
+
+	body {
+		background-color: #202124;
+		color: var(--text-color);
+	}
+
+	section {
+		background-color: #303134;
+	}
+
+	.modal-content {
+		background-color: #303134;
+		color: var(--text-color);
+	}
+
+	input {
+		background-color: #303134;
+		color: var(--text-color);
+		border-color: var(--border-color);
+	}
+
+	.btn-secondary {
+		background-color: var(--secondary-color);
+		color: var(--text-color);
+	}
+
+	.table-container::after {
+		background-color: rgba(60, 64, 67, 0.8);
+		color: var(--light-text);
+	}
+}
+
+/* 高コントラストモード対応 */
+@media (prefers-contrast: high) {
+	.btn {
+		border: 2px solid #000;
+	}
+
+	#match-grid td,
+	#match-grid th {
+		border: 2px solid #000;
+	}
+
+	.modal-content {
+		border: 3px solid #000;
+	}
+}
+
+/* アニメーション無効設定に対応 */
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	#match-grid td:active,
+	.btn:active {
+		transform: none;
+	}
+}
+
+/* コンテキストメニューのスタイル */
+.context-menu {
+	background: white;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	overflow: hidden;
+	min-width: 150px;
+}
+
+.context-menu-item {
+	padding: 12px 16px;
+	cursor: pointer;
+	border-bottom: 1px solid var(--border-color);
+	transition: background-color 0.2s ease;
+}
+
+.context-menu-item:last-child {
+	border-bottom: none;
+}
+
+.context-menu-item:hover,
+.context-menu-item:active {
+	background-color: var(--secondary-color);
+}
+
+.context-menu-item[data-action="clear"] {
+	color: var(--error-color);
+}
+
+/* 長押し時のエフェクト */
+.long-pressed {
+	background-color: rgba(26, 115, 232, 0.2) !important;
+	transform: scale(0.95);
+}
+
+/* オフラインバナー */
+.offline-banner {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	background-color: #ff9800;
+	color: white;
+	text-align: center;
+	padding: 10px;
+	z-index: 3000;
+	font-size: 14px;
+}
+
+/* 省電力モード */
+.power-saving-mode {
+	filter: brightness(0.8);
+}
+
+/* フォーカス状態の改善 */
+.focused {
+	outline: 2px solid var(--primary-color);
+	outline-offset: 2px;
+}
+
+/* ダークモード追加調整 */
+.dark-mode .context-menu {
+	background: #303134;
+	border-color: #5f6368;
+}
+
+.dark-mode .context-menu-item:hover {
+	background-color: #3c4043;
+}
