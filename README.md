@@ -41,19 +41,27 @@ CSVファイルには以下の情報が含まれます：
 ## セットアップ方法
 
 ### 必要な環境
-- Webブラウザ（Chrome、Firefox、Safari、Edge等）
-- Python 3.x（ローカルサーバー用）
+- **Webブラウザ**: Chrome、Firefox、Safari、Edge等のモダンブラウザ
+- **ローカルサーバー**: Python 3.x、Node.js、またはその他のHTTPサーバー
+- **推奨環境**: Windows 10/11、macOS 10.15+、Linux（Ubuntu 20.04+）
 
 ### インストールと起動
 1. **リポジトリの取得**
    ```bash
-   git clone https://github.com/yanagi-jabee-28/yanagi-jabee-28.github.io.git
-   cd yanagi-jabee-28.github.io
+   git clone https://github.com/yanagi-jabee-28/TennisMatch-Pro-2.git
+   cd TennisMatch-Pro-2
    ```
 
 2. **ローカルサーバーの起動**
    ```powershell
+   # Python使用の場合
    python -m http.server 8080
+   
+   # Node.js使用の場合（npx）
+   npx http-server -p 8080
+   
+   # Live Server (VSCode拡張機能) 使用の場合
+   # index.htmlを右クリック → "Open with Live Server"
    ```
 
 3. **アプリケーションの起動**
@@ -81,7 +89,7 @@ CSVファイルには以下の情報が含まれます：
 ## プロジェクト構成
 
 ```
-yanagi-jabee-28.github.io/
+TennisMatch-Pro-2/
 ├── index.html              # メインHTMLファイル
 ├── config.json             # チーム設定・大会情報
 ├── README.md               # プロジェクト説明書
@@ -133,13 +141,45 @@ yanagi-jabee-28.github.io/
 - `app/export.js`: CSV形式でのデータエクスポート機能
 - `app/debug.js`: 開発・テスト用のデバッグ機能
 
+### アーキテクチャ
+- **モジュール化**: ES6 Modulesによる機能分離
+- **状態管理**: 中央集権的な状態管理パターン
+- **データ永続化**: LocalStorage APIによる自動保存
+- **レスポンシブデザイン**: CSS Grid & Flexboxによる柔軟なレイアウト
+
+### 開発環境のセットアップ
+1. **必要な拡張機能** (VSCode推奨)
+   - Live Server: リアルタイムプレビュー
+   - Prettier: コードフォーマッター
+   - ESLint: JavaScript品質チェック
+
+2. **デバッグ方法**
+   - ブラウザの開発者ツール（F12）を使用
+   - アプリ内のデバッグ機能（🎲、🗑️ボタン）を活用
+   - LocalStorageの確認: `localStorage.getItem('tennisMatchData')`
+
+### トラブルシューティング
+- **CORSエラー**: ローカルサーバーを必ず使用してください（file://では動作しません）
+- **設定が反映されない**: ブラウザのキャッシュをクリアしてください
+- **データが消える**: LocalStorageが無効化されていないか確認してください
+- **レイアウト崩れ**: ブラウザの互換性を確認してください（IE非対応）
+
 ## ライセンス
-MIT License
+MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照
 
 ## 更新履歴
+- **v2.1.0** (2025-06-05): プロジェクト構成の見直し、READMEの大幅アップデート、開発者向け情報充実
 - **v2.0.0** (2025-06-05): デバッグ機能追加、順位付きCSVエクスポート、モジュール化完了
 - **v1.0.0**: 基本的な試合管理機能、順位表、データエクスポート
 
 ## 貢献・サポート
-- 問題報告: [GitHub Issues](https://github.com/yanagi-jabee-28/yanagi-jabee-28.github.io/issues)
-- 機能要望: Pull Requestをお送りください
+- **問題報告**: [GitHub Issues](https://github.com/yanagi-jabee-28/TennisMatch-Pro-2/issues)
+- **機能要望**: Pull Requestをお送りください
+- **ディスカッション**: [GitHub Discussions](https://github.com/yanagi-jabee-28/TennisMatch-Pro-2/discussions)
+
+### コントリビューション方法
+1. このリポジトリをフォーク
+2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. Pull Requestを作成
