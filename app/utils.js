@@ -23,7 +23,7 @@ function loadFromLocalStorage(key, defaultValue = null) {
 
 // マッチIDを生成（小さい番号のチームが先）
 function getMatchId(team1Id, team2Id) {
-	return team1Id < team2Id ? `${team1Id}-${team2Id}` : `${team2Id}-${team1Id}`;
+	return team1Id < team2Id ? `T${team1Id}_vs_T${team2Id}` : `T${team2Id}_vs_T${team1Id}`;
 }
 
 export {
