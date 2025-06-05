@@ -38,36 +38,33 @@ function exportMatchAnalysis() {
 		});
 	});
 
-	csvContent += '\n';
-	// 1. 対戦表データのエクスポート
+	csvContent += '\n';	// 1. 対戦表データのエクスポート
 	csvContent += '============================================\n';
 	csvContent += '2. 全試合結果一覧\n';
 	csvContent += '============================================\n';
-	csvContent += '対戦ID,チーム1,チーム2,チーム1スコア,チーム2スコア,勝利チーム,引き分け,試合状況\n';
+	csvContent += '対戦ID,チーム1,チーム2,チーム1スコア,チーム2スコア,試合結果,試合状況\n';
 
 	// 対戦結果をCSVに変換
 	Object.entries(appState.matches).forEach(([matchId, match]) => {
-		// 勝者の表示方法を決定
-		let winnerDisplay = '';
-		let drawDisplay = 'いいえ';
+		// 試合結果の表示方法を決定
+		let resultDisplay = '';
 		let gameStatus = '';
 
 		if (match.scoreTeam1 === null || match.scoreTeam2 === null) {
 			gameStatus = '未実施';
-			winnerDisplay = '-';
+			resultDisplay = '-';
 		} else if (match.winner === null) {
-			drawDisplay = 'はい';
-			winnerDisplay = '引き分け';
+			resultDisplay = '引き分け';
 			gameStatus = '終了';
 		} else {
-			winnerDisplay = `チーム${match.winner}`;
+			resultDisplay = `チーム${match.winner}勝利`;
 			gameStatus = '終了';
 		}
 
 		const score1 = match.scoreTeam1 !== null ? match.scoreTeam1 : '-';
 		const score2 = match.scoreTeam2 !== null ? match.scoreTeam2 : '-';
 
-		csvContent += `${matchId},チーム${match.team1},チーム${match.team2},${score1},${score2},${winnerDisplay},${drawDisplay},${gameStatus}\n`;
+		csvContent += `${matchId},チーム${match.team1},チーム${match.team2},${score1},${score2},${resultDisplay},${gameStatus}\n`;
 	});
 
 	csvContent += '\n';	// 2. 最終順位表のエクスポート
@@ -149,19 +146,24 @@ function exportMatchAnalysis() {
 	csvContent += '============================================\n';
 	csvContent += '6. 大会統計サマリー\n';
 	csvContent += '============================================\n';
-	
-	// 全体統計を計算
+		// 全体統計を計算
 	const totalMatches = Object.keys(appState.matches).length;
 	const completedMatches = Object.values(appState.matches).filter(m => m.scoreTeam1 !== null && m.scoreTeam2 !== null).length;
 	const pendingMatches = totalMatches - completedMatches;
 	const totalPoints = Object.values(teamStats).reduce((sum, stats) => sum + stats.pointsFor, 0);
 	const averagePointsPerMatch = completedMatches > 0 ? (totalPoints / (completedMatches * 2)).toFixed(1) : 0;
 	
+	// 勝敗統計を計算
+	const drawMatches = Object.values(appState.matches).filter(m => m.scoreTeam1 !== null && m.scoreTeam2 !== null && m.winner === null).length;
+	const decidedMatches = completedMatches - drawMatches;
+	
 	csvContent += `項目,値\n`;
 	csvContent += `総チーム数,${appState.teams.length}チーム\n`;
 	csvContent += `総試合数,${totalMatches}試合\n`;
 	csvContent += `完了試合数,${completedMatches}試合\n`;
 	csvContent += `未実施試合数,${pendingMatches}試合\n`;
+	csvContent += `勝敗決着試合数,${decidedMatches}試合\n`;
+	csvContent += `引き分け試合数,${drawMatches}試合\n`;
 	csvContent += `進行率,${totalMatches > 0 ? ((completedMatches / totalMatches) * 100).toFixed(1) : 0}%\n`;
 	csvContent += `総得点数,${totalPoints}点\n`;
 	csvContent += `1試合平均得点,${averagePointsPerMatch}点\n`;
