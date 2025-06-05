@@ -41,11 +41,10 @@ function openScoreModal(rowTeamId, colTeamId, matchId) {
 		rowTeamId: rowTeamId,
 		colTeamId: colTeamId,
 		matchId: matchId
-	};
-	// モーダルを表示
+	};	// モーダルを表示
 	const scoreModal = domCache.scoreModal;
 	if (scoreModal) {
-		scoreModal.style.display = 'block';
+		scoreModal.classList.add('show');
 		
 		// モーダルが表示されたら最初の入力フィールドにフォーカスを当てる
 		setTimeout(() => {
@@ -59,7 +58,7 @@ function openScoreModal(rowTeamId, colTeamId, matchId) {
 function closeScoreModal() {
 	const scoreModal = domCache.scoreModal;
 	if (scoreModal) {
-		scoreModal.style.display = 'none';
+		scoreModal.classList.remove('show');
 	}
 	currentMatchData = null;
 }

@@ -39,12 +39,11 @@ function openTeamEditModal(teamId) {
 	renderMembersList();
 	// 未割り当てのメンバーリストを表示
 	renderUnassignedMembersList();
-
 	// モーダルを表示
 	const teamEditModal = domCache.teamEditModal;
 	if (teamEditModal) {
-		teamEditModal.style.display = 'block';
-	} else {
+		teamEditModal.classList.add('show');
+	}else {
 		console.error('チーム編集モーダル要素が見つかりません');
 	}
 }
@@ -53,7 +52,7 @@ function openTeamEditModal(teamId) {
 function closeTeamEditModal() {
 	const teamEditModal = domCache.teamEditModal;
 	if (teamEditModal) {
-		teamEditModal.style.display = 'none';
+		teamEditModal.classList.remove('show');
 	}
 	currentEditTeamId = null;
 	tempTeamMembers = [];

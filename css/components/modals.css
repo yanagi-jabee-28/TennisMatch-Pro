@@ -2,7 +2,7 @@
 
 /* モーダル基本スタイル */
 .modal {
-	display: none;
+	display: none !important;
 	position: fixed;
 	z-index: 1000;
 	left: 0;
@@ -11,6 +11,11 @@
 	height: 100%;
 	overflow: auto;
 	background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* モーダルが開いている時のみ表示 */
+.modal.show {
+	display: block !important;
 }
 
 .modal-content {
