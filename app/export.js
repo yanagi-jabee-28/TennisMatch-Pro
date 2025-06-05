@@ -27,14 +27,13 @@ function exportMatchAnalysis() {
 	csvContent += `総試合数: ${Object.keys(appState.matches).length}試合\n`;
 	csvContent += '\n';
 	// 0. チームメンバー情報のエクスポート
+	csvContent += '============================================\n';	csvContent += '1. チーム構成メンバー一覧\n';
 	csvContent += '============================================\n';
-	csvContent += '1. チーム構成メンバー一覧\n';
-	csvContent += '============================================\n';
-	csvContent += 'チームID,チーム名,メンバー名,チーム内順序\n';
+	csvContent += 'チームID,チーム名,メンバー名\n';
 
 	appState.teams.forEach(team => {
 		team.members.forEach((member, index) => {
-			csvContent += `${team.id},チーム${team.id},${member},${index + 1}\n`;
+			csvContent += `${team.id},チーム${team.id},${member}\n`;
 		});
 	});
 	csvContent += '\n';	// 1. 対戦表データのエクスポート
