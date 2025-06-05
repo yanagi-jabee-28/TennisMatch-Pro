@@ -53,6 +53,12 @@ function closeTeamEditModal() {
 	const teamEditModal = domCache.teamEditModal;
 	if (teamEditModal) {
 		teamEditModal.classList.remove('show');
+		// スマートフォンChrome対応：強制的にdisplayをnoneに
+		setTimeout(() => {
+			if (!teamEditModal.classList.contains('show')) {
+				teamEditModal.style.display = 'none';
+			}
+		}, 50);
 	}
 	currentEditTeamId = null;
 	tempTeamMembers = [];

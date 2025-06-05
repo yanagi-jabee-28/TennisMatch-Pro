@@ -59,6 +59,12 @@ function closeScoreModal() {
 	const scoreModal = domCache.scoreModal;
 	if (scoreModal) {
 		scoreModal.classList.remove('show');
+		// スマートフォンChrome対応：強制的にdisplayをnoneに
+		setTimeout(() => {
+			if (!scoreModal.classList.contains('show')) {
+				scoreModal.style.display = 'none';
+			}
+		}, 50);
 	}
 	currentMatchData = null;
 }

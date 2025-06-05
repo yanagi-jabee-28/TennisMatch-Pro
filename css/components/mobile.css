@@ -5,6 +5,28 @@
 	--vh: 1vh;
 }
 
+/* Chrome for Android 特有の問題対応 */
+@supports (-webkit-touch-callout: none) {
+	/* iOS Safari 対応 */
+	:root {
+		--vh: 1vh;
+	}
+}
+
+/* Chrome for Android でのビューポート問題対応 */
+@media screen and (-webkit-min-device-pixel-ratio: 1) {
+	html {
+		/* アドレスバーの高さ変化対応 */
+		height: -webkit-fill-available;
+	}
+	
+	body {
+		min-height: 100vh;
+		min-height: -webkit-fill-available;
+		background-color: #f9f9f9;
+	}
+}
+
 /* キーボード表示時の調整用クラス */
 .keyboard-visible {
 	height: 100vh;
