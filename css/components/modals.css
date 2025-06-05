@@ -11,47 +11,6 @@
 	height: 100%;
 	overflow: auto;
 	background-color: rgba(0, 0, 0, 0.5);
-	opacity: 0;
-	visibility: hidden;
-	transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-/* モーダルが開いている時のスタイル */
-.modal.show {
-	display: block;
-	opacity: 1;
-	visibility: visible;
-}
-
-/* Chrome for Android 専用の修正 */
-@supports (-webkit-appearance: none) {
-	@media (hover: none) and (pointer: coarse) {
-		.modal {
-			/* Chrome for Androidでの描画問題を修正 */
-			-webkit-transform: translate3d(0, 0, 0);
-			transform: translate3d(0, 0, 0);
-			-webkit-backface-visibility: hidden;
-			backface-visibility: hidden;
-			/* 薄暗いオーバーレイが残る問題の修正 */
-			pointer-events: none;
-		}
-		
-		.modal.show {
-			pointer-events: auto;
-			/* Chrome for Androidでの強制表示 */
-			display: block !important;
-			opacity: 1 !important;
-			visibility: visible !important;
-		}
-		
-		/* モーダルが非表示の時は完全に隠す */
-		.modal:not(.show) {
-			display: none !important;
-			opacity: 0 !important;
-			visibility: hidden !important;
-			pointer-events: none !important;
-		}
-	}
 }
 
 .modal-content {

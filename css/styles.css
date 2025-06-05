@@ -6,9 +6,6 @@
 /* レイアウト */
 @import url('layout.css');
 
-/* レスポンシブデザイン */
-@import url('responsive.css');
-
 /* コンポーネント */
 @import url('components/buttons.css');
 @import url('components/forms.css');
@@ -17,4 +14,6 @@
 @import url('components/toast.css');
 @import url('components/dialog.css');
 @import url('components/teams.css');
-@import url('components/mobile.css');
+
+/* レスポンシブデザイン */
+@import url('responsive.css');

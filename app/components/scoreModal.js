@@ -41,10 +41,11 @@ function openScoreModal(rowTeamId, colTeamId, matchId) {
 		rowTeamId: rowTeamId,
 		colTeamId: colTeamId,
 		matchId: matchId
-	};	// モーダルを表示
+	};
+	// モーダルを表示
 	const scoreModal = domCache.scoreModal;
 	if (scoreModal) {
-		scoreModal.classList.add('show');
+		scoreModal.style.display = 'block';
 		
 		// モーダルが表示されたら最初の入力フィールドにフォーカスを当てる
 		setTimeout(() => {
@@ -58,33 +59,7 @@ function openScoreModal(rowTeamId, colTeamId, matchId) {
 function closeScoreModal() {
 	const scoreModal = domCache.scoreModal;
 	if (scoreModal) {
-		scoreModal.classList.remove('show');
-		
-		// Chrome for Android専用の強制非表示処理
-		if (navigator.userAgent.includes('Chrome') && navigator.userAgent.includes('Mobile')) {
-			// 即座に非表示にする
-			scoreModal.style.display = 'none';
-			scoreModal.style.opacity = '0';
-			scoreModal.style.visibility = 'hidden';
-			scoreModal.style.pointerEvents = 'none';
-			
-			// 少し遅れて元に戻す（次回表示のため）
-			setTimeout(() => {
-				if (!scoreModal.classList.contains('show')) {
-					scoreModal.style.display = '';
-					scoreModal.style.opacity = '';
-					scoreModal.style.visibility = '';
-					scoreModal.style.pointerEvents = '';
-				}
-			}, 300);
-		} else {
-			// 通常のブラウザでは標準的な処理
-			setTimeout(() => {
-				if (!scoreModal.classList.contains('show')) {
-					scoreModal.style.display = 'none';
-				}
-			}, 300);
-		}
+		scoreModal.style.display = 'none';
 	}
 	currentMatchData = null;
 }
