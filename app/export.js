@@ -37,12 +37,11 @@ function exportMatchAnalysis() {
 			csvContent += `${team.id},チーム${team.id},${member},${index + 1}\n`;
 		});
 	});
-
 	csvContent += '\n';	// 1. 対戦表データのエクスポート
 	csvContent += '============================================\n';
 	csvContent += '2. 全試合結果一覧\n';
 	csvContent += '============================================\n';
-	csvContent += '対戦ID,チーム1,チーム2,チーム1スコア,チーム2スコア,試合結果,試合状況\n';
+	csvContent += '対戦ID,対戦チームA,対戦チームB,チームAスコア,チームBスコア,試合結果,試合状況\n';
 
 	// 対戦結果をCSVに変換
 	Object.entries(appState.matches).forEach(([matchId, match]) => {
