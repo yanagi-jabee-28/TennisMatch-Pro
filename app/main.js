@@ -10,6 +10,7 @@ import { calculateStandings, initializeSettingsForm } from './standings.js';
 import { exportMatchAnalysis } from './export.js';
 import { initializeTeamEditListeners } from './components/teamEditor.js';
 import { initializeScoreModalListeners } from './components/scoreModal.js';
+import { initializeDebugListeners } from './debug.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 async function initializeApp() {
@@ -49,9 +50,11 @@ async function initializeApp() {
 	
 	// チームメンバー編集用のモーダルのイベントリスナー設定
 	initializeTeamEditListeners(renderTeams);
-	
-	// スコアモーダルのイベントリスナー設定
+		// スコアモーダルのイベントリスナー設定
 	initializeScoreModalListeners(createMatchTable, calculateStandings);
+	
+	// デバッグ機能のイベントリスナー設定
+	initializeDebugListeners(createMatchTable, calculateStandings);
 	
 	// カスタム確認ダイアログを初期化
 	customConfirm.init();

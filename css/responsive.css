@@ -41,10 +41,23 @@
 		max-width: 60px;
 		font-size: 0.85rem;
 	}
-	
-	/* 各セクションの内部余白を小さく */
+		/* 各セクションの内部余白を小さく */
 	section {
 		padding: 1rem;
+	}
+	
+	/* ボタンコントロールをモバイル対応 */
+	.match-controls,
+	.analysis-controls {
+		flex-direction: column;
+		gap: 8px;
+		text-align: center;
+	}
+	
+	.match-controls .btn,
+	.analysis-controls .btn {
+		width: 100%;
+		margin: 0;
 	}
 }
 
@@ -64,6 +77,13 @@
 		max-width: 50px;
 		font-size: 0.8rem;
 		padding: 0.5rem 0.25rem;
+	}
+	
+	/* ボタンのフォントサイズを小さく */
+	.match-controls .btn,
+	.analysis-controls .btn {
+		font-size: 0.85rem;
+		padding: 0.6rem 1rem;
 	}
 	
 	.modal-content {

@@ -27,6 +27,15 @@ th.empty-cell {
 	gap: 10px;
 }
 
+/* 対戦表コントロール */
+.match-controls {
+	margin-bottom: 15px;
+	text-align: right;
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+}
+
 /* ヘッダー設定パネルレイアウト */
 .settings-panel {
 	margin-top: 1rem;
