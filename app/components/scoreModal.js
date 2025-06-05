@@ -17,16 +17,19 @@ function openScoreModal(rowTeamId, colTeamId, matchId) {
 	// 入力欄の初期化と最大値設定
 	const score1Input = document.getElementById('modal-score-team1');
 	const score2Input = document.getElementById('modal-score-team2');
-
 	// 既存のデータがある場合は、それを表示する
 	if (appState.matches[matchId]) {
 		score1Input.value = appState.matches[matchId].scoreTeam1;
 		score2Input.value = appState.matches[matchId].scoreTeam2;
 	} else {
-		// 新規入力の場合は0で初期化
-		score1Input.value = 0;
-		score2Input.value = 0;
+		// 新規入力の場合は空にして入力しやすくする
+		score1Input.value = '';
+		score2Input.value = '';
 	}
+	
+	// プレースホルダーを設定
+	score1Input.placeholder = '0';
+	score2Input.placeholder = '0';
 
 	// マッチポイントを取得（最大スコアとして使用）
 	const matchPoint = appState.settings.matchPoint;
@@ -39,11 +42,16 @@ function openScoreModal(rowTeamId, colTeamId, matchId) {
 		colTeamId: colTeamId,
 		matchId: matchId
 	};
-
 	// モーダルを表示
 	const scoreModal = domCache.scoreModal;
 	if (scoreModal) {
 		scoreModal.style.display = 'block';
+		
+		// モーダルが表示されたら最初の入力フィールドにフォーカスを当てる
+		setTimeout(() => {
+			score1Input.focus();
+			score1Input.select(); // 既存の値がある場合は全選択
+		}, 100);
 	}
 }
 
@@ -63,10 +71,9 @@ function saveScore(createMatchTable, calculateStandings) {
 	const { rowTeamId, colTeamId, matchId } = currentMatchData;
 	const score1Input = document.getElementById('modal-score-team1');
 	const score2Input = document.getElementById('modal-score-team2');
-
-	// 入力値の取得
-	let team1Score = parseInt(score1Input.value);
-	let team2Score = parseInt(score2Input.value);
+	// 入力値の取得（空の場合は0として扱う）
+	let team1Score = score1Input.value === '' ? 0 : parseInt(score1Input.value);
+	let team2Score = score2Input.value === '' ? 0 : parseInt(score2Input.value);
 	// 入力値のバリデーション
 	if (isNaN(team1Score) || isNaN(team2Score) || team1Score < 0 || team2Score < 0) {
 		toast.error('スコアは0以上の数字を入力してください');
@@ -136,6 +143,54 @@ function initializeScoreModalListeners(createMatchTable, calculateStandings) {
 
 	// 閉じるボタン（×）のクリックイベント - スコア入力モーダルの閉じるボタンを特定
 	document.querySelector('#score-modal .close-modal').addEventListener('click', closeScoreModal);
+	
+	// 入力フィールドのフォーカス時に全選択する
+	const score1Input = document.getElementById('modal-score-team1');
+	const score2Input = document.getElementById('modal-score-team2');
+	
+	score1Input.addEventListener('focus', function() {
+		this.select();
+	});
+	
+	score2Input.addEventListener('focus', function() {
+		this.select();
+	});
+		// Enterキーで次のフィールドに移動、またはフォームを送信
+	score1Input.addEventListener('keypress', function(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			score2Input.focus();
+		}
+	});
+	
+	score2Input.addEventListener('keypress', function(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			saveScore(createMatchTable, calculateStandings);
+		}
+	});
+	
+	// 数字以外の入力を制限（デリートキーやバックスペースは許可）
+	function restrictToNumbers(e) {
+		const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+		if (allowedKeys.includes(e.key) || (e.key >= '0' && e.key <= '9')) {
+			return;
+		}
+		e.preventDefault();
+	}
+	
+	score1Input.addEventListener('keydown', restrictToNumbers);
+	score2Input.addEventListener('keydown', restrictToNumbers);
+	
+	// 負の値を防ぐ
+	function preventNegative() {
+		if (this.value < 0) {
+			this.value = 0;
+		}
+	}
+	
+	score1Input.addEventListener('input', preventNegative);
+	score2Input.addEventListener('input', preventNegative);
 	
 	// モーダル外をクリックした時に閉じる
 	window.addEventListener('click', function (event) {

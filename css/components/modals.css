@@ -90,6 +90,14 @@
 	font-size: 16px;
 	border: 1px solid var(--border-color);
 	border-radius: 4px;
+	text-align: center;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.team-score-input input:focus {
+	outline: none;
+	border-color: var(--primary-color);
+	box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
 }
 
 /* モーダルフッター */
