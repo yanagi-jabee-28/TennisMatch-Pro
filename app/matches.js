@@ -111,11 +111,9 @@ function createMatchTable() {
 						displayScore = `${match.scoreTeam1}-${match.scoreTeam2}`;
 					} else {
 						displayScore = `${match.scoreTeam2}-${match.scoreTeam1}`;
-					}
-
-					cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
+					}					cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
 				} else {
-					cell.textContent = '未対戦';
+					cell.textContent = '-';
 				}
 			}
 

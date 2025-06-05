@@ -62,13 +62,12 @@ function calculateStandings() {
 		stats.winRate = totalMatches > 0 ? Math.round((stats.wins / totalMatches) * 1000) / 1000 : 0;
 		stats.scoreDifference = stats.totalScore - stats.totalConceded; // 得失点差を計算
 	});
-
-	// 順位付け（勝利数 → 得失点差 → 得点合計 → 勝率の順）
+	// 順位付け（勝率 → 得失点差 → 勝利数 → 得点合計の順）
 	appState.standings = Object.values(teamStats).sort((a, b) => {
-		if (b.wins !== a.wins) return b.wins - a.wins;
-		if (b.scoreDifference !== a.scoreDifference) return b.scoreDifference - a.scoreDifference; // 得失点差で比較
-		if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
-		return b.winRate - a.winRate;
+		if (b.winRate !== a.winRate) return b.winRate - a.winRate; // 勝率で比較（第1優先）
+		if (b.scoreDifference !== a.scoreDifference) return b.scoreDifference - a.scoreDifference; // 得失点差で比較（第2優先）
+		if (b.wins !== a.wins) return b.wins - a.wins; // 勝利数で比較（第3優先）
+		return b.totalScore - a.totalScore; // 得点合計で比較（第4優先）
 	});
 
 	// 順位表の表示

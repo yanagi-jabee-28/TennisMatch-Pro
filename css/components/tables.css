@@ -7,6 +7,13 @@ table {
 	margin-bottom: 1rem;
 }
 
+/* 対戦表専用のスタイル */
+#match-grid {
+	table-layout: fixed;
+	width: auto;
+	margin: 0 auto;
+}
+
 th,
 td {
 	padding: 0.75rem;
@@ -34,6 +41,24 @@ thead th {
 	height: 100%;
 	background: linear-gradient(to bottom right, transparent calc(50% - 1px), var(--border-color), transparent calc(50% + 1px));
 	pointer-events: none;
+}
+
+/* 対戦表のセル幅固定 */
+#match-grid td,
+#match-grid th {
+	width: 80px;
+	min-width: 80px;
+	max-width: 80px;
+	box-sizing: border-box;
+	word-wrap: break-word;
+	overflow: hidden;
+}
+
+/* 対戦表の行ヘッダー（チーム番号）*/
+#match-grid th:first-child {
+	background-color: var(--primary-color);
+	color: white;
+	font-weight: bold;
 }
 
 /* クリック可能なセル */

@@ -27,11 +27,19 @@
 		width: 95%;
 		margin: 10% auto;
 	}
-	
-	/* テーブル調整 */
+		/* テーブル調整 */
 	.table-container {
 		margin: 0 -1rem;
 		width: calc(100% + 2rem);
+	}
+	
+	/* 対戦表のセル幅をモバイルで調整 */
+	#match-grid td,
+	#match-grid th {
+		width: 60px;
+		min-width: 60px;
+		max-width: 60px;
+		font-size: 0.85rem;
 	}
 	
 	/* 各セクションの内部余白を小さく */
@@ -46,6 +54,16 @@
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 8px;
+	}
+	
+	/* 対戦表のセル幅をより小さく */
+	#match-grid td,
+	#match-grid th {
+		width: 50px;
+		min-width: 50px;
+		max-width: 50px;
+		font-size: 0.8rem;
+		padding: 0.5rem 0.25rem;
 	}
 	
 	.modal-content {
