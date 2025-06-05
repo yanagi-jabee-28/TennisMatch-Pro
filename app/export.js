@@ -48,14 +48,35 @@ function exportMatchAnalysis() {
 
 		csvContent += `チーム${match.team1},チーム${match.team2},${match.scoreTeam1},${match.scoreTeam2},${winnerDisplay},${drawDisplay}\n`;
 	});
-
-	// 2. 勝敗表のエクスポート
-	csvContent += '\n# 勝敗表データ\n';
-	csvContent += 'チームID,勝利数,敗北数,引き分け数,得点,失点,得失点差,勝率\n';
+	// 2. 勝敗表のエクスポート（順位順）
+	csvContent += '\n# 順位表データ\n';
+	csvContent += '順位,チームID,勝利数,敗北数,引き分け数,得点,失点,得失点差,勝率\n';
 
 	// 各チームの勝敗統計を計算
 	const teamStats = calculateTeamStats();
 	
+	// 順位付けのために統計データを並び替え（standings.jsと同じロジック）
+	const rankedTeams = Object.entries(teamStats)
+		.map(([teamId, stats]) => ({ teamId, ...stats }))
+		.sort((a, b) => {
+			if (b.winRate !== a.winRate) return b.winRate - a.winRate; // 勝率で比較（第1優先）
+			if (b.pointDiff !== a.pointDiff) return b.pointDiff - a.pointDiff; // 得失点差で比較（第2優先）
+			if (b.wins !== a.wins) return b.wins - a.wins; // 勝利数で比較（第3優先）
+			return b.pointsFor - a.pointsFor; // 得点合計で比較（第4優先）
+		});
+	
+	// 順位付きで出力
+	rankedTeams.forEach((teamData, index) => {
+		const rank = index + 1;
+		csvContent += `${rank},チーム${teamData.teamId},${teamData.wins},${teamData.losses},${teamData.draws},`;
+		csvContent += `${teamData.pointsFor},${teamData.pointsAgainst},${teamData.pointDiff},`;
+		csvContent += `${teamData.winRate.toFixed(3)}\n`;
+	});
+
+	// 3. 勝敗表のエクスポート（チームID順）
+	csvContent += '\n# 勝敗表データ（チームID順）\n';
+	csvContent += 'チームID,勝利数,敗北数,引き分け数,得点,失点,得失点差,勝率\n';
+
 	// チームID順に並び替えて出力
 	Object.keys(teamStats)
 		.sort((a, b) => parseInt(a) - parseInt(b))
@@ -65,8 +86,7 @@ function exportMatchAnalysis() {
 			csvContent += `${stats.pointsFor},${stats.pointsAgainst},${stats.pointDiff},`;
 			csvContent += `${stats.winRate.toFixed(3)}\n`;
 		});
-
-	// 3. チーム間の点数詳細
+	// 4. チーム間の点数詳細
 	csvContent += '\n# チーム間の得点詳細\n';
 	csvContent += '対戦ID,チーム1,チーム2,チーム1スコア,チーム2スコア\n';
 
@@ -74,12 +94,12 @@ function exportMatchAnalysis() {
 		csvContent += `${matchId},チーム${match.team1},チーム${match.team2},${match.scoreTeam1},${match.scoreTeam2}\n`;
 	});
 
-	// 4. 設定情報の追加
+	// 5. 設定情報の追加
 	csvContent += '\n# 設定情報\n';
 	csvContent += `マッチポイント,${appState.settings.matchPoint}\n`;
 	csvContent += `エクスポート日時,${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}:${('0' + now.getMinutes()).slice(-2)}\n`;
 
-	// 5. 大会情報の追加（config.jsonから）
+	// 6. 大会情報の追加（config.jsonから）
 	fetchConfigAndExport(csvContent, filename);
 }
 

@@ -30,21 +30,22 @@ function generateRandomScores(createMatchTable, calculateStandings) {
     }
     
     console.log('生成する試合数:', matchesToGenerate.length);
-    
-    // 各試合にランダムスコアを設定
+      // 各試合にランダムスコアを設定
     matchesToGenerate.forEach(match => {
-        // マッチポイントの範囲内でランダムスコアを生成
-        // 0からマッチポイントまでの範囲でランダム生成
-        const score1 = Math.floor(Math.random() * (matchPoint + 1));
-        const score2 = Math.floor(Math.random() * (matchPoint + 1));
+        // どちらのチームが勝つかを先にランダムに決定
+        const team1Wins = Math.random() < 0.5;
         
-        // 勝者を決定
-        let winner;
-        if (score1 === score2) {
-            winner = null; // 引き分け
-        } else if (score1 > score2) {
+        let score1, score2, winner;
+        
+        if (team1Wins) {
+            // team1が勝利：team1は必ずマッチポイント、team2は0からマッチポイント-1
+            score1 = matchPoint;
+            score2 = Math.floor(Math.random() * matchPoint);
             winner = match.team1Id;
         } else {
+            // team2が勝利：team2は必ずマッチポイント、team1は0からマッチポイント-1
+            score1 = Math.floor(Math.random() * matchPoint);
+            score2 = matchPoint;
             winner = match.team2Id;
         }
         
