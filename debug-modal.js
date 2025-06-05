@@ -80,9 +80,40 @@ function emergencyOverlayFix() {
     }
 }
 
+// 手動で薄暗いオーバーレイを除去する関数（デバッグ用）
+function manualOverlayRemoval() {
+    console.log('手動薄暗いオーバーレイ除去を実行中...');
+    
+    // 全ての除去機能を実行
+    if (typeof aggressiveOverlayRemoval === 'function') {
+        aggressiveOverlayRemoval();
+    }
+    
+    if (typeof nuclearOverlayRemoval === 'function') {
+        nuclearOverlayRemoval();
+    }
+    
+    if (typeof emergencyOverlayFix === 'function') {
+        emergencyOverlayFix();
+    }
+    
+    // ボディクラスを強制的にリセット
+    document.body.classList.remove('modal-open');
+    document.body.classList.add('no-dark-overlay');
+    
+    console.log('手動除去完了');
+}
+
 // ページ読み込み後にチェック
 window.addEventListener('load', checkModalStates);
 
 // グローバルに公開
 window.checkModalStates = checkModalStates;
 window.emergencyOverlayFix = emergencyOverlayFix;
+window.manualOverlayRemoval = manualOverlayRemoval;
+
+// コンソールに使用方法を表示
+console.log('薄暗いオーバーレイ問題の修正機能が有効になりました。');
+console.log('手動で除去する場合: manualOverlayRemoval()');
+console.log('状態確認: checkModalStates()');
+console.log('緊急修正: emergencyOverlayFix()');
