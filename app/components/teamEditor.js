@@ -53,12 +53,32 @@ function closeTeamEditModal() {
 	const teamEditModal = domCache.teamEditModal;
 	if (teamEditModal) {
 		teamEditModal.classList.remove('show');
-		// スマートフォンChrome対応：強制的にdisplayをnoneに
-		setTimeout(() => {
-			if (!teamEditModal.classList.contains('show')) {
-				teamEditModal.style.display = 'none';
-			}
-		}, 50);
+		
+		// Chrome for Android専用の強制非表示処理
+		if (navigator.userAgent.includes('Chrome') && navigator.userAgent.includes('Mobile')) {
+			// 即座に非表示にする
+			teamEditModal.style.display = 'none';
+			teamEditModal.style.opacity = '0';
+			teamEditModal.style.visibility = 'hidden';
+			teamEditModal.style.pointerEvents = 'none';
+			
+			// 少し遅れて元に戻す（次回表示のため）
+			setTimeout(() => {
+				if (!teamEditModal.classList.contains('show')) {
+					teamEditModal.style.display = '';
+					teamEditModal.style.opacity = '';
+					teamEditModal.style.visibility = '';
+					teamEditModal.style.pointerEvents = '';
+				}
+			}, 300);
+		} else {
+			// 通常のブラウザでは標準的な処理
+			setTimeout(() => {
+				if (!teamEditModal.classList.contains('show')) {
+					teamEditModal.style.display = 'none';
+				}
+			}, 300);
+		}
 	}
 	currentEditTeamId = null;
 	tempTeamMembers = [];

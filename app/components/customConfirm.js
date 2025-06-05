@@ -32,9 +32,28 @@ const customConfirm = {
             this.currentResolve = resolve;
         });
     },
-    
-    handleConfirm(result) {
+      handleConfirm(result) {
         this.dialog.classList.remove('show');
+        
+        // Chrome for Android専用の強制非表示処理
+        if (navigator.userAgent.includes('Chrome') && navigator.userAgent.includes('Mobile')) {
+            // 即座に非表示にする
+            this.dialog.style.display = 'none';
+            this.dialog.style.opacity = '0';
+            this.dialog.style.visibility = 'hidden';
+            this.dialog.style.pointerEvents = 'none';
+            
+            // 少し遅れて元に戻す（次回表示のため）
+            setTimeout(() => {
+                if (!this.dialog.classList.contains('show')) {
+                    this.dialog.style.display = '';
+                    this.dialog.style.opacity = '';
+                    this.dialog.style.visibility = '';
+                    this.dialog.style.pointerEvents = '';
+                }
+            }, 300);
+        }
+        
         if (this.currentResolve) {
             this.currentResolve(result);
             this.currentResolve = null;

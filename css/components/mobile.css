@@ -25,6 +25,26 @@
 		min-height: -webkit-fill-available;
 		background-color: #f9f9f9;
 	}
+	
+	/* Chrome for Android でのモーダル関連の問題を修正 */
+	.modal:not(.show) {
+		transform: translate3d(0, 0, -1000px) !important;
+		-webkit-transform: translate3d(0, 0, -1000px) !important;
+	}
+	
+	/* 強制的にオーバーレイを除去 */
+	body:not(.modal-open) .modal {
+		display: none !important;
+		opacity: 0 !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+		background-color: transparent !important;
+	}
+	
+	/* モーダル開閉時のボディクラス管理 */
+	body.modal-open {
+		overflow: hidden;
+	}
 }
 
 /* キーボード表示時の調整用クラス */

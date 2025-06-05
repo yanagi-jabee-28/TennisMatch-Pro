@@ -24,6 +24,8 @@ import {
 	monitorNetworkStatus, 
 	enhanceSmartphoneExperience 
 } from './components/advancedMobile.js';
+// Chrome for Android専用のモーダル修正
+import './components/chromeModalFix.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 async function initializeApp() {

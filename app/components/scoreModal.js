@@ -59,12 +59,32 @@ function closeScoreModal() {
 	const scoreModal = domCache.scoreModal;
 	if (scoreModal) {
 		scoreModal.classList.remove('show');
-		// スマートフォンChrome対応：強制的にdisplayをnoneに
-		setTimeout(() => {
-			if (!scoreModal.classList.contains('show')) {
-				scoreModal.style.display = 'none';
-			}
-		}, 50);
+		
+		// Chrome for Android専用の強制非表示処理
+		if (navigator.userAgent.includes('Chrome') && navigator.userAgent.includes('Mobile')) {
+			// 即座に非表示にする
+			scoreModal.style.display = 'none';
+			scoreModal.style.opacity = '0';
+			scoreModal.style.visibility = 'hidden';
+			scoreModal.style.pointerEvents = 'none';
+			
+			// 少し遅れて元に戻す（次回表示のため）
+			setTimeout(() => {
+				if (!scoreModal.classList.contains('show')) {
+					scoreModal.style.display = '';
+					scoreModal.style.opacity = '';
+					scoreModal.style.visibility = '';
+					scoreModal.style.pointerEvents = '';
+				}
+			}, 300);
+		} else {
+			// 通常のブラウザでは標準的な処理
+			setTimeout(() => {
+				if (!scoreModal.classList.contains('show')) {
+					scoreModal.style.display = 'none';
+				}
+			}, 300);
+		}
 	}
 	currentMatchData = null;
 }
