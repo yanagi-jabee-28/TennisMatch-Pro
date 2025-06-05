@@ -138,21 +138,6 @@
 		width: 100%;
 	}
 	
-	/* 対戦表コントロールの調整 */
-	.match-controls {
-		flex-direction: column;
-		gap: 8px;
-	}
-	
-	.match-controls .btn {
-		order: 2; /* 通常のボタンを下に */
-	}
-	
-	.match-controls .btn-toggle {
-		order: 1; /* 切り替えボタンを上に */
-		font-size: 0.9rem;
-	}
-	
 	/* 設定パネルの調整 */
 	.settings-panel {
 		padding: 0.5rem;

@@ -3,12 +3,12 @@
 import { saveToLocalStorage, loadFromLocalStorage } from './utils.js';
 
 // アプリケーション状態の管理
-const appState = {	teams: [],
+const appState = {
+	teams: [],
 	matches: {},
 	standings: [],
 	settings: {
-		matchPoint: 7,      // マッチポイント（勝利と最大スコアを決定）
-		compactMode: false  // コンパクト表示モード
+		matchPoint: 7       // マッチポイント（勝利と最大スコアを決定）
 	},
 	originalTeams: []      // オリジナルのチーム構成を保存
 };

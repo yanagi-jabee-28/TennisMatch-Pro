@@ -91,7 +91,9 @@ function createMatchTable() {
 				cell.dataset.rowTeamId = rowTeam.id;
 				cell.dataset.colTeamId = colTeam.id;
 				cell.dataset.matchId = matchId;
-				cell.classList.add('clickable-cell');				// 試合結果があれば表示
+				cell.classList.add('clickable-cell');
+
+				// 試合結果があれば表示
 				const match = appState.matches[matchId];
 				if (match) {
 					// 勝者が存在するか引き分けかで表示スタイルを変更
@@ -102,18 +104,14 @@ function createMatchTable() {
 						resultClass = match.winner === rowTeam.id ? 'winner' : 'loser';
 					}
 
-					// 行側のチーム（左列のチーム番号）を常に左側に表示するため、
+					// 行側のチーム（自チーム）を常に左側に表示するため、
 					// 適切な順序でスコアを表示
 					let displayScore;
 					if (match.team1 === rowTeam.id) {
-						// 行側のチームがteam1の場合: team1(行側) - team2(列側)
 						displayScore = `${match.scoreTeam1}-${match.scoreTeam2}`;
 					} else {
-						// 行側のチームがteam2の場合: team2(行側) - team1(列側)
 						displayScore = `${match.scoreTeam2}-${match.scoreTeam1}`;
-					}
-					
-					cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
+					}					cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
 				} else {
 					cell.textContent = '-';
 				}
