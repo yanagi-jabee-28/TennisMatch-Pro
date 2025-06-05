@@ -24,6 +24,7 @@ import {
 	monitorNetworkStatus, 
 	enhanceSmartphoneExperience 
 } from './components/advancedMobile.js';
+import { DarkModeManager } from './components/themeManager.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 async function initializeApp() {

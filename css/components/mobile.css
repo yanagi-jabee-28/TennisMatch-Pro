@@ -161,44 +161,18 @@
 	}
 }
 
-/* ダークモード対応（システム設定に合わせる） */
+/* ダークモード対応は darkmode.css で統一管理 */
+/* モバイル特有のダークモード調整のみここに記載 */
 @media (prefers-color-scheme: dark) {
-	:root {
-		--primary-color: #4285f4;
-		--text-color: #e8eaed;
-		--light-text: #9aa0a6;
-		--border-color: #5f6368;
-		--secondary-color: #3c4043;
-	}
-
-	body {
-		background-color: #202124;
-		color: var(--text-color);
-	}
-
-	section {
-		background-color: #303134;
-	}
-
-	.modal-content {
-		background-color: #303134;
-		color: var(--text-color);
-	}
-
-	input {
-		background-color: #303134;
-		color: var(--text-color);
-		border-color: var(--border-color);
-	}
-
-	.btn-secondary {
-		background-color: var(--secondary-color);
-		color: var(--text-color);
-	}
-
 	.table-container::after {
-		background-color: rgba(60, 64, 67, 0.8);
+		background-color: rgba(60, 64, 67, 0.9);
 		color: var(--light-text);
+		border-radius: 0 0 8px 8px;
+	}
+	
+	/* モバイルでのタッチフィードバック改善 */
+	#match-grid td:active {
+		background-color: rgba(138, 180, 248, 0.3) !important;
 	}
 }
 
@@ -296,10 +270,11 @@
 
 /* ダークモード追加調整 */
 .dark-mode .context-menu {
-	background: #303134;
-	border-color: #5f6368;
+	background: var(--modal-background);
+	border-color: var(--border-color);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .dark-mode .context-menu-item:hover {
-	background-color: #3c4043;
+	background-color: var(--surface-hover);
 }

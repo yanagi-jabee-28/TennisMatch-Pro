@@ -1,0 +1,574 @@
+/* 改善されたダークモードスタイル */
+
+/* ダークモード専用のCSS変数定義 - 視認性強化版 */
+@media (prefers-color-scheme: dark) {
+	:root {
+		/* プライマリカラー - より明るく高コントラスト */
+		--primary-color: #99c2ff;
+		--primary-hover: #b8d5ff;
+		--primary-dark: #7ab3ff;
+		
+		/* テキストカラー - より高いコントラスト（WCAG AAA準拠） */
+		--text-color: #f1f3f4;
+		--text-secondary: #c8ccd0;
+		--light-text: #a8adb3;
+		
+		/* 背景色 - より深い黒とグレーのコントラスト */
+		--background-primary: #121212;
+		--background-secondary: #1e1e1e;
+		--background-tertiary: #2a2a2a;
+		
+		/* サーフェス色 - より明確な階層 */
+		--surface-color: #242424;
+		--surface-hover: #323232;
+		--surface-active: #404040;
+		
+		/* ボーダー色 - より明確な境界線 */
+		--border-color: #606060;
+		--border-light: #484848;
+		
+		/* アクセントカラー */
+		--secondary-color: #404040;
+		--accent-color: #ffdd44;
+		
+		/* ステータスカラー - より明るく視認性重視 */
+		--success-color: #90d999;
+		--error-color: #ff8a80;
+		--warning-color: #ffcc80;
+		
+		/* インプット関連 - より高いコントラスト */
+		--input-background: #2a2a2a;
+		--input-border: #606060;
+		--input-focus: #99c2ff;
+		
+		/* モーダル関連 */
+		--modal-overlay: rgba(0, 0, 0, 0.85);
+		--modal-background: #242424;
+		
+		/* テーブル関連 - より明確な区別 */
+		--table-header: #323232;
+		--table-row-even: #2a2a2a;
+		--table-row-hover: rgba(153, 194, 255, 0.15);
+	}
+	
+	/* 基本要素のスタイル */
+	body {
+		background-color: var(--background-primary);
+		color: var(--text-color);
+	}
+		/* ヘッダー - より高コントラストの改善 */
+	header {
+		background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+		color: var(--background-primary);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+		border-bottom: 1px solid var(--border-color);
+	}
+	
+	header h1 {
+		color: var(--background-primary);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+		font-weight: 700;
+	}
+	
+	/* 設定パネルの改善 */
+	.settings-panel {
+		background-color: rgba(36, 36, 36, 0.9);
+		border: 1px solid var(--border-color);
+		border-radius: 8px;
+		padding: 1rem;
+		margin-top: 1rem;
+	}
+	
+	.settings-panel label {
+		color: var(--text-color);
+		font-weight: 600;
+	}
+	
+	/* セクション */
+	section {
+		background-color: var(--surface-color);
+		border: 1px solid var(--border-light);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	}
+	
+	/* 見出し */
+	h2 {
+		color: var(--primary-color);
+		border-bottom-color: var(--border-color);
+	}
+	
+	/* フッター */
+	footer {
+		background-color: var(--background-secondary);
+		color: var(--text-secondary);
+		border-top-color: var(--border-color);
+	}
+	
+	/* 情報ボックス */
+	.info-box {
+		background-color: var(--background-tertiary);
+		border-left-color: var(--primary-color);
+		color: var(--text-color);
+	}
+	
+	.click-info {
+		color: var(--text-secondary);
+	}
+}
+
+/* ボタンのダークモード対応 - 高コントラスト改善版 */
+@media (prefers-color-scheme: dark) {
+	.btn {
+		background-color: var(--primary-color);
+		color: var(--background-primary);
+		border: 2px solid var(--primary-color);
+		font-weight: 600;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	}
+	
+	.btn:hover {
+		background-color: var(--primary-hover);
+		border-color: var(--primary-hover);
+		transform: translateY(-1px);
+		box-shadow: 0 6px 12px rgba(153, 194, 255, 0.4);
+	}
+	
+	.btn:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 6px rgba(153, 194, 255, 0.3);
+	}
+	
+	.btn-secondary {
+		background-color: var(--surface-hover);
+		color: var(--text-color);
+		border: 2px solid var(--border-color);
+		font-weight: 500;
+	}
+	
+	.btn-secondary:hover {
+		background-color: var(--surface-active);
+		border-color: var(--primary-color);
+		color: var(--primary-color);
+	}
+	
+	.btn-small {
+		background-color: var(--surface-color);
+		color: var(--primary-color);
+		border: 2px solid var(--primary-color);
+		font-weight: 500;
+	}
+	
+	.btn-small:hover {
+		background-color: var(--primary-color);
+		color: var(--background-primary);
+	}
+	
+	.edit-team-btn {
+		background-color: var(--surface-hover);
+		color: var(--primary-color);
+		border: 2px solid var(--border-color);
+		font-weight: 500;
+	}
+	
+	.edit-team-btn:hover {
+		background-color: var(--surface-active);
+		border-color: var(--primary-color);
+		box-shadow: 0 2px 8px rgba(153, 194, 255, 0.3);
+	}
+	
+	/* デバッグボタン - より明確な色 */
+	.btn-debug {
+		background-color: var(--warning-color);
+		color: var(--background-primary);
+		border: 2px solid var(--warning-color);
+		font-weight: 600;
+	}
+	
+	.btn-debug:hover {
+		background-color: #ffb74d;
+		border-color: #ffb74d;
+		box-shadow: 0 4px 8px rgba(255, 204, 128, 0.4);
+	}
+}
+
+/* テーブルのダークモード対応 - 高視認性改善版 */
+@media (prefers-color-scheme: dark) {
+	.table-container {
+		border: 2px solid var(--border-color);
+		border-radius: 8px;
+		overflow: hidden;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	}
+	
+	#match-grid,
+	#standings-table {
+		background-color: var(--surface-color);
+		border-collapse: separate;
+		border-spacing: 0;
+	}
+	
+	#match-grid th,
+	#standings-table th {
+		background-color: var(--table-header);
+		color: var(--text-color);
+		border-bottom: 3px solid var(--border-color);
+		font-weight: 700;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+		padding: 12px 8px;
+	}
+	
+	#match-grid td,
+	#standings-table td {
+		border: 1px solid var(--border-light);
+		color: var(--text-color);
+		padding: 10px 8px;
+		font-weight: 500;
+	}
+	
+	#match-grid tr:nth-child(even) td,
+	#standings-table tr:nth-child(even) {
+		background-color: var(--table-row-even);
+	}
+	
+	#match-grid tr:hover td,
+	#standings-table tr:hover {
+		background-color: var(--table-row-hover);
+		border-color: var(--primary-color);
+	}	
+	/* 対戦結果セル - より明確なインタラクション */
+	#match-grid td[data-match-id] {
+		cursor: pointer;
+		transition: all 0.2s ease;
+		border: 2px solid transparent;
+	}
+	
+	#match-grid td[data-match-id]:hover {
+		background-color: rgba(153, 194, 255, 0.25) !important;
+		border-color: var(--primary-color);
+		transform: scale(1.02);
+		box-shadow: 0 2px 8px rgba(153, 194, 255, 0.3);
+	}
+	
+	#match-grid td[data-match-id]:active {
+		background-color: rgba(153, 194, 255, 0.35) !important;
+		transform: scale(0.98);
+	}
+	
+	/* 対戦結果の色分け - より高コントラスト */
+	.match-win {
+		background-color: rgba(144, 217, 153, 0.3) !important;
+		color: var(--success-color);
+		font-weight: bold;
+		border-left: 4px solid var(--success-color);
+	}
+	
+	.match-lose {
+		background-color: rgba(255, 138, 128, 0.3) !important;
+		color: var(--error-color);
+		font-weight: bold;
+		border-left: 4px solid var(--error-color);
+	}
+	
+	.match-draw {
+		background-color: rgba(255, 221, 68, 0.3) !important;
+		color: var(--accent-color);
+		font-weight: bold;
+		border-left: 4px solid var(--accent-color);
+	}
+	
+	/* 得失点差のスタイル - より明確 */
+	.positive-diff {
+		color: var(--success-color);
+		font-weight: bold;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	}
+	
+	.negative-diff {
+		color: var(--error-color);
+		font-weight: bold;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	}
+}
+
+/* モーダルのダークモード対応 - 高視認性改善版 */
+@media (prefers-color-scheme: dark) {
+	.modal {
+		background-color: var(--modal-overlay);
+	}
+	
+	.modal-content {
+		background-color: var(--modal-background);
+		border: 2px solid var(--border-color);
+		box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+		border-radius: 12px;
+	}
+	
+	.modal-header {
+		background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+		color: var(--background-primary);
+		border-bottom: 2px solid var(--border-color);
+		font-weight: 700;
+	}
+	
+	.modal-body {
+		color: var(--text-color);
+		padding: 1.5rem;
+	}
+	
+	.modal-footer {
+		border-top: 2px solid var(--border-color);
+		background-color: var(--background-tertiary);
+		padding: 1rem 1.5rem;
+	}
+	
+	.close-modal {
+		color: var(--background-primary);
+		opacity: 0.9;
+		font-weight: bold;
+		font-size: 1.5rem;
+	}
+	
+	.close-modal:hover {
+		opacity: 1;
+		transform: scale(1.1);
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	}
+}
+
+/* フォームのダークモード対応 - 高コントラスト改善版 */
+@media (prefers-color-scheme: dark) {
+	input[type="number"],
+	input[type="text"],
+	select,
+	textarea {
+		background-color: var(--input-background);
+		color: var(--text-color);
+		border: 2px solid var(--input-border);
+		border-radius: 8px;
+		padding: 8px 12px;
+		font-weight: 500;
+	}
+	
+	input:focus,
+	select:focus,
+	textarea:focus {
+		border-color: var(--input-focus);
+		box-shadow: 0 0 0 3px rgba(153, 194, 255, 0.3);
+		outline: none;
+		background-color: var(--surface-color);
+	}
+	
+	input::placeholder {
+		color: var(--light-text);
+		font-style: italic;
+	}
+	
+	/* 設定パネル */
+	.settings-panel {
+		background-color: rgba(36, 36, 36, 0.95);
+		border: 2px solid var(--border-color);
+		border-radius: 12px;
+		padding: 1.5rem;
+		margin-top: 1rem;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	}
+	
+	.form-group label {
+		color: var(--text-color);
+		font-weight: 600;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	}
+}
+
+/* チーム関連のダークモード対応 */
+@media (prefers-color-scheme: dark) {
+	.team {
+		background-color: var(--surface-color);
+		border: 1px solid var(--border-color);
+		border-radius: 8px;
+	}
+	
+	.team-header {
+		background-color: var(--surface-hover);
+		border-bottom: 1px solid var(--border-color);
+		padding: 1rem;
+	}
+	
+	.team-name {
+		color: var(--primary-color);
+		font-weight: bold;
+	}
+	
+	.team-members {
+		padding: 1rem;
+	}
+	
+	.team-member {
+		color: var(--text-secondary);
+		padding: 0.5rem;
+		border-radius: 4px;
+		margin: 0.25rem 0;
+		background-color: var(--background-tertiary);
+	}
+	
+	.original-member {
+		color: var(--primary-color);
+		font-weight: bold;
+		background-color: rgba(138, 180, 248, 0.1);
+	}
+}
+
+/* トーストのダークモード対応 */
+@media (prefers-color-scheme: dark) {
+	.toast {
+		background-color: var(--surface-color);
+		color: var(--text-color);
+		border: 1px solid var(--border-color);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+	}
+	
+	.toast.success {
+		background-color: var(--success-color);
+		color: var(--background-primary);
+		border-color: var(--success-color);
+	}
+	
+	.toast.error {
+		background-color: var(--error-color);
+		color: var(--background-primary);
+		border-color: var(--error-color);
+	}
+	
+	.toast.warning {
+		background-color: var(--warning-color);
+		color: var(--background-primary);
+		border-color: var(--warning-color);
+	}
+}
+
+/* ダイアログのダークモード対応 */
+@media (prefers-color-scheme: dark) {
+	.custom-dialog {
+		background-color: var(--modal-overlay);
+	}
+	
+	.dialog-content {
+		background-color: var(--modal-background);
+		border: 1px solid var(--border-color);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+	}
+	
+	.dialog-header {
+		background-color: var(--surface-hover);
+		border-bottom-color: var(--border-color);
+		color: var(--text-color);
+	}
+	
+	.dialog-body {
+		color: var(--text-color);
+	}
+	
+	.dialog-footer {
+		border-top-color: var(--border-color);
+		background-color: var(--background-tertiary);
+	}
+}
+
+/* スクロールバーのダークモード対応 */
+@media (prefers-color-scheme: dark) {
+	.table-container::-webkit-scrollbar {
+		background-color: var(--background-secondary);
+	}
+	
+	.table-container::-webkit-scrollbar-track {
+		background-color: var(--background-tertiary);
+	}
+	
+	.table-container::-webkit-scrollbar-thumb {
+		background-color: var(--primary-color);
+		border-radius: 4px;
+	}
+	
+	.table-container::-webkit-scrollbar-thumb:hover {
+		background-color: var(--primary-hover);
+	}
+}
+
+/* アニメーション効果の改善 */
+@media (prefers-color-scheme: dark) {
+	.btn,
+	#match-grid td,
+	.team,
+	.modal-content {
+		transition: all 0.2s ease;
+	}
+	
+	/* ホバー効果の強化 */
+	.btn:hover,
+	.edit-team-btn:hover {
+		box-shadow: 0 4px 12px rgba(138, 180, 248, 0.2);
+	}
+	
+	/* フォーカス効果の改善 */
+	.focused,
+	input:focus,
+	button:focus {
+		box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.4);
+		outline: none;
+	}
+}
+
+/* テーマ切り替えボタンのスタイル */
+.header-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+.btn-theme-toggle {
+	background-color: rgba(255, 255, 255, 0.2);
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	border-radius: 50%;
+	width: 48px;
+	height: 48px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	font-size: 1.2rem;
+}
+
+.btn-theme-toggle:hover {
+	background-color: rgba(255, 255, 255, 0.3);
+	border-color: rgba(255, 255, 255, 0.5);
+	transform: scale(1.1);
+}
+
+.btn-theme-toggle:active {
+	transform: scale(0.95);
+}
+
+.theme-icon {
+	transition: transform 0.3s ease;
+}
+
+.btn-theme-toggle:hover .theme-icon {
+	transform: rotate(20deg);
+}
+
+/* ダークモード時のテーマボタン */
+@media (prefers-color-scheme: dark) {
+	.btn-theme-toggle {
+		background-color: rgba(36, 36, 36, 0.8);
+		border-color: var(--border-color);
+		color: var(--text-color);
+	}
+	
+	.btn-theme-toggle:hover {
+		background-color: var(--surface-hover);
+		border-color: var(--primary-color);
+		box-shadow: 0 4px 12px rgba(153, 194, 255, 0.3);
+	}
+}
