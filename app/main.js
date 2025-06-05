@@ -88,7 +88,6 @@ async function initializeApp() {
 			}
 		});
 	}
-
 	// モバイル機能拡張の初期化
 	initMobileEnhancements();
 	addSwipeGestures();
@@ -101,6 +100,9 @@ async function initializeApp() {
 	handlePowerSavingMode();
 	monitorNetworkStatus();
 	enhanceSmartphoneExperience();
+
+	// ダークモード管理の初期化
+	const darkModeManager = new DarkModeManager();
 
 	// ビューポート高さの動的計算（iOS Safari対応）
 	const setVhProperty = () => {

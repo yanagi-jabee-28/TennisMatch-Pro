@@ -380,41 +380,91 @@
 	}
 }
 
-/* チーム関連のダークモード対応 */
+/* チーム関連のダークモード対応 - 高視認性改善版 */
 @media (prefers-color-scheme: dark) {
-	.team {
+	.team-card {
 		background-color: var(--surface-color);
-		border: 1px solid var(--border-color);
-		border-radius: 8px;
+		border: 2px solid var(--border-light);
+		border-radius: 12px;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+	}
+	
+	.team-card:hover {
+		border-color: var(--primary-color);
+		box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+	}
+	
+	.team-card h3 {
+		color: var(--primary-color);
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+	}
+	
+	.team-members li {
+		background-color: var(--background-tertiary);
+		color: var(--text-color);
+		border-left-color: var(--primary-color);
+		font-weight: 600;
+	}
+	
+	.team-members li:hover {
+		background-color: var(--surface-hover);
+		color: var(--primary-color);
 	}
 	
 	.team-header {
-		background-color: var(--surface-hover);
-		border-bottom: 1px solid var(--border-color);
-		padding: 1rem;
+		background: linear-gradient(135deg, var(--surface-hover), var(--background-tertiary));
+		border: 1px solid var(--border-color);
+		color: var(--text-color);
 	}
 	
-	.team-name {
+	.team-header h3 {
 		color: var(--primary-color);
-		font-weight: bold;
+		margin: 0;
 	}
 	
-	.team-members {
-		padding: 1rem;
-	}
-	
-	.team-member {
-		color: var(--text-secondary);
-		padding: 0.5rem;
-		border-radius: 4px;
-		margin: 0.25rem 0;
+	.team-info {
 		background-color: var(--background-tertiary);
+		color: var(--primary-color);
+		border-left-color: var(--primary-color);
+		font-weight: 700;
 	}
 	
-	.original-member {
+	.member-list-container {
+		background-color: var(--background-tertiary);
+		border: 2px solid var(--border-color);
+		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+	}
+	
+	.member-item {
+		background-color: var(--surface-color);
+		border: 1px solid var(--border-light);
+		color: var(--text-color);
+	}
+	
+	.member-item:hover {
+		background-color: var(--surface-hover);
+		border-color: var(--primary-color);
 		color: var(--primary-color);
-		font-weight: bold;
-		background-color: rgba(138, 180, 248, 0.1);
+	}
+	
+	.member-name {
+		color: var(--text-color);
+		font-weight: 600;
+	}
+	
+	.member-item:hover .member-name {
+		color: var(--primary-color);
+	}
+	
+	.member-actions select {
+		background-color: var(--input-background);
+		color: var(--text-color);
+		border: 2px solid var(--input-border);
+	}
+	
+	.member-actions select:focus {
+		border-color: var(--input-focus);
+		box-shadow: 0 0 0 2px rgba(153, 194, 255, 0.3);
 	}
 }
 
