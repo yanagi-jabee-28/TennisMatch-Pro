@@ -34,11 +34,10 @@ function openTeamEditModal(teamId) {
 	// 一時的なメンバーリストにコピー
 	tempTeamMembers = [...team.members];
 	console.log('メンバーリストをコピーしました:', tempTeamMembers);
-
 	// メンバーリストを表示
 	renderMembersList();
-	// 未割り当てのメンバーリストを表示
-	renderUnassignedMembersList();
+	// 利用可能なメンバーリストを表示
+	renderAvailableMembersList();
 
 	// モーダルを表示
 	const teamEditModal = domCache.teamEditModal;
@@ -87,26 +86,24 @@ function renderMembersList() {
 				console.log(`メンバー "${removedMember}" を削除します`);
 
 				// チームメンバーリストから削除
-				tempTeamMembers.splice(index, 1);
-
-				// リストを更新
+				tempTeamMembers.splice(index, 1);				// リストを更新
 				renderMembersList();
-				// メンバーが削除されたら、未割り当てのメンバーリストも更新
-				renderUnassignedMembersList();
+				// メンバーが削除されたら、利用可能なメンバーリストも更新
+				renderAvailableMembersList();
 			});
 		}
 	});
 }
 
-// メンバーを追加
+// メンバーを追加（元のチームから自動削除）
 function addNewMember() {
-	const unassignedMembersSelect = document.getElementById('unassigned-members-select');
-	if (!unassignedMembersSelect) {
-		console.error('未割り当てメンバー選択リストが見つかりません');
+	const availableMembersSelect = document.getElementById('unassigned-members-select');
+	if (!availableMembersSelect) {
+		console.error('メンバー選択リストが見つかりません');
 		return;
 	}
 
-	const newMemberName = unassignedMembersSelect.value;
+	const newMemberName = availableMembersSelect.value;
 	if (newMemberName) {
 		// 重複チェック（念のため）
 		if (tempTeamMembers.includes(newMemberName)) {
@@ -114,109 +111,122 @@ function addNewMember() {
 			return;
 		}
 
+		// 元のチームからメンバーを削除
+		const currentTeam = findCurrentTeamForMember(newMemberName);
+		if (currentTeam) {
+			const memberIndex = currentTeam.members.indexOf(newMemberName);
+			if (memberIndex !== -1) {
+				currentTeam.members.splice(memberIndex, 1);
+				console.log(`メンバー "${newMemberName}" をチーム${currentTeam.id}から削除しました`);
+			}
+		}
+
+		// 編集中のチームに追加
 		tempTeamMembers.push(newMemberName);
-		console.log(`新しいメンバー "${newMemberName}" を追加しました`);
-		// メンバーリストと未割り当てのメンバーリストを更新
+		console.log(`新しいメンバー "${newMemberName}" をチーム${currentEditTeamId}に追加しました`);
+		
+		// メンバーリストと利用可能なメンバーリストを更新
 		renderMembersList();
-		renderUnassignedMembersList();
+		renderAvailableMembersList();
+		
+		// 選択をリセット
+		availableMembersSelect.value = '';
 	} else {
 		toast.error('追加するメンバーを選択してください');
 	}
 }
 
-// 未割り当てのメンバーリストを取得する関数
-function getUnassignedMembers() {
-	// 全チームのメンバーを取得
-	const allAssignedMembers = [];
+// 指定されたメンバーが現在所属しているチームを見つける関数
+function findCurrentTeamForMember(memberName) {
+	return appState.teams.find(team => team.members.includes(memberName));
+}
 
-	// 現在編集中のチーム以外の全てのチームのメンバーを取得
-	appState.teams.forEach(team => {
-		if (team.id !== currentEditTeamId) {
-			allAssignedMembers.push(...team.members);
-		}
-	});
-
+// 全メンバーリストを取得する関数（現在編集中のチームに既にいるメンバーは除外）
+function getAllAvailableMembers() {
 	// オリジナルの全メンバーリストを取得
 	const allOriginalMembers = [];
 	appState.originalTeams.forEach(team => {
 		allOriginalMembers.push(...team.members);
 	});
 
-	// 編集中のチームのオリジナルメンバーを取得
-	const originalTeam = appState.originalTeams.find(team => team.id === currentEditTeamId);
-	const originalTeamMembers = originalTeam ? originalTeam.members : [];
-
-	// 未割り当てのメンバー = オリジナルの全メンバー - 他のチームに割り当て済みのメンバー
-	const unassignedMembers = allOriginalMembers.filter(member => {
-		// 他のチームに割り当て済みでないメンバー、もしくは
-		// 元々現在のチームにいたメンバー（これにより削除されたメンバーも未割当として表示される）
-		return !allAssignedMembers.includes(member) || originalTeamMembers.includes(member);
-	});
-
 	// 現在編集中のチームに既に割り当てられているメンバーは除外（重複を防ぐ）
-	return unassignedMembers.filter(member => !tempTeamMembers.includes(member));
+	return allOriginalMembers.filter(member => !tempTeamMembers.includes(member));
 }
 
-// 未割り当てのメンバーリストを表示する関数
-function renderUnassignedMembersList() {
-	const unassignedMembersSelect = document.getElementById('unassigned-members-select');
-	if (!unassignedMembersSelect) {
-		console.error('未割り当てメンバー選択リストが見つかりません');
+// 利用可能なメンバーリストを表示する関数
+function renderAvailableMembersList() {
+	const availableMembersSelect = document.getElementById('unassigned-members-select');
+	if (!availableMembersSelect) {
+		console.error('メンバー選択リストが見つかりません');
 		return;
 	}
 
 	// 選択リストをリセット
-	unassignedMembersSelect.innerHTML = '<option value="">-- 未割り当てのメンバーを選択 --</option>';
+	availableMembersSelect.innerHTML = '<option value="">-- メンバーを選択してチームに追加 --</option>';
 
-	// 未割り当てのメンバーを取得
-	const unassignedMembers = getUnassignedMembers();
-	console.log('未割り当てのメンバー:', unassignedMembers);
+	// 利用可能なメンバーを取得
+	const availableMembers = getAllAvailableMembers();
+	console.log('利用可能なメンバー:', availableMembers);
 
-	// 未割り当てのメンバーがない場合
-	if (unassignedMembers.length === 0) {
+	// 利用可能なメンバーがない場合
+	if (availableMembers.length === 0) {
 		const option = document.createElement('option');
 		option.value = "";
 		option.disabled = true;
-		option.textContent = "利用可能なメンバーがありません";
-		unassignedMembersSelect.appendChild(option);
+		option.textContent = "追加可能なメンバーがありません";
+		availableMembersSelect.appendChild(option);
 	} else {
-		// オリジナルチームの情報を取得
-		const originalTeam = appState.originalTeams.find(team => team.id === currentEditTeamId);
-		const originalTeamMembers = originalTeam ? originalTeam.members : [];
+		// 現在どのチームに所属しているかを取得するヘルパー関数
+		const getCurrentTeamForMember = (memberName) => {
+			for (let team of appState.teams) {
+				if (team.members.includes(memberName)) {
+					return team.id;
+				}
+			}
+			return null;
+		};
 
-		// 未割り当てのメンバーをリストに追加
-		unassignedMembers.forEach(member => {
+		// 利用可能なメンバーをリストに追加
+		availableMembers.forEach(member => {
 			const option = document.createElement('option');
 			option.value = member;
 
-			// 元々このチームのメンバーだった場合、特別に表示
-			if (originalTeamMembers.includes(member)) {
-				option.textContent = `${member} (元のメンバー)`;
-				option.classList.add('original-member');
+			// 現在どのチームに所属しているかを表示
+			const currentTeam = getCurrentTeamForMember(member);
+			if (currentTeam) {
+				option.textContent = `${member} (現在: チーム${currentTeam})`;
+				option.classList.add('assigned-member');
 			} else {
-				option.textContent = member;
+				option.textContent = `${member} (未所属)`;
+				option.classList.add('unassigned-member');
 			}
 
-			unassignedMembersSelect.appendChild(option);
+			availableMembersSelect.appendChild(option);
 		});
 	}
 }
 
 // チームメンバーを保存する関数
 function saveTeamMembersHandler(renderTeams) {
-	if (currentEditTeamId !== null && tempTeamMembers.length > 0) {
-		// 重複チェック
-		const uniqueMembers = [...new Set(tempTeamMembers)];
-		if (uniqueMembers.length !== tempTeamMembers.length) {
-			toast.error('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
-			return;
+	if (currentEditTeamId !== null) {
+		// メンバーが存在する場合のみ重複チェック（0人のチームも保存可能）
+		if (tempTeamMembers.length > 0) {
+			const uniqueMembers = [...new Set(tempTeamMembers)];
+			if (uniqueMembers.length !== tempTeamMembers.length) {
+				toast.error('同じ名前のメンバーが重複しています。メンバー名はそれぞれ一意である必要があります。');
+				return;
+			}
 		}
 		
 		const result = saveTeamMembers(currentEditTeamId, tempTeamMembers);
 		if (result) {
 			renderTeams();
 			closeTeamEditModal();
-			toast.success('チームメンバーを更新しました！');
+			if (tempTeamMembers.length === 0) {
+				toast.success('チームメンバーをクリアしました！');
+			} else {
+				toast.success('チームメンバーを更新しました！');
+			}
 		} else {
 			toast.error('チーム情報の更新に失敗しました');
 		}
@@ -272,7 +282,7 @@ function initializeTeamEditListeners(renderTeams) {
 				if (addMemberBtn) addMemberBtn.focus();
 			}
 		});
-		console.log('未割り当てメンバー選択リストのリスナーを設定しました');
+		console.log('メンバー選択リストのリスナーを設定しました');
 	}
 }
 
@@ -281,8 +291,9 @@ export {
 	closeTeamEditModal, 
 	renderMembersList, 
 	addNewMember,
-	getUnassignedMembers,
-	renderUnassignedMembersList,
+	getAllAvailableMembers,
+	renderAvailableMembersList,
+	findCurrentTeamForMember,
 	saveTeamMembersHandler,
 	initializeTeamEditListeners,
 	currentEditTeamId,

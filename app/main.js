@@ -2,7 +2,7 @@
 
 import { loadConfigData } from './config.js';
 import { domCache } from './dom.js';
-import { appState, loadMatchResults, loadSettings, loadTeamMembers, resetTeams } from './state.js';
+import { appState, loadMatchResults, loadSettings, loadTeamMembers, loadAbsentTeam, resetTeams, clearAllTeams } from './state.js';
 import { toast } from './components/toast.js';
 import { customConfirm } from './components/customConfirm.js';
 import { renderTeams, createMatchTable } from './matches.js';
@@ -30,11 +30,11 @@ async function initializeApp() {
 	if (config.matchSettings) {
 		appState.settings.matchPoint = config.matchSettings.matchPoint || 7;
 	}
-	
 	// 保存された設定と試合結果を読み込む
 	loadSettings();
 	loadMatchResults();
 	loadTeamMembers(); // カスタムチームメンバーがあれば読み込む
+	loadAbsentTeam(); // 欠席チームがあれば読み込む
 
 	// DOM要素キャッシュを初期化
 	domCache.init();
@@ -58,7 +58,6 @@ async function initializeApp() {
 	
 	// カスタム確認ダイアログを初期化
 	customConfirm.init();
-
 	// リセットボタンのイベントリスナーを追加
 	const resetButton = document.getElementById('reset-teams-btn');
 	if (resetButton) {
@@ -70,6 +69,21 @@ async function initializeApp() {
 					// UI更新
 					renderTeams();
 					toast.success('すべてのチームをオリジナルの構成にリセットしました');
+				}
+			}
+		});
+	}
+	// 全チームクリアボタンのイベントリスナーを追加
+	const clearAllTeamsButton = document.getElementById('clear-all-teams-btn');
+	if (clearAllTeamsButton) {
+		clearAllTeamsButton.addEventListener('click', async () => {
+			const confirmed = await customConfirm.show('すべてのメンバーを未割り当て状態にしますか？欠席メンバーも含めて全員が未割り当てになります。', '全クリア確認');
+			
+			if (confirmed) {
+				if (clearAllTeams()) {
+					// UI更新
+					renderTeams();
+					toast.success('すべてのメンバーを未割り当て状態にしました');
 				}
 			}
 		});

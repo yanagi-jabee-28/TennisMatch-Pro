@@ -21,15 +21,23 @@
 		</div>
 	</header>
 
-	<main>
-		<section id="team-info">
+	<main>		<section id="team-info">
 			<h2>チーム情報</h2>
 			<div class="team-controls">
 				<button id="reset-teams-btn" class="btn btn-secondary">
 					<span class="reset-icon">↺</span> オリジナル構成に戻す
 				</button>
+				<button id="clear-all-teams-btn" class="btn btn-warning">
+					<span>🧹</span> 全メンバーを未割り当てにする
+				</button>
 			</div>
-			<div id="teams-container"></div>
+			<div id="teams-container"></div>			<!-- 未割り当てメンバー表示エリア -->
+			<div id="unassigned-members-section" class="unassigned-section">
+				<h3>未割り当てメンバー</h3>
+				<div id="unassigned-members-container" class="unassigned-members-container">
+					<!-- 未割り当てメンバーがここに表示されます -->
+				</div>
+			</div>
 		</section>
 		<section id="match-table">
 			<h2>対戦表</h2>
@@ -126,11 +134,10 @@
 					<div class="member-list-container">
 						<ul id="edit-members-list">
 							<!-- メンバーリストがここに動的に生成されます -->
-						</ul>
-						<div class="member-actions">
+						</ul>						<div class="member-actions">
 							<select id="unassigned-members-select">
-								<option value="">-- 未割り当てのメンバーを選択 --</option>
-								<!-- 未割り当てのメンバーがここに動的に追加されます -->
+								<option value="">-- メンバーを選択してチームに追加 --</option>
+								<!-- 利用可能なメンバーがここに動的に追加されます -->
 							</select>
 							<button id="add-member-btn" class="btn btn-small">追加</button>
 						</div>

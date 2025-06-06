@@ -156,3 +156,19 @@
 .btn-debug:hover {
 	background: linear-gradient(135deg, #F57C00, #E65100);
 }
+
+/* 警告ボタン */
+.btn-warning {
+	background-color: #ffc107;
+	color: #212529;
+}
+
+@media (hover: hover) {
+	.btn-warning:hover {
+		background-color: #e0a800;
+	}
+}
+
+.btn-warning:active {
+	background-color: #d39e00;
+}
