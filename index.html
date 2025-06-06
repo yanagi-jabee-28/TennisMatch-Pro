@@ -40,10 +40,11 @@
 			</div>
 		</section>
 		<section id="match-table">
-			<h2>対戦表</h2>
-			<div class="match-controls">
+			<h2>対戦表</h2>			<div class="match-controls">
 				<button id="debug-fill-btn" class="btn btn-debug">🎲 デバッグ: ランダムスコア生成</button>
 				<button id="clear-all-matches-btn" class="btn btn-secondary">🗑️ 全試合結果をクリア</button>
+				<button id="validate-stats-btn" class="btn btn-debug">🔍 統計計算検証</button>
+				<button id="comprehensive-test-btn" class="btn btn-debug">🧪 包括的システムテスト</button>
 			</div>
 			<div class="table-container">
 				<table id="match-grid">
@@ -65,11 +66,15 @@
 				<p class="click-info">
 					対戦表のマスをクリックすると、各チームの点数を順番に入力できます。点数がマッチポイントを超える場合は自動的に上限が適用されます。記録済みの結果をクリックすると修正できます。</p>
 			</div>
-		</section>
-		<section id="team-standings">
+		</section>		<section id="team-standings">
 			<h2>順位表</h2>
 			<div class="analysis-controls">
 				<button id="export-results-btn" class="btn">📊 試合分析データをダウンロード</button>
+			</div>
+			<div class="ranking-info">
+				<p class="ranking-criteria">
+					<small>順位決定基準: ①勝率 ②得失点差 ③直接対戦結果 ④勝利数 ⑤得点合計</small>
+				</p>
 			</div>
 			<div class="table-container">
 				<table id="standings-table">

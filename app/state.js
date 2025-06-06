@@ -11,7 +11,8 @@ const appState = {
 		matchPoint: 7       // マッチポイント（勝利と最大スコアを決定）
 	},
 	originalTeams: [],      // オリジナルのチーム構成を保存
-	absentTeam: { id: 6, members: [] }  // 欠席チーム（6番目のチーム）
+	absentTeam: { id: 6, members: [] },  // 欠席チーム（6番目のチーム）
+	teamParticipation: {}   // チームの参加状態管理 { teamId: { active: boolean } }
 };
 
 // ローカルストレージから試合結果を読み込む
@@ -151,6 +152,47 @@ function clearAllTeams() {
 	return true;
 }
 
+// チーム参加状態を読み込む
+function loadTeamParticipation() {
+	const participation = loadFromLocalStorage('tennisTeamParticipation');
+	if (participation) {
+		appState.teamParticipation = participation;
+	} else {
+		// 初期化：すべてのチームを参加状態にする
+		appState.teams.forEach(team => {
+			appState.teamParticipation[team.id] = { active: true };
+		});
+		saveTeamParticipation();
+	}
+}
+
+// チーム参加状態を保存する
+function saveTeamParticipation() {
+	saveToLocalStorage('tennisTeamParticipation', appState.teamParticipation);
+}
+
+// チームの参加状態を切り替える
+function toggleTeamParticipation(teamId) {
+	if (!appState.teamParticipation[teamId]) {
+		appState.teamParticipation[teamId] = { active: true };
+	}
+	appState.teamParticipation[teamId].active = !appState.teamParticipation[teamId].active;
+	saveTeamParticipation();
+	return appState.teamParticipation[teamId].active;
+}
+
+// 参加中のチームのみを取得する
+function getActiveTeams() {
+	return appState.teams.filter(team => 
+		appState.teamParticipation[team.id]?.active !== false
+	);
+}
+
+// チームが参加中かどうかを確認する
+function isTeamActive(teamId) {
+	return appState.teamParticipation[teamId]?.active !== false;
+}
+
 export {
 	appState,
 	loadMatchResults,
@@ -164,5 +206,10 @@ export {
 	loadAbsentTeam,
 	markMemberAsAbsent,
 	returnMemberFromAbsent,
-	clearAllTeams
+	clearAllTeams,
+	loadTeamParticipation,
+	saveTeamParticipation,
+	toggleTeamParticipation,
+	getActiveTeams,
+	isTeamActive
 };

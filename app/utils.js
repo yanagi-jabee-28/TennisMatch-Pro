@@ -84,15 +84,19 @@ function calculateTeamStats(teams, matches) {
 			winRate: 0
 		};
 	});
-	
-	// 試合結果から統計を計算
+		// 試合結果から統計を計算
+	const activeTeamIds = teams.map(team => team.id);
 	Object.values(matches).forEach(match => {
 		const team1 = match.team1;
 		const team2 = match.team2;
 		const score1 = match.scoreTeam1;
 		const score2 = match.scoreTeam2;
 		
-		if (score1 !== null && score2 !== null && teamStats[team1] && teamStats[team2]) {
+		// 両チームが参加中で、スコアが記録されている試合のみを処理
+		if (score1 !== null && score2 !== null && 
+			teamStats[team1] && teamStats[team2] &&
+			activeTeamIds.includes(team1) && activeTeamIds.includes(team2)) {
+			
 			// 得失点を加算
 			teamStats[team1].pointsFor += score1;
 			teamStats[team1].pointsAgainst += score2;
@@ -113,12 +117,13 @@ function calculateTeamStats(teams, matches) {
 			}
 		}
 	});
-	
-	// 得失点差と勝率を計算
+		// 得失点差と勝率を計算
 	Object.values(teamStats).forEach(stat => {
 		stat.pointDiff = stat.pointsFor - stat.pointsAgainst;
 		const totalGames = stat.wins + stat.losses + stat.draws;
-		stat.winRate = totalGames > 0 ? stat.wins / totalGames : 0;
+		// 引き分けを0.5勝として計算
+		const adjustedWins = stat.wins + (stat.draws * 0.5);
+		stat.winRate = totalGames > 0 ? adjustedWins / totalGames : 0;
 	});
 	
 	return teamStats;

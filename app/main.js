@@ -2,7 +2,7 @@
 
 import { loadConfigData } from './config.js';
 import { domCache } from './dom.js';
-import { appState, loadMatchResults, loadSettings, loadTeamMembers, loadAbsentTeam, resetTeams, clearAllTeams } from './state.js';
+import { appState, loadMatchResults, loadSettings, loadTeamMembers, loadAbsentTeam, loadTeamParticipation, resetTeams, clearAllTeams } from './state.js';
 import { toast } from './components/toast.js';
 import { customConfirm } from './components/customConfirm.js';
 import { renderTeams, createMatchTable } from './matches.js';
@@ -10,7 +10,7 @@ import { calculateStandings, initializeSettingsForm } from './standings.js';
 import { exportMatchAnalysis } from './export.js';
 import { initializeTeamEditListeners } from './components/teamEditor.js';
 import { initializeScoreModalListeners } from './components/scoreModal.js';
-import { initializeDebugListeners } from './debug.js';
+import { initializeDebugListeners, validateStats } from './debug.js';
 import { EventListenerManager } from './utils.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
@@ -30,12 +30,12 @@ async function initializeApp() {
 	// 設定ファイルから初期設定を読み込み
 	if (config.matchSettings) {
 		appState.settings.matchPoint = config.matchSettings.matchPoint || 7;
-	}
-	// 保存された設定と試合結果を読み込む
+	}	// 保存された設定と試合結果を読み込む
 	loadSettings();
 	loadMatchResults();
 	loadTeamMembers(); // カスタムチームメンバーがあれば読み込む
 	loadAbsentTeam(); // 欠席チームがあれば読み込む
+	loadTeamParticipation(); // チーム参加状態を読み込む
 
 	// DOM要素キャッシュを初期化
 	domCache.init();

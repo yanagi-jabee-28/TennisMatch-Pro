@@ -61,6 +61,72 @@
 	margin-bottom: 10px;
 }
 
+/* チームタイトルセクション */
+.team-title-section {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.team-title-section h3 {
+	margin: 0;
+	color: var(--primary-color);
+}
+
+/* チーム参加状態トグルボタン */
+.team-participation-toggle {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	border: 2px solid;
+	background: none;
+	cursor: pointer;
+	font-size: 12px;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	padding: 0;
+	line-height: 1;
+}
+
+.team-participation-toggle.active {
+	background-color: #28a745;
+	border-color: #28a745;
+	color: white;
+}
+
+.team-participation-toggle.inactive {
+	background-color: #dc3545;
+	border-color: #dc3545;
+	color: white;
+}
+
+.team-participation-toggle:hover {
+	transform: scale(1.1);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.team-participation-toggle:active {
+	transform: scale(0.95);
+}
+
+/* 不参加チームのスタイル */
+.team-card.inactive-team {
+	opacity: 0.6;
+	background-color: #f8f9fa;
+	border: 2px dashed #dee2e6;
+}
+
+.team-card.inactive-team .team-header {
+	background-color: rgba(220, 53, 69, 0.1);
+}
+
+.team-card.inactive-team .team-members {
+	color: #6c757d;
+}
+
 /* チームヘッダーをクリック可能にするスタイル */
 .team-header.clickable-team-header {
 	cursor: pointer;

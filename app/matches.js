@@ -1,11 +1,13 @@
 // 対戦表と試合管理関連の機能
 
 import { domCache } from './dom.js';
-import { appState, saveMatchResults, markMemberAsAbsent, returnMemberFromAbsent } from './state.js';
+import { appState, saveMatchResults, markMemberAsAbsent, returnMemberFromAbsent, getActiveTeams, isTeamActive, toggleTeamParticipation } from './state.js';
 import { getMatchId, EventListenerManager } from './utils.js';
 import { customConfirm } from './components/customConfirm.js';
 import { openScoreModal } from './components/scoreModal.js';
 import { openTeamEditModal } from './components/teamEditor.js';
+import { calculateStandings } from './standings.js';
+import { logTeamParticipationChange, validateMatchDataIntegrity } from './debug.js';
 
 // チーム情報を表示する関数
 function renderTeams() {
@@ -14,19 +16,25 @@ function renderTeams() {
 	
 	teamsContainer.innerHTML = '';
 
-	const documentFragment = document.createDocumentFragment();
-	// 通常のチーム1-5を表示
+	const documentFragment = document.createDocumentFragment();	// 通常のチーム1-5を表示
 	appState.teams.forEach(team => {
 		const teamCard = document.createElement('div');
-		teamCard.className = 'team-card';
+		const isActive = isTeamActive(team.id);
+		teamCard.className = `team-card ${!isActive ? 'inactive-team' : ''}`;
 		
 		// メンバーが選択されている場合、チームヘッダーをクリック可能にする
 		const hasSelectedMembers = selectedMembers.size > 0;
 		const headerClass = hasSelectedMembers ? 'team-header clickable-team-header assignable' : 'team-header';
-		
-		teamCard.innerHTML = `
+				teamCard.innerHTML = `
             <div class="${headerClass}" data-team-id="${team.id}">
-                <h3>チーム${team.id}</h3>
+                <div class="team-title-section">
+                    <h3>チーム${team.id}</h3>
+                    <button class="team-participation-toggle ${isTeamActive(team.id) ? 'active' : 'inactive'}" 
+                            data-team-id="${team.id}" 
+                            title="${isTeamActive(team.id) ? 'チームを不参加にする' : 'チームを参加させる'}">
+                        ${isTeamActive(team.id) ? '✓' : '✗'}
+                    </button>
+                </div>
                 <button class="edit-team-btn btn-small" data-team-id="${team.id}">
                     <span class="edit-icon">✎</span> 編集
                 </button>
@@ -37,19 +45,25 @@ function renderTeams() {
         `;
 
 		documentFragment.appendChild(teamCard);
-	});
-	// 欠席チーム（チーム6）を表示
+	});	// 欠席チーム（チーム6）を表示
 	const absentTeamCard = document.createElement('div');
-	absentTeamCard.className = 'team-card absent-team-card';
+	const isAbsentTeamActive = isTeamActive(6);
+	absentTeamCard.className = `team-card absent-team-card ${!isAbsentTeamActive ? 'inactive-team' : ''}`;
 	
 	// メンバーが選択されている場合、欠席チームヘッダーもクリック可能にする
 	const hasSelectedMembers = selectedMembers.size > 0;
 	const absentHeaderClass = hasSelectedMembers ? 'team-header clickable-team-header assignable' : 'team-header';
-	
-	absentTeamCard.innerHTML = `
+		absentTeamCard.innerHTML = `
         <div class="${absentHeaderClass}" data-team-id="6">
-            <h3>欠席チーム</h3>
-            <span class="team-subtitle">（チーム6）</span>
+            <div class="team-title-section">
+                <h3>欠席チーム</h3>
+                <span class="team-subtitle">（チーム6）</span>
+                <button class="team-participation-toggle ${isTeamActive(6) ? 'active' : 'inactive'}" 
+                        data-team-id="6" 
+                        title="${isTeamActive(6) ? 'チームを不参加にする' : 'チームを参加させる'}">
+                    ${isTeamActive(6) ? '✓' : '✗'}
+                </button>
+            </div>
         </div>
         <ul class="team-members">
             ${appState.absentTeam.members.map(member => `
@@ -125,7 +139,58 @@ function renderUnassignedMembers() {
 }
 
 // チーム編集ボタンとメンバークリックの処理（イベント委譲）
-function handleTeamEditClick(event) {
+function handleTeamEditClick(event) {	// チーム参加状態トグルボタンのクリック処理
+	const participationToggle = event.target.closest('.team-participation-toggle');
+	if (participationToggle) {
+		event.stopPropagation(); // イベントの伝播を止める
+		const teamId = parseInt(participationToggle.dataset.teamId);
+		
+		// 変更前の状態をログ
+		logTeamParticipationChange(teamId, !isTeamActive(teamId));
+		
+		const newState = toggleTeamParticipation(teamId);
+		
+		// チームが不参加になった場合、そのチームの試合データを削除
+		if (!newState) {
+			const matchesToDelete = [];
+			Object.keys(appState.matches).forEach(matchId => {
+				const match = appState.matches[matchId];
+				if (match.team1 === teamId || match.team2 === teamId) {
+					matchesToDelete.push({id: matchId, match});
+					delete appState.matches[matchId];
+				}
+			});
+			
+			console.log(`チーム${teamId}の不参加により${matchesToDelete.length}件の試合データを削除しました`);
+			matchesToDelete.forEach(({id, match}) => {
+				console.log(`  削除: ${id} - チーム${match.team1} vs チーム${match.team2}`);
+			});
+			
+			// 試合データの変更を保存
+			saveMatchResults();
+		}
+				// ボタンの表示を更新
+		participationToggle.className = `team-participation-toggle ${newState ? 'active' : 'inactive'}`;
+		participationToggle.textContent = newState ? '✓' : '✗';
+		participationToggle.title = newState ? 'チームを不参加にする' : 'チームを参加させる';
+		
+		// チーム全体の表示を更新
+		renderTeams();
+				// 対戦表を再生成
+		createMatchTable();
+		
+		// 順位表も更新
+		calculateStandings();
+		
+		// 参加状態変更後の整合性チェック
+		setTimeout(() => {
+			validateMatchDataIntegrity();
+		}, 100);
+		
+		console.log(`チーム${teamId}の参加状態を${newState ? '参加' : '不参加'}に変更しました`);
+		return;
+	}
+
 	// 復帰ボタンのクリック処理
 	const returnBtn = event.target.closest('.return-member-btn');
 	if (returnBtn) {
@@ -443,9 +508,18 @@ function createMatchTable() {
 	
 	if (!tableHeader || !tableBody) return;
 
-	// ヘッダー行にチーム番号を追加
+	// 参加中のチームのみを取得
+	const activeTeams = getActiveTeams();
+		// 参加中のチームが1つ以下の場合は対戦表を表示しない
+	if (activeTeams.length <= 1) {
+		tableHeader.innerHTML = '<th class="empty-cell insufficient-teams-header">参加中のチームが不足しています</th>';
+		tableBody.innerHTML = '<tr><td class="match-table-message warning">対戦表を表示するには、2つ以上のチームが参加している必要があります</td></tr>';
+		return;
+	}
+
+	// ヘッダー行にチーム番号を追加（参加中のチームのみ）
 	tableHeader.innerHTML = '<th class="empty-cell"></th>';
-	appState.teams.forEach(team => {
+	activeTeams.forEach(team => {
 		tableHeader.innerHTML += `<th>${team.id}</th>`;
 	});
 
@@ -453,16 +527,15 @@ function createMatchTable() {
 	tableBody.innerHTML = '';
 	const documentFragment = document.createDocumentFragment(); // パフォーマンス最適化
 
-	appState.teams.forEach((rowTeam, rowIndex) => {
+	activeTeams.forEach((rowTeam, rowIndex) => {
 		const row = document.createElement('tr');
 
 		// 行の最初のセルにチーム番号
 		const firstCell = document.createElement('th');
 		firstCell.textContent = rowTeam.id;
 		row.appendChild(firstCell);
-
 		// 各対戦相手との結果セルを作成
-		appState.teams.forEach((colTeam, colIndex) => {
+		activeTeams.forEach((colTeam, colIndex) => {
 			const cell = document.createElement('td');
 
 			if (rowIndex === colIndex) {

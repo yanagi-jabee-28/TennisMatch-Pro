@@ -4,6 +4,44 @@ import { appState } from './state.js';
 import { toast } from './components/toast.js';
 import { getMatchId, calculateTeamStats, formatDateTime, fetchConfigWithPaths } from './utils.js';
 
+// 直接対戦結果を計算する関数（standings.jsと同じロジック）
+function getDirectMatchResult(teamA, teamB, matches) {
+	const directMatches = Object.values(matches).filter(match => 
+		(match.team1 === teamA && match.team2 === teamB) ||
+		(match.team1 === teamB && match.team2 === teamA)
+	);
+
+	let teamAWins = 0;
+	let teamBWins = 0;
+	let draws = 0;
+
+	directMatches.forEach(match => {
+		if (match.scoreTeam1 !== null && match.scoreTeam2 !== null) {
+			if (match.team1 === teamA) {
+				if (match.scoreTeam1 > match.scoreTeam2) teamAWins++;
+				else if (match.scoreTeam1 < match.scoreTeam2) teamBWins++;
+				else draws++;
+			} else {
+				if (match.scoreTeam2 > match.scoreTeam1) teamAWins++;
+				else if (match.scoreTeam2 < match.scoreTeam1) teamBWins++;
+				else draws++;
+			}
+		}
+	});
+
+	// 直接対戦での勝率を計算
+	const totalGames = teamAWins + teamBWins + draws;
+	if (totalGames === 0) return 0; // 対戦実績なし
+
+	// 引き分けは0.5勝として計算
+	const teamAPoints = teamAWins + (draws * 0.5);
+	const teamBPoints = teamBWins + (draws * 0.5);
+	
+	if (teamAPoints > teamBPoints) return 1;  // teamAの勝利
+	if (teamAPoints < teamBPoints) return -1; // teamBの勝利
+	return 0; // 同点
+}
+
 // 試合分析データをエクスポートする関数
 function exportMatchAnalysis() {
 	// ファイル名用の現在日時を取得
@@ -75,15 +113,19 @@ function exportMatchAnalysis() {
 
 	// 各チームの勝敗統計を計算（共有関数を使用）
 	const teamStats = calculateTeamStats(appState.teams, appState.matches);
-	
-	// 順位付けのために統計データを並び替え
+		// 順位付けのために統計データを並び替え
 	const rankedTeams = Object.entries(teamStats)
 		.map(([teamId, stats]) => ({ teamId, ...stats }))
 		.sort((a, b) => {
 			if (b.winRate !== a.winRate) return b.winRate - a.winRate; // 勝率で比較（第1優先）
 			if (b.pointDiff !== a.pointDiff) return b.pointDiff - a.pointDiff; // 得失点差で比較（第2優先）
-			if (b.wins !== a.wins) return b.wins - a.wins; // 勝利数で比較（第3優先）
-			return b.pointsFor - a.pointsFor; // 得点合計で比較（第4優先）
+			
+			// 勝率と得失点差が同じ場合は直接対戦結果で比較（第3優先）
+			const directResult = getDirectMatchResult(parseInt(a.teamId), parseInt(b.teamId), appState.matches);
+			if (directResult !== 0) return directResult; // 直接対戦で決着がつく場合
+			
+			if (b.wins !== a.wins) return b.wins - a.wins; // 勝利数で比較（第4優先）
+			return b.pointsFor - a.pointsFor; // 得点合計で比較（第5優先）
 		});
 	
 	// 順位付きで出力
