@@ -10,7 +10,7 @@ import { calculateStandings, initializeSettingsForm } from './standings.js';
 import { exportMatchAnalysis } from './export.js';
 import { initializeTeamEditListeners } from './components/teamEditor.js';
 import { initializeScoreModalListeners } from './components/scoreModal.js';
-import { initializeDebugListeners, validateStats } from './debug.js';
+import { initializeDebugListeners } from './debug.js';
 import { EventListenerManager } from './utils.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化

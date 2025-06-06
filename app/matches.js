@@ -7,7 +7,7 @@ import { customConfirm } from './components/customConfirm.js';
 import { openScoreModal } from './components/scoreModal.js';
 import { openTeamEditModal } from './components/teamEditor.js';
 import { calculateStandings } from './standings.js';
-import { logTeamParticipationChange, validateMatchDataIntegrity } from './debug.js';
+import { logTeamParticipationChange } from './debug.js';
 
 // チーム情報を表示する関数
 function renderTeams() {
@@ -178,14 +178,8 @@ function handleTeamEditClick(event) {	// チーム参加状態トグルボタン
 		renderTeams();
 				// 対戦表を再生成
 		createMatchTable();
-		
-		// 順位表も更新
+				// 順位表も更新
 		calculateStandings();
-		
-		// 参加状態変更後の整合性チェック
-		setTimeout(() => {
-			validateMatchDataIntegrity();
-		}, 100);
 		
 		console.log(`チーム${teamId}の参加状態を${newState ? '参加' : '不参加'}に変更しました`);
 		return;
