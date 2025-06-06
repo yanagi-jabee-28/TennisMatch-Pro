@@ -1,5 +1,7 @@
 // DOM要素キャッシュ（パフォーマンス最適化）
 
+import { EventListenerManager } from './utils.js';
+
 const domCache = {
 	teamsContainer: null,
 	tableHeader: null,
@@ -42,10 +44,9 @@ const domCache = {
 					margin-bottom: 0.5rem;
 				`;
 				this.tableContainer.insertBefore(hint, this.tableContainer.firstChild);
-				
-				// スクロールイベントで案内を非表示に
+						// スクロールイベントで案内を非表示に
 				let scrollTimeout;
-				this.tableContainer.addEventListener('scroll', () => {
+				EventListenerManager.safeAddEventListener(this.tableContainer, 'scroll', () => {
 					hint.style.opacity = '0.5';
 					clearTimeout(scrollTimeout);
 					scrollTimeout = setTimeout(() => {

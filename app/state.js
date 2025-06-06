@@ -1,6 +1,6 @@
 // アプリケーション状態の管理
 
-import { saveToLocalStorage, loadFromLocalStorage } from './utils.js';
+import { saveToLocalStorage, loadFromLocalStorage, removeMultipleFromLocalStorage } from './utils.js';
 
 // アプリケーション状態の管理
 const appState = {
@@ -76,15 +76,12 @@ function resetTeams() {
 	appState.absentTeam.members = [];
 
 	// ローカルストレージから現在のカスタム設定を削除
-	try {
-		localStorage.removeItem('tennisCustomTeams');
-		localStorage.removeItem('tennisAbsentTeam');
-		console.log('カスタムチーム設定と欠席チーム設定をローカルストレージから削除しました');
-		return true;
-	} catch (e) {
-		console.error('ローカルストレージからの削除に失敗しました:', e);
-		return false;
-	}
+	const keysToRemove = ['tennisCustomTeams', 'tennisAbsentTeam'];
+	const results = removeMultipleFromLocalStorage(keysToRemove);
+	
+	// 全て成功したかチェック
+	const allSuccess = Object.values(results).every(success => success);
+	return allSuccess;
 }
 
 // 欠席チームを保存する関数

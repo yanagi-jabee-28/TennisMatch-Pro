@@ -1,69 +1,28 @@
 // 順位表に関する機能
 
 import { domCache } from './dom.js';
-import { appState } from './state.js';
+import { appState, saveSettings } from './state.js';
+import { calculateTeamStats, EventListenerManager, addNumberInputRestriction } from './utils.js';
 
 // 順位表を計算して表示する関数
 function calculateStandings() {
-	// チームごとの成績を初期化
-	const teamStats = {};
+	// 共有関数を使用して統計を計算
+	const teamStats = calculateTeamStats(appState.teams, appState.matches);
+	
+	// standings.js用の形式に変換（フィールド名の調整）
+	const convertedStats = Object.values(teamStats).map(stats => ({
+		teamId: parseInt(stats.teamId || Object.keys(teamStats).find(key => teamStats[key] === stats)),
+		wins: stats.wins,
+		losses: stats.losses,
+		draws: stats.draws,
+		totalScore: stats.pointsFor,
+		totalConceded: stats.pointsAgainst,
+		scoreDifference: stats.pointDiff,
+		winRate: stats.winRate
+	}));
 
-	appState.teams.forEach(team => {
-		teamStats[team.id] = {
-			teamId: team.id,
-			wins: 0,
-			losses: 0,
-			draws: 0,
-			totalScore: 0,
-			totalConceded: 0, // 失点の合計を追加
-			scoreDifference: 0, // 得失点差を追加
-			winRate: 0
-		};
-	});
-
-	// 試合結果から勝敗を集計
-	Object.values(appState.matches).forEach(match => {
-		if (match.winner) {
-			// 勝者が存在する場合
-			teamStats[match.winner].wins++;
-
-			// 負けたチームを特定
-			const loserId = match.winner === match.team1 ? match.team2 : match.team1;
-			teamStats[loserId].losses++;
-
-			// スコアも加算（得点と失点両方を記録）
-			if (match.team1 === match.winner) {
-				teamStats[match.team1].totalScore += match.scoreTeam1;
-				teamStats[match.team1].totalConceded += match.scoreTeam2;
-				teamStats[match.team2].totalScore += match.scoreTeam2;
-				teamStats[match.team2].totalConceded += match.scoreTeam1;
-			} else {
-				teamStats[match.team1].totalScore += match.scoreTeam1;
-				teamStats[match.team1].totalConceded += match.scoreTeam2;
-				teamStats[match.team2].totalScore += match.scoreTeam2;
-				teamStats[match.team2].totalConceded += match.scoreTeam1;
-			}
-		} else {
-			// 引き分けの場合
-			teamStats[match.team1].draws++;
-			teamStats[match.team2].draws++;
-
-			// スコアを加算（得点と失点両方を記録）
-			teamStats[match.team1].totalScore += match.scoreTeam1;
-			teamStats[match.team1].totalConceded += match.scoreTeam2;
-			teamStats[match.team2].totalScore += match.scoreTeam2;
-			teamStats[match.team2].totalConceded += match.scoreTeam1;
-		}
-	});
-
-	// 勝率と得失点差を計算
-	Object.values(teamStats).forEach(stats => {
-		const totalMatches = stats.wins + stats.losses + stats.draws;
-		stats.winRate = totalMatches > 0 ? Math.round((stats.wins / totalMatches) * 1000) / 1000 : 0;
-		stats.scoreDifference = stats.totalScore - stats.totalConceded; // 得失点差を計算
-	});
 	// 順位付け（勝率 → 得失点差 → 勝利数 → 得点合計の順）
-	appState.standings = Object.values(teamStats).sort((a, b) => {
+	appState.standings = convertedStats.sort((a, b) => {
 		if (b.winRate !== a.winRate) return b.winRate - a.winRate; // 勝率で比較（第1優先）
 		if (b.scoreDifference !== a.scoreDifference) return b.scoreDifference - a.scoreDifference; // 得失点差で比較（第2優先）
 		if (b.wins !== a.wins) return b.wins - a.wins; // 勝利数で比較（第3優先）
@@ -116,8 +75,11 @@ function initializeSettingsForm(toast) {
 	// 現在の設定を表示
 	matchPointInput.value = appState.settings.matchPoint;
 
+	// 数値入力制限を適用
+	addNumberInputRestriction(matchPointInput);
+
 	// 設定変更時の処理
-	settingsForm.addEventListener('submit', (e) => {
+	EventListenerManager.safeAddEventListener(settingsForm, 'submit', (e) => {
 		e.preventDefault();
 
 		const newMatchPoint = parseInt(matchPointInput.value);

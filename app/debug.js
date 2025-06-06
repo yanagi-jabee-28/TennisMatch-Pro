@@ -1,7 +1,7 @@
 // デバッグ機能
 
 import { appState, saveMatchResults } from './state.js';
-import { getMatchId } from './utils.js';
+import { getMatchId, EventListenerManager } from './utils.js';
 import { customConfirm } from './components/customConfirm.js';
 import { toast } from './components/toast.js';
 
@@ -96,14 +96,8 @@ async function clearAllMatches(createMatchTable, calculateStandings) {
 function initializeDebugListeners(createMatchTable, calculateStandings) {
     console.log('デバッグリスナーを初期化中...');
     
-    const debugFillBtn = document.getElementById('debug-fill-btn');
-    const clearAllMatchesBtn = document.getElementById('clear-all-matches-btn');
-    
-    console.log('デバッグボタン:', debugFillBtn);
-    console.log('クリアボタン:', clearAllMatchesBtn);
-    
-    if (debugFillBtn) {
-        debugFillBtn.addEventListener('click', async () => {
+    const debugButtonHandlers = {
+        'debug-fill-btn': async () => {
             console.log('デバッグボタンがクリックされました');
             const confirmed = await customConfirm.show(
                 '全ての対戦にランダムなスコアを生成しますか？既存の結果は上書きされます。',
@@ -114,21 +108,22 @@ function initializeDebugListeners(createMatchTable, calculateStandings) {
                 console.log('ランダムスコア生成を開始');
                 generateRandomScores(createMatchTable, calculateStandings);
             }
-        });
-        console.log('デバッグボタンのイベントリスナーが設定されました');
-    } else {
-        console.error('デバッグボタンが見つかりません');
-    }
-    
-    if (clearAllMatchesBtn) {
-        clearAllMatchesBtn.addEventListener('click', () => {
+        },
+        'clear-all-matches-btn': () => {
             console.log('クリアボタンがクリックされました');
             clearAllMatches(createMatchTable, calculateStandings);
-        });
-        console.log('クリアボタンのイベントリスナーが設定されました');
-    } else {
-        console.error('クリアボタンが見つかりません');
-    }
+        }
+    };
+    
+    Object.entries(debugButtonHandlers).forEach(([id, handler]) => {
+        const button = document.getElementById(id);
+        if (button) {
+            EventListenerManager.safeAddEventListener(button, 'click', handler);
+            console.log(`${id}のイベントリスナーが設定されました`);
+        } else {
+            console.error(`${id}が見つかりません`);
+        }
+    });
 }
 
 export { initializeDebugListeners };

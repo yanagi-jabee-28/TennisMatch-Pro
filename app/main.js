@@ -11,6 +11,7 @@ import { exportMatchAnalysis } from './export.js';
 import { initializeTeamEditListeners } from './components/teamEditor.js';
 import { initializeScoreModalListeners } from './components/scoreModal.js';
 import { initializeDebugListeners } from './debug.js';
+import { EventListenerManager } from './utils.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
 async function initializeApp() {
@@ -38,19 +39,47 @@ async function initializeApp() {
 
 	// DOM要素キャッシュを初期化
 	domCache.init();
-	
-	// UI初期化
+		// UI初期化
 	renderTeams();
 	createMatchTable();
 	initializeSettingsForm(toast);
 	calculateStandings();
 
-	// エクスポートボタンのイベントリスナーを追加
-	document.getElementById('export-results-btn').addEventListener('click', exportMatchAnalysis);
+	// メインボタンのイベントリスナー設定
+	const mainButtonHandlers = {
+		'export-results-btn': exportMatchAnalysis,
+		'reset-teams-btn': async () => {
+			const confirmed = await customConfirm.show('すべてのチームをオリジナルの構成にリセットしますか？この操作は元に戻せません。', 'リセット確認');
+			
+			if (confirmed) {
+				if (resetTeams()) {
+					renderTeams();
+					toast.success('すべてのチームをオリジナルの構成にリセットしました');
+				}
+			}
+		},
+		'clear-all-teams-btn': async () => {
+			const confirmed = await customConfirm.show('すべてのメンバーを未割り当て状態にしますか？欠席メンバーも含めて全員が未割り当てになります。', '全クリア確認');
+			
+			if (confirmed) {
+				if (clearAllTeams()) {
+					renderTeams();
+					toast.success('すべてのメンバーを未割り当て状態にしました');
+				}
+			}
+		}
+	};
+	
+	Object.entries(mainButtonHandlers).forEach(([id, handler]) => {
+		const button = document.getElementById(id);
+		if (button) {
+			EventListenerManager.safeAddEventListener(button, 'click', handler);
+		}
+	});
 	
 	// チームメンバー編集用のモーダルのイベントリスナー設定
 	initializeTeamEditListeners(renderTeams);
-		// スコアモーダルのイベントリスナー設定
+	// スコアモーダルのイベントリスナー設定
 	initializeScoreModalListeners(createMatchTable, calculateStandings);
 	
 	// デバッグ機能のイベントリスナー設定
@@ -58,36 +87,6 @@ async function initializeApp() {
 	
 	// カスタム確認ダイアログを初期化
 	customConfirm.init();
-	// リセットボタンのイベントリスナーを追加
-	const resetButton = document.getElementById('reset-teams-btn');
-	if (resetButton) {
-		resetButton.addEventListener('click', async () => {
-			const confirmed = await customConfirm.show('すべてのチームをオリジナルの構成にリセットしますか？この操作は元に戻せません。', 'リセット確認');
-			
-			if (confirmed) {
-				if (resetTeams()) {
-					// UI更新
-					renderTeams();
-					toast.success('すべてのチームをオリジナルの構成にリセットしました');
-				}
-			}
-		});
-	}
-	// 全チームクリアボタンのイベントリスナーを追加
-	const clearAllTeamsButton = document.getElementById('clear-all-teams-btn');
-	if (clearAllTeamsButton) {
-		clearAllTeamsButton.addEventListener('click', async () => {
-			const confirmed = await customConfirm.show('すべてのメンバーを未割り当て状態にしますか？欠席メンバーも含めて全員が未割り当てになります。', '全クリア確認');
-			
-			if (confirmed) {
-				if (clearAllTeams()) {
-					// UI更新
-					renderTeams();
-					toast.success('すべてのメンバーを未割り当て状態にしました');
-				}
-			}
-		});
-	}
 }
 
 // DOMが読み込まれた後にアプリケーションを初期化

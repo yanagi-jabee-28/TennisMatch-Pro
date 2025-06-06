@@ -2,6 +2,7 @@
 
 import { domCache } from '../dom.js';
 import { appState, saveTeamMembers } from '../state.js';
+import { EventListenerManager, addModalOutsideClickHandler } from '../utils.js';
 import { toast } from './toast.js';
 
 // モーダル関連データ
@@ -77,16 +78,17 @@ function renderMembersList() {
             <button class="remove-member-btn" data-index="${index}">×</button>
         `;
 		membersList.appendChild(li);
+		
 		// 削除ボタンにイベントリスナーを追加
 		const removeBtn = li.querySelector('.remove-member-btn');
 		if (removeBtn) {
-			removeBtn.addEventListener('click', () => {
-				// 削除されるメンバーを保存
+			EventListenerManager.safeAddEventListener(removeBtn, 'click', () => {
 				const removedMember = tempTeamMembers[index];
 				console.log(`メンバー "${removedMember}" を削除します`);
 
 				// チームメンバーリストから削除
-				tempTeamMembers.splice(index, 1);				// リストを更新
+				tempTeamMembers.splice(index, 1);
+				// リストを更新
 				renderMembersList();
 				// メンバーが削除されたら、利用可能なメンバーリストも更新
 				renderAvailableMembersList();
@@ -237,46 +239,32 @@ function saveTeamMembersHandler(renderTeams) {
 function initializeTeamEditListeners(renderTeams) {
 	console.log('チームメンバー編集モーダルのイベントリスナーを初期化します');
 
-	// モーダルの保存ボタンのクリックイベント
-	const saveTeamBtn = document.getElementById('save-team-btn');
-	if (saveTeamBtn) {
-		saveTeamBtn.addEventListener('click', () => saveTeamMembersHandler(renderTeams));
-		console.log('保存ボタンのリスナーを設定しました');
-	}
-
-	// キャンセルボタンのクリックイベント
-	const cancelTeamBtn = document.getElementById('cancel-team-btn');
-	if (cancelTeamBtn) {
-		cancelTeamBtn.addEventListener('click', closeTeamEditModal);
-		console.log('キャンセルボタンのリスナーを設定しました');
-	}
-
-	// 閉じるボタン（×）のクリックイベント - チームメンバー編集モーダル内の閉じるボタンを特定
-	const closeModalBtn = document.querySelector('#team-edit-modal .close-modal');
-	if (closeModalBtn) {
-		closeModalBtn.addEventListener('click', closeTeamEditModal);
-		console.log('閉じるボタンのリスナーを設定しました');
-	}
-	// モーダル外をクリックした時に閉じる
-	window.addEventListener('click', function (event) {
-		const teamEditModal = domCache.teamEditModal;
-		if (event.target === teamEditModal) {
-			closeTeamEditModal();
+	// ボタンのイベントリスナー設定
+	const buttonHandlers = {
+		'save-team-btn': () => saveTeamMembersHandler(renderTeams),
+		'cancel-team-btn': closeTeamEditModal,
+		'add-member-btn': addNewMember
+	};
+	
+	Object.entries(buttonHandlers).forEach(([id, handler]) => {
+		const button = document.getElementById(id);
+		if (button) {
+			EventListenerManager.safeAddEventListener(button, 'click', handler);
+			console.log(`${id}のリスナーを設定しました`);
 		}
 	});
 
-	// 新しいメンバーを追加するボタンのクリックイベント
-	const addMemberBtn = document.getElementById('add-member-btn');
-	if (addMemberBtn) {
-		addMemberBtn.addEventListener('click', addNewMember);
-		console.log('追加ボタンのリスナーを設定しました');
+	// 閉じるボタンの設定
+	const closeModalBtn = document.querySelector('#team-edit-modal .close-modal');
+	if (closeModalBtn) {
+		EventListenerManager.safeAddEventListener(closeModalBtn, 'click', closeTeamEditModal);
+		console.log('閉じるボタンのリスナーを設定しました');
 	}
-
-	// 選択リストが変更されたときのイベント
+	
+	// メンバー選択リストの変更イベント
 	const unassignedMembersSelect = document.getElementById('unassigned-members-select');
 	if (unassignedMembersSelect) {
-		unassignedMembersSelect.addEventListener('change', function () {
-			// 選択されたらボタンにフォーカスを移動（使いやすさのため）
+		EventListenerManager.safeAddEventListener(unassignedMembersSelect, 'change', function() {
 			if (this.value) {
 				const addMemberBtn = document.getElementById('add-member-btn');
 				if (addMemberBtn) addMemberBtn.focus();
@@ -284,6 +272,9 @@ function initializeTeamEditListeners(renderTeams) {
 		});
 		console.log('メンバー選択リストのリスナーを設定しました');
 	}
+	
+	// モーダル外クリックで閉じる
+	addModalOutsideClickHandler(domCache.teamEditModal, closeTeamEditModal);
 }
 
 export { 

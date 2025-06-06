@@ -2,7 +2,7 @@
 
 import { domCache } from './dom.js';
 import { appState, saveMatchResults, markMemberAsAbsent, returnMemberFromAbsent } from './state.js';
-import { getMatchId } from './utils.js';
+import { getMatchId, EventListenerManager } from './utils.js';
 import { customConfirm } from './components/customConfirm.js';
 import { openScoreModal } from './components/scoreModal.js';
 import { openTeamEditModal } from './components/teamEditor.js';
@@ -62,16 +62,13 @@ function renderTeams() {
         </ul>
     `;
 
-	documentFragment.appendChild(absentTeamCard);
-	teamsContainer.appendChild(documentFragment);
+	documentFragment.appendChild(absentTeamCard);	teamsContainer.appendChild(documentFragment);
 
 	// イベント委譲で編集ボタンとメンバークリックのイベントを処理
-	teamsContainer.removeEventListener('click', handleTeamEditClick);
-	teamsContainer.addEventListener('click', handleTeamEditClick);
+	EventListenerManager.updateEventListener(teamsContainer, 'click', handleTeamEditClick);
 	
 	// 右クリックイベントも追加
-	teamsContainer.removeEventListener('contextmenu', handleTeamRightClick);
-	teamsContainer.addEventListener('contextmenu', handleTeamRightClick);
+	EventListenerManager.updateEventListener(teamsContainer, 'contextmenu', handleTeamRightClick);
 
 	// 未割り当てメンバーも表示
 	renderUnassignedMembers();
@@ -118,15 +115,12 @@ function renderUnassignedMembers() {
 			memberItem.dataset.member = member;
 			memberItem.dataset.teamId = 'unassigned';
 			memberItem.textContent = member;
-			unassignedContainer.appendChild(memberItem);
-		});
-				// イベント委譲で未割り当てメンバーのクリックを処理
-		unassignedContainer.removeEventListener('click', handleUnassignedMemberClick);
-		unassignedContainer.addEventListener('click', handleUnassignedMemberClick);
+			unassignedContainer.appendChild(memberItem);		});
+		// イベント委譲で未割り当てメンバーのクリックを処理
+		EventListenerManager.updateEventListener(unassignedContainer, 'click', handleUnassignedMemberClick);
 		
 		// 右クリックイベントも追加
-		unassignedContainer.removeEventListener('contextmenu', handleUnassignedRightClick);
-		unassignedContainer.addEventListener('contextmenu', handleUnassignedRightClick);
+		EventListenerManager.updateEventListener(unassignedContainer, 'contextmenu', handleUnassignedRightClick);
 	}
 }
 
@@ -293,27 +287,28 @@ function createMemberPalette() {
 	return paletteContainer;
 }
 
-// パレットのイベントリスナーを設定
+	// パレットのイベントリスナーを設定
 function setupPaletteEventListeners(paletteContainer) {
-	// 選択をクリアボタン
-	const clearBtn = paletteContainer.querySelector('#clear-selection-btn');
-	if (clearBtn) {
-		clearBtn.addEventListener('click', () => {
+	// ボタンのイベントハンドラー設定
+	const buttonHandlers = {
+		'#clear-selection-btn': () => {
 			selectedMembers.clear();
 			updateMemberSelectionUI();
 			updateMemberPalette();
-		});
-	}
+		},
+		'#close-palette-btn': () => {
+			selectedMembers.clear();
+			updateMemberSelectionUI();
+			updateMemberPalette();
+		}
+	};
 	
-	// パレットを閉じるボタン
-	const closeBtn = paletteContainer.querySelector('#close-palette-btn');
-	if (closeBtn) {
-		closeBtn.addEventListener('click', () => {
-			selectedMembers.clear();
-			updateMemberSelectionUI();
-			updateMemberPalette();
-		});
-	}
+	Object.entries(buttonHandlers).forEach(([selector, handler]) => {
+		const button = paletteContainer.querySelector(selector);
+		if (button) {
+			EventListenerManager.safeAddEventListener(button, 'click', handler);
+		}
+	});
 }
 
 // 選択されたメンバーをパレットに表示
@@ -343,11 +338,10 @@ function renderSelectedMembers(paletteContainer) {
 			<button class="remove-from-selection-btn" data-member-key="${memberKey}">&times;</button>
 		`;
 		selectedMembersList.appendChild(memberItem);
-		
-		// 個別削除ボタンのイベントリスナー
+				// 個別削除ボタンのイベントリスナー
 		const removeBtn = memberItem.querySelector('.remove-from-selection-btn');
 		if (removeBtn) {
-			removeBtn.addEventListener('click', () => {
+			EventListenerManager.safeAddEventListener(removeBtn, 'click', () => {
 				selectedMembers.delete(memberKey);
 				updateMemberSelectionUI();
 				updateMemberPalette();
@@ -515,10 +509,8 @@ function createMatchTable() {
 	});
 
 	tableBody.appendChild(documentFragment);
-
 	// イベントリスナーを一括で追加（イベント委譲を使用）
-	tableBody.removeEventListener('click', handleTableClick); // 既存のリスナーを削除
-	tableBody.addEventListener('click', handleTableClick);
+	EventListenerManager.updateEventListener(tableBody, 'click', handleTableClick);
 }
 	// イベント委譲によるテーブルクリック処理
 function handleTableClick(event) {
@@ -620,12 +612,11 @@ function createMemberContextMenu() {
 			<span>✎</span> チーム編集
 		</div>
 	`;
-	
-	// メニューアイテムのクリックイベント
-	contextMenu.addEventListener('click', handleContextMenuClick);
+		// メニューアイテムのクリックイベント
+	EventListenerManager.safeAddEventListener(contextMenu, 'click', handleContextMenuClick);
 	
 	// 外部クリックでメニューを閉じる
-	document.addEventListener('click', closeContextMenu);
+	EventListenerManager.safeAddEventListener(document, 'click', closeContextMenu);
 	
 	document.body.appendChild(contextMenu);
 	return contextMenu;

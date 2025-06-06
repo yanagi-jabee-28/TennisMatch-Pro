@@ -2,6 +2,7 @@
 
 import { domCache } from '../dom.js';
 import { appState, saveMatchResults } from '../state.js';
+import { getMatchId, EventListenerManager, addModalOutsideClickHandler, addNumberInputRestriction } from '../utils.js';
 import { toast } from './toast.js';
 
 // モーダル関連データ
@@ -135,70 +136,42 @@ function processMatchScore(rowTeamId, colTeamId, matchId, scoreTeam1, scoreTeam2
 
 // モーダルのイベントリスナー設定
 function initializeScoreModalListeners(createMatchTable, calculateStandings) {
-	// 保存ボタンのクリックイベント
-	document.getElementById('save-score-btn').addEventListener('click', () => saveScore(createMatchTable, calculateStandings));
-
-	// キャンセルボタンのクリックイベント
-	document.getElementById('cancel-score-btn').addEventListener('click', closeScoreModal);
-
-	// 閉じるボタン（×）のクリックイベント - スコア入力モーダルの閉じるボタンを特定
-	document.querySelector('#score-modal .close-modal').addEventListener('click', closeScoreModal);
+	// ボタンのイベントリスナー設定
+	const saveBtn = document.getElementById('save-score-btn');
+	const cancelBtn = document.getElementById('cancel-score-btn');
+	const closeBtn = document.querySelector('#score-modal .close-modal');
 	
-	// 入力フィールドのフォーカス時に全選択する
+	if (saveBtn) EventListenerManager.safeAddEventListener(saveBtn, 'click', () => saveScore(createMatchTable, calculateStandings));
+	if (cancelBtn) EventListenerManager.safeAddEventListener(cancelBtn, 'click', closeScoreModal);
+	if (closeBtn) EventListenerManager.safeAddEventListener(closeBtn, 'click', closeScoreModal);
+	
+	// 入力フィールドの設定
 	const score1Input = document.getElementById('modal-score-team1');
 	const score2Input = document.getElementById('modal-score-team2');
 	
-	score1Input.addEventListener('focus', function() {
-		this.select();
-	});
+	// 数値入力制限を適用
+	if (score1Input) addNumberInputRestriction(score1Input);
+	if (score2Input) addNumberInputRestriction(score2Input);
 	
-	score2Input.addEventListener('focus', function() {
-		this.select();
-	});
-		// Enterキーで次のフィールドに移動、またはフォームを送信
-	score1Input.addEventListener('keypress', function(e) {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			score2Input.focus();
-		}
-	});
-	
-	score2Input.addEventListener('keypress', function(e) {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			saveScore(createMatchTable, calculateStandings);
-		}
-	});
-	
-	// 数字以外の入力を制限（デリートキーやバックスペースは許可）
-	function restrictToNumbers(e) {
-		const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
-		if (allowedKeys.includes(e.key) || (e.key >= '0' && e.key <= '9')) {
-			return;
-		}
-		e.preventDefault();
+	// Enterキーでのフィールド移動
+	if (score1Input && score2Input) {
+		EventListenerManager.safeAddEventListener(score1Input, 'keypress', function(e) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				score2Input.focus();
+			}
+		});
+		
+		EventListenerManager.safeAddEventListener(score2Input, 'keypress', function(e) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				saveScore(createMatchTable, calculateStandings);
+			}
+		});
 	}
 	
-	score1Input.addEventListener('keydown', restrictToNumbers);
-	score2Input.addEventListener('keydown', restrictToNumbers);
-	
-	// 負の値を防ぐ
-	function preventNegative() {
-		if (this.value < 0) {
-			this.value = 0;
-		}
-	}
-	
-	score1Input.addEventListener('input', preventNegative);
-	score2Input.addEventListener('input', preventNegative);
-	
-	// モーダル外をクリックした時に閉じる
-	window.addEventListener('click', function (event) {
-		const scoreModal = domCache.scoreModal;
-		if (event.target === scoreModal) {
-			closeScoreModal();
-		}
-	});
+	// モーダル外クリックで閉じる
+	addModalOutsideClickHandler(domCache.scoreModal, closeScoreModal);
 }
 
 export { 
