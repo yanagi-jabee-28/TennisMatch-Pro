@@ -21,12 +21,28 @@
 		</div>
 	</header>
 
-	<main>		<section id="team-info">
-			<h2>チーム情報</h2>
-			<div class="team-controls">
-				<button id="reset-teams-btn" class="btn btn-secondary">
-					<span class="reset-icon">↺</span> オリジナル構成に戻す
-				</button>
+	<main>		<section id="team-info">			<h2>チーム情報</h2>
+			<!-- 現在の編成表示 -->
+			<div class="current-formation-display">
+				<span class="current-formation-label">現在の編成:</span>
+				<span id="current-formation-name">未設定</span>
+			</div>
+			<!-- 編成選択セクション -->
+			<div class="formation-selector-section">
+				<label for="formation-selector">編成選択:</label>
+				<select id="formation-selector" class="formation-select">
+					<option value="">-- 編成を選択してください --</option>
+					<!-- 編成オプションがJavaScriptで動的に追加されます -->
+				</select>
+				<button id="apply-formation-btn" class="btn btn-primary" disabled>編成を適用</button>
+			</div>
+			<!-- 編成履歴表示 -->
+			<div class="formation-history-section">
+				<h3>編成履歴</h3>
+				<div id="formation-history-list" class="formation-history-list">
+					<!-- 編成履歴がここに動的に表示されます -->
+				</div>
+			</div>			<div class="team-controls">
 				<button id="clear-all-teams-btn" class="btn btn-warning">
 					<span>🧹</span> 全メンバーを未割り当てにする
 				</button>

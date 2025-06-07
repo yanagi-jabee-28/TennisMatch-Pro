@@ -67,11 +67,6 @@ th.empty-cell {
 }
 
 /* アイコン表示位置調整 */
-.reset-icon {
-	font-weight: bold;
-	margin-right: 4px;
-}
-
 .edit-icon {
 	font-size: 12px;
 }

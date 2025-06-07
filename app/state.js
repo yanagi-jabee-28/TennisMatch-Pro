@@ -10,9 +10,11 @@ const appState = {
 	settings: {
 		matchPoint: 7       // マッチポイント（勝利と最大スコアを決定）
 	},
-	originalTeams: [],      // オリジナルのチーム構成を保存
+	initialConfig: null,     // 初期設定データ（config.jsonから読み込み）
 	absentTeam: { id: 6, members: [] },  // 欠席チーム（6番目のチーム）
-	teamParticipation: {}   // チームの参加状態管理 { teamId: { active: boolean } }
+	teamParticipation: {},   // チームの参加状態管理 { teamId: { active: boolean } }
+	currentFormation: null,  // 現在の編成キー
+	formationHistory: []     // 編成履歴（最大3つ保持）
 };
 
 // ローカルストレージから試合結果を読み込む
@@ -63,26 +65,9 @@ function loadTeamMembers() {
 	const savedTeams = loadFromLocalStorage('tennisCustomTeams');
 	if (savedTeams) {
 		appState.teams = savedTeams;
-	} else {
-		appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
+	} else if (appState.initialConfig && appState.initialConfig.teams) {
+		appState.teams = JSON.parse(JSON.stringify(appState.initialConfig.teams));
 	}
-}
-
-// オリジナルのチーム構成にリセットする機能
-function resetTeams() {
-	// オリジナルのチーム構成をコピー
-	appState.teams = JSON.parse(JSON.stringify(appState.originalTeams));
-	
-	// 欠席チームをクリア
-	appState.absentTeam.members = [];
-
-	// ローカルストレージから現在のカスタム設定を削除
-	const keysToRemove = ['tennisCustomTeams', 'tennisAbsentTeam'];
-	const results = removeMultipleFromLocalStorage(keysToRemove);
-	
-	// 全て成功したかチェック
-	const allSuccess = Object.values(results).every(success => success);
-	return allSuccess;
 }
 
 // 欠席チームを保存する関数
@@ -133,11 +118,13 @@ function returnMemberFromAbsent(memberName) {
 
 // 全メンバーを未割り当てにする関数
 function clearAllTeams() {
-	// オリジナルの全メンバーリストを取得
+	// 初期設定の全メンバーリストを取得
 	const allOriginalMembers = [];
-	appState.originalTeams.forEach(team => {
-		allOriginalMembers.push(...team.members);
-	});
+	if (appState.initialConfig && appState.initialConfig.teams) {
+		appState.initialConfig.teams.forEach(team => {
+			allOriginalMembers.push(...team.members);
+		});
+	}
 	
 	// 全てのチームから全メンバーを削除
 	appState.teams.forEach(team => {
@@ -193,6 +180,58 @@ function isTeamActive(teamId) {
 	return appState.teamParticipation[teamId]?.active !== false;
 }
 
+// 編成履歴を保存する関数
+function saveFormationHistory() {
+	saveToLocalStorage('tennisFormationHistory', {
+		currentFormation: appState.currentFormation,
+		history: appState.formationHistory
+	});
+}
+
+// 編成履歴を読み込む関数
+function loadFormationHistory() {
+	const savedHistory = loadFromLocalStorage('tennisFormationHistory');
+	if (savedHistory) {
+		appState.currentFormation = savedHistory.currentFormation || null;
+		appState.formationHistory = savedHistory.history || [];
+	}
+}
+
+// 編成を履歴に追加する関数
+function addToFormationHistory(formationKey, formationName) {
+	// 現在の編成が履歴の最初にある場合は重複を避ける
+	if (appState.formationHistory.length > 0 && appState.formationHistory[0].key === formationKey) {
+		return;
+	}
+	
+	// 新しい編成を履歴の最初に追加
+	const newEntry = {
+		key: formationKey,
+		name: formationName,
+		timestamp: new Date().toISOString()
+	};
+	
+	appState.formationHistory.unshift(newEntry);
+	
+	// 履歴は最大3つまで保持
+	if (appState.formationHistory.length > 3) {
+		appState.formationHistory = appState.formationHistory.slice(0, 3);
+	}
+	
+	// 現在の編成を更新
+	appState.currentFormation = formationKey;
+	
+	// 保存
+	saveFormationHistory();
+}
+
+// 現在の編成を特定する関数
+function identifyCurrentFormation() {
+	// formations.jsから編成データをインポートして比較する必要があります
+	// この関数は formationSelector.js で実装します
+	return appState.currentFormation;
+}
+
 export {
 	appState,
 	loadMatchResults,
@@ -201,7 +240,6 @@ export {
 	saveSettings,
 	saveTeamMembers,
 	loadTeamMembers,
-	resetTeams,
 	saveAbsentTeam,
 	loadAbsentTeam,
 	markMemberAsAbsent,
@@ -211,5 +249,9 @@ export {
 	saveTeamParticipation,
 	toggleTeamParticipation,
 	getActiveTeams,
-	isTeamActive
+	isTeamActive,
+	saveFormationHistory,
+	loadFormationHistory,
+	addToFormationHistory,
+	identifyCurrentFormation
 };

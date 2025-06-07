@@ -54,10 +54,20 @@ input {
 		width: 5rem;
 		padding: 0.75rem 0.5rem;
 		font-size: 16px;
-		min-height: 44px;
-	}
+		min-height: 44px;	}
 }
 
+/* アニメーション */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
 /* フォーカス時のスタイル */
 select:focus,
 input:focus {
@@ -98,4 +108,153 @@ input:focus {
 #unassigned-members-select option[value=""] {
 	font-style: italic;
 	color: #666;
+}
+
+/* 編成選択セクション */
+.formation-selector-section {
+	background: #f8f9fa;
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1rem;
+	border: 1px solid #dee2e6;
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.formation-selector-section label {
+	color: #333;
+	font-weight: 600;
+	margin-bottom: 0;
+	white-space: nowrap;
+}
+
+.formation-select {
+	flex: 1;
+	min-width: 250px;
+	max-width: 400px;
+	padding: 0.5rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: white;
+}
+
+.formation-selector-section .btn {
+	white-space: nowrap;
+}
+
+/* 現在の編成表示 */
+.current-formation-display {
+	background: linear-gradient(135deg, #4CAF50, #45a049);
+	color: white;
+	padding: 12px 20px;
+	border-radius: 8px;
+	margin-bottom: 1rem;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	font-weight: 500;
+	animation: fadeIn 0.3s ease-in;
+}
+
+.current-formation-display::before {
+	content: "📋";
+	font-size: 1.2em;
+}
+
+.current-formation-label {
+	font-weight: 600;
+	color: white;
+}
+
+#current-formation-name {
+	color: white;
+	font-weight: 600;
+	font-size: 1.1em;
+}
+
+/* 編成履歴セクション */
+.formation-history-section {
+	background: #f8f9fa;
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1rem;
+	border: 1px solid #dee2e6;
+}
+
+.formation-history-section h3 {
+	margin: 0 0 0.75rem 0;
+	color: #333;
+	font-size: 1rem;
+}
+
+.formation-history-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.formation-history-item {
+	background: white;
+	padding: 0.5rem 0.75rem;
+	border-radius: 4px;
+	border: 1px solid #ddd;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.formation-history-item:hover {
+	background: #f0f0f0;
+}
+
+.formation-history-name {
+	font-weight: 500;
+	color: #333;
+}
+
+.formation-history-time {
+	font-size: 0.875rem;
+	color: #666;
+}
+
+.formation-history-empty {
+	color: #999;
+	font-style: italic;
+	text-align: center;
+	padding: 1rem;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+	.formation-selector-section {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.75rem;
+	}
+	
+	.formation-selector-section label {
+		text-align: center;
+	}
+	
+	.formation-select {
+		min-width: auto;
+		max-width: none;
+	}
+	
+	.current-formation-display {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.25rem;
+	}
+	
+	.formation-history-item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.25rem;
+	}
 }

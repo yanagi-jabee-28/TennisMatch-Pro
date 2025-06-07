@@ -2,7 +2,7 @@
 
 import { loadConfigData } from './config.js';
 import { domCache } from './dom.js';
-import { appState, loadMatchResults, loadSettings, loadTeamMembers, loadAbsentTeam, loadTeamParticipation, resetTeams, clearAllTeams } from './state.js';
+import { appState, loadMatchResults, loadSettings, loadTeamMembers, loadAbsentTeam, loadTeamParticipation, clearAllTeams } from './state.js';
 import { toast } from './components/toast.js';
 import { customConfirm } from './components/customConfirm.js';
 import { renderTeams, createMatchTable } from './matches.js';
@@ -11,6 +11,7 @@ import { exportMatchAnalysis } from './export.js';
 import { initializeTeamEditListeners } from './components/teamEditor.js';
 import { initializeScoreModalListeners } from './components/scoreModal.js';
 import { initializeDebugListeners } from './debug.js';
+import { initializeFormationSelector } from './formationSelector.js';
 import { EventListenerManager } from './utils.js';
 
 // 設定ファイルを読み込んでアプリケーションを初期化
@@ -19,13 +20,12 @@ async function initializeApp() {
 	if (!config) {
 		toast.error('設定ファイルの読み込みに失敗しました。Chrome、Firefox、Edge、Safariなどの最新ブラウザをご使用ください。また、ページの再読み込みをお試しください。');
 		return;
-	}
-
-	// オリジナルのチーム構成を保存（リセット用）
-	appState.originalTeams = JSON.parse(JSON.stringify(config.teams));
-
+	}	// オリジナルのチーム構成を保存は不要になったため削除
 	// 初期データとして設定
 	appState.teams = JSON.parse(JSON.stringify(config.teams));
+	
+	// 設定情報をstateに保存（初期データとして）
+	appState.initialConfig = config;
 
 	// 設定ファイルから初期設定を読み込み
 	if (config.matchSettings) {
@@ -44,20 +44,9 @@ async function initializeApp() {
 	createMatchTable();
 	initializeSettingsForm(toast);
 	calculateStandings();
-
 	// メインボタンのイベントリスナー設定
 	const mainButtonHandlers = {
 		'export-results-btn': exportMatchAnalysis,
-		'reset-teams-btn': async () => {
-			const confirmed = await customConfirm.show('すべてのチームをオリジナルの構成にリセットしますか？この操作は元に戻せません。', 'リセット確認');
-			
-			if (confirmed) {
-				if (resetTeams()) {
-					renderTeams();
-					toast.success('すべてのチームをオリジナルの構成にリセットしました');
-				}
-			}
-		},
 		'clear-all-teams-btn': async () => {
 			const confirmed = await customConfirm.show('すべてのメンバーを未割り当て状態にしますか？欠席メンバーも含めて全員が未割り当てになります。', '全クリア確認');
 			
@@ -76,11 +65,13 @@ async function initializeApp() {
 			EventListenerManager.safeAddEventListener(button, 'click', handler);
 		}
 	});
-	
-	// チームメンバー編集用のモーダルのイベントリスナー設定
+		// チームメンバー編集用のモーダルのイベントリスナー設定
 	initializeTeamEditListeners(renderTeams);
 	// スコアモーダルのイベントリスナー設定
 	initializeScoreModalListeners(createMatchTable, calculateStandings);
+	
+	// 編成選択機能の初期化
+	initializeFormationSelector(renderTeams, createMatchTable, calculateStandings);
 	
 	// デバッグ機能のイベントリスナー設定
 	initializeDebugListeners(createMatchTable, calculateStandings);

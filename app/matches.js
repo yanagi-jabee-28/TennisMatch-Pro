@@ -90,11 +90,13 @@ function renderTeams() {
 
 // 未割り当てメンバーを取得する関数
 function getUnassignedMembers() {
-	// オリジナルの全メンバーリストを取得
+	// 初期設定の全メンバーリストを取得
 	const allOriginalMembers = [];
-	appState.originalTeams.forEach(team => {
-		allOriginalMembers.push(...team.members);
-	});
+	if (appState.initialConfig && appState.initialConfig.teams) {
+		appState.initialConfig.teams.forEach(team => {
+			allOriginalMembers.push(...team.members);
+		});
+	}
 	
 	// 現在どのチームにも所属していないメンバーを特定
 	const assignedMembers = [];
@@ -103,7 +105,7 @@ function getUnassignedMembers() {
 	});
 	
 	// 欠席チームのメンバーも除外
-	return allOriginalMembers.filter(member => 
+	return allOriginalMembers.filter(member =>
 		!assignedMembers.includes(member) && 
 		!appState.absentTeam.members.includes(member)
 	);

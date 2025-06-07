@@ -145,11 +145,13 @@ function findCurrentTeamForMember(memberName) {
 
 // 全メンバーリストを取得する関数（現在編集中のチームに既にいるメンバーは除外）
 function getAllAvailableMembers() {
-	// オリジナルの全メンバーリストを取得
+	// 初期設定の全メンバーリストを取得
 	const allOriginalMembers = [];
-	appState.originalTeams.forEach(team => {
-		allOriginalMembers.push(...team.members);
-	});
+	if (appState.initialConfig && appState.initialConfig.teams) {
+		appState.initialConfig.teams.forEach(team => {
+			allOriginalMembers.push(...team.members);
+		});
+	}
 
 	// 現在編集中のチームに既に割り当てられているメンバーは除外（重複を防ぐ）
 	return allOriginalMembers.filter(member => !tempTeamMembers.includes(member));
