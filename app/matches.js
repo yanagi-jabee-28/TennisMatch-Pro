@@ -13,7 +13,7 @@ import { logTeamParticipationChange } from './debug.js';
 function renderTeams() {
 	const teamsContainer = domCache.teamsContainer;
 	if (!teamsContainer) return;
-	
+
 	teamsContainer.innerHTML = '';
 
 	const documentFragment = document.createDocumentFragment();	// 通常のチーム1-5を表示
@@ -21,11 +21,11 @@ function renderTeams() {
 		const teamCard = document.createElement('div');
 		const isActive = isTeamActive(team.id);
 		teamCard.className = `team-card ${!isActive ? 'inactive-team' : ''}`;
-		
+
 		// メンバーが選択されている場合、チームヘッダーをクリック可能にする
 		const hasSelectedMembers = selectedMembers.size > 0;
 		const headerClass = hasSelectedMembers ? 'team-header clickable-team-header assignable' : 'team-header';
-				teamCard.innerHTML = `
+		teamCard.innerHTML = `
             <div class="${headerClass}" data-team-id="${team.id}">
                 <div class="team-title-section">
                     <h3>チーム${team.id}</h3>
@@ -40,7 +40,12 @@ function renderTeams() {
                 </button>
             </div>
             <ul class="team-members">
-                ${team.members.map(member => `<li class="member-item clickable-member" data-member="${member}" data-team-id="${team.id}">${member}</li>`).join('')}
+                ${team.members.map(member => `
+                    <li class="member-item clickable-member" data-member="${member}" data-team-id="${team.id}">
+                        <span class="member-name">${member}</span>
+                        <button class="move-to-unassigned-btn" data-member="${member}" data-team-id="${team.id}" title="未割り当てへ移動">➡️</button>
+                    </li>
+                `).join('')}
             </ul>
         `;
 
@@ -49,11 +54,11 @@ function renderTeams() {
 	const absentTeamCard = document.createElement('div');
 	const isAbsentTeamActive = isTeamActive(6);
 	absentTeamCard.className = `team-card absent-team-card ${!isAbsentTeamActive ? 'inactive-team' : ''}`;
-	
+
 	// メンバーが選択されている場合、欠席チームヘッダーもクリック可能にする
 	const hasSelectedMembers = selectedMembers.size > 0;
 	const absentHeaderClass = hasSelectedMembers ? 'team-header clickable-team-header assignable' : 'team-header';
-		absentTeamCard.innerHTML = `
+	absentTeamCard.innerHTML = `
         <div class="${absentHeaderClass}" data-team-id="6">
             <div class="team-title-section">
                 <h3>欠席チーム</h3>
@@ -76,11 +81,11 @@ function renderTeams() {
         </ul>
     `;
 
-	documentFragment.appendChild(absentTeamCard);	teamsContainer.appendChild(documentFragment);
+	documentFragment.appendChild(absentTeamCard); teamsContainer.appendChild(documentFragment);
 
 	// イベント委譲で編集ボタンとメンバークリックのイベントを処理
 	EventListenerManager.updateEventListener(teamsContainer, 'click', handleTeamEditClick);
-	
+
 	// 右クリックイベントも追加
 	EventListenerManager.updateEventListener(teamsContainer, 'contextmenu', handleTeamRightClick);
 
@@ -97,16 +102,16 @@ function getUnassignedMembers() {
 			allOriginalMembers.push(...team.members);
 		});
 	}
-	
+
 	// 現在どのチームにも所属していないメンバーを特定
 	const assignedMembers = [];
 	appState.teams.forEach(team => {
 		assignedMembers.push(...team.members);
 	});
-	
+
 	// 欠席チームのメンバーも除外
 	return allOriginalMembers.filter(member =>
-		!assignedMembers.includes(member) && 
+		!assignedMembers.includes(member) &&
 		!appState.absentTeam.members.includes(member)
 	);
 }
@@ -115,10 +120,10 @@ function getUnassignedMembers() {
 function renderUnassignedMembers() {
 	const unassignedContainer = document.getElementById('unassigned-members-container');
 	if (!unassignedContainer) return;
-	
+
 	const unassignedMembers = getUnassignedMembers();
 	unassignedContainer.innerHTML = '';
-	
+
 	if (unassignedMembers.length === 0) {
 		const emptyMessage = document.createElement('div');
 		emptyMessage.className = 'unassigned-members-empty';
@@ -131,10 +136,11 @@ function renderUnassignedMembers() {
 			memberItem.dataset.member = member;
 			memberItem.dataset.teamId = 'unassigned';
 			memberItem.textContent = member;
-			unassignedContainer.appendChild(memberItem);		});
+			unassignedContainer.appendChild(memberItem);
+		});
 		// イベント委譲で未割り当てメンバーのクリックを処理
 		EventListenerManager.updateEventListener(unassignedContainer, 'click', handleUnassignedMemberClick);
-		
+
 		// 右クリックイベントも追加
 		EventListenerManager.updateEventListener(unassignedContainer, 'contextmenu', handleUnassignedRightClick);
 	}
@@ -146,43 +152,43 @@ function handleTeamEditClick(event) {	// チーム参加状態トグルボタン
 	if (participationToggle) {
 		event.stopPropagation(); // イベントの伝播を止める
 		const teamId = parseInt(participationToggle.dataset.teamId);
-		
+
 		// 変更前の状態をログ
 		logTeamParticipationChange(teamId, !isTeamActive(teamId));
-		
+
 		const newState = toggleTeamParticipation(teamId);
-		
+
 		// チームが不参加になった場合、そのチームの試合データを削除
 		if (!newState) {
 			const matchesToDelete = [];
 			Object.keys(appState.matches).forEach(matchId => {
 				const match = appState.matches[matchId];
 				if (match.team1 === teamId || match.team2 === teamId) {
-					matchesToDelete.push({id: matchId, match});
+					matchesToDelete.push({ id: matchId, match });
 					delete appState.matches[matchId];
 				}
 			});
-			
+
 			console.log(`チーム${teamId}の不参加により${matchesToDelete.length}件の試合データを削除しました`);
-			matchesToDelete.forEach(({id, match}) => {
+			matchesToDelete.forEach(({ id, match }) => {
 				console.log(`  削除: ${id} - チーム${match.team1} vs チーム${match.team2}`);
 			});
-			
+
 			// 試合データの変更を保存
 			saveMatchResults();
 		}
-				// ボタンの表示を更新
+		// ボタンの表示を更新
 		participationToggle.className = `team-participation-toggle ${newState ? 'active' : 'inactive'}`;
 		participationToggle.textContent = newState ? '✓' : '✗';
 		participationToggle.title = newState ? 'チームを不参加にする' : 'チームを参加させる';
-		
+
 		// チーム全体の表示を更新
 		renderTeams();
-				// 対戦表を再生成
+		// 対戦表を再生成
 		createMatchTable();
-				// 順位表も更新
+		// 順位表も更新
 		calculateStandings();
-		
+
 		console.log(`チーム${teamId}の参加状態を${newState ? '参加' : '不参加'}に変更しました`);
 		return;
 	}
@@ -195,6 +201,15 @@ function handleTeamEditClick(event) {	// チーム参加状態トグルボタン
 		return;
 	}
 
+	// 未割り当てへ移動ボタンのクリック処理
+	const moveToUnassignedBtn = event.target.closest('.move-to-unassigned-btn');
+	if (moveToUnassignedBtn) {
+		const memberName = moveToUnassignedBtn.dataset.member;
+		const teamId = parseInt(moveToUnassignedBtn.dataset.teamId);
+		moveMemberToUnassigned(memberName, teamId);
+		return;
+	}
+
 	// 編集ボタンのクリック処理
 	const editBtn = event.target.closest('.edit-team-btn');
 	if (editBtn) {
@@ -202,7 +217,7 @@ function handleTeamEditClick(event) {	// チーム参加状態トグルボタン
 		openTeamEditModal(teamId);
 		return;
 	}
-	
+
 	// チームヘッダーのクリック処理（メンバー割り当て）
 	const teamHeader = event.target.closest('.clickable-team-header');
 	if (teamHeader && selectedMembers.size > 0) {
@@ -216,7 +231,7 @@ function handleTeamEditClick(event) {	// チーム参加状態トグルボタン
 		}
 		return;
 	}
-	
+
 	// メンバークリックの処理
 	const memberItem = event.target.closest('.clickable-member');
 	if (memberItem && !event.target.closest('.return-member-btn')) {
@@ -230,7 +245,7 @@ function handleTeamEditClick(event) {	// チーム参加状態トグルボタン
 // メンバークリック時の処理
 function handleMemberClick(memberName, currentTeamId) {
 	console.log(`メンバー "${memberName}" (チーム${currentTeamId}) がクリックされました`);
-	
+
 	// メンバーを選択状態にする（パレットモード用）
 	toggleMemberSelection(memberName, currentTeamId);
 }
@@ -242,7 +257,7 @@ let memberPaletteMode = false;
 // メンバーの選択状態を切り替える
 function toggleMemberSelection(memberName, teamId) {
 	const memberKey = `${memberName}-${teamId}`;
-	
+
 	if (selectedMembers.has(memberKey)) {
 		selectedMembers.delete(memberKey);
 		console.log(`メンバー "${memberName}" の選択を解除しました`);
@@ -250,10 +265,10 @@ function toggleMemberSelection(memberName, teamId) {
 		selectedMembers.add(memberKey);
 		console.log(`メンバー "${memberName}" を選択しました`);
 	}
-	
+
 	// UI上での選択状態を更新
 	updateMemberSelectionUI();
-	
+
 	// パレットモードの表示を更新
 	updateMemberPalette();
 }
@@ -261,19 +276,19 @@ function toggleMemberSelection(memberName, teamId) {
 // メンバー選択のUIを更新
 function updateMemberSelectionUI() {
 	const allMemberItems = document.querySelectorAll('.clickable-member');
-	
+
 	allMemberItems.forEach(item => {
 		const memberName = item.dataset.member;
 		const teamId = item.dataset.teamId;
 		const memberKey = `${memberName}-${teamId}`;
-		
+
 		if (selectedMembers.has(memberKey)) {
 			item.classList.add('selected-member');
 		} else {
 			item.classList.remove('selected-member');
 		}
 	});
-	
+
 	// チームヘッダーのスタイルも更新（メンバーが選択されている場合にクリック可能にする）
 	const teamHeaders = document.querySelectorAll('.team-header');
 	teamHeaders.forEach(header => {
@@ -288,15 +303,15 @@ function updateMemberSelectionUI() {
 // メンバーパレットの表示を更新
 function updateMemberPalette() {
 	let paletteContainer = document.getElementById('member-palette');
-	
+
 	// パレットコンテナが存在しない場合は作成
 	if (!paletteContainer) {
 		paletteContainer = createMemberPalette();
 	}
-	
+
 	// 選択されたメンバーの表示を更新
 	renderSelectedMembers(paletteContainer);
-	
+
 	// パレットの表示/非表示を制御
 	if (selectedMembers.size > 0) {
 		paletteContainer.style.display = 'block';
@@ -312,7 +327,7 @@ function createMemberPalette() {
 	const paletteContainer = document.createElement('div');
 	paletteContainer.id = 'member-palette';
 	paletteContainer.className = 'member-palette-container';
-	
+
 	paletteContainer.innerHTML = `
 		<div class="palette-header">
 			<h3>選択されたメンバー</h3>
@@ -333,22 +348,22 @@ function createMemberPalette() {
 			</div>
 		</div>
 	`;
-	
+
 	// チーム情報セクションと対戦表セクションの間に挿入
 	const teamInfoSection = document.getElementById('team-info');
 	const matchTableSection = document.getElementById('match-table');
-	
+
 	if (teamInfoSection && matchTableSection) {
 		teamInfoSection.parentNode.insertBefore(paletteContainer, matchTableSection);
 	}
-	
+
 	// イベントリスナーを追加
 	setupPaletteEventListeners(paletteContainer);
-	
+
 	return paletteContainer;
 }
 
-	// パレットのイベントリスナーを設定
+// パレットのイベントリスナーを設定
 function setupPaletteEventListeners(paletteContainer) {
 	// ボタンのイベントハンドラー設定
 	const buttonHandlers = {
@@ -363,7 +378,7 @@ function setupPaletteEventListeners(paletteContainer) {
 			updateMemberPalette();
 		}
 	};
-	
+
 	Object.entries(buttonHandlers).forEach(([selector, handler]) => {
 		const button = paletteContainer.querySelector(selector);
 		if (button) {
@@ -376,30 +391,30 @@ function setupPaletteEventListeners(paletteContainer) {
 function renderSelectedMembers(paletteContainer) {
 	const selectedMembersList = paletteContainer.querySelector('#selected-members-list');
 	const teamButtonsContainer = paletteContainer.querySelector('#team-assignment-buttons');
-	
+
 	if (!selectedMembersList || !teamButtonsContainer) return;
-		// 選択されたメンバーリストを表示
+	// 選択されたメンバーリストを表示
 	selectedMembersList.innerHTML = '';
 	Array.from(selectedMembers).forEach(memberKey => {
 		const [memberName, teamId] = memberKey.split('-');
 		const memberItem = document.createElement('div');
 		memberItem.className = 'selected-member-item';
-				// 未割り当てメンバーと欠席メンバーの場合の表示を変更
-		let currentTeamText;		if (teamId === 'unassigned') {
+		// 未割り当てメンバーと欠席メンバーの場合の表示を変更
+		let currentTeamText; if (teamId === 'unassigned') {
 			currentTeamText = '未割り当て';
 		} else if (teamId === 6) {
 			currentTeamText = '欠席';
 		} else {
 			currentTeamText = `チーム${teamId}`;
 		}
-		
+
 		memberItem.innerHTML = `
 			<span class="member-name">${memberName}</span>
 			<span class="current-team">現在: ${currentTeamText}</span>
 			<button class="remove-from-selection-btn" data-member-key="${memberKey}">&times;</button>
 		`;
 		selectedMembersList.appendChild(memberItem);
-				// 個別削除ボタンのイベントリスナー
+		// 個別削除ボタンのイベントリスナー
 		const removeBtn = memberItem.querySelector('.remove-from-selection-btn');
 		if (removeBtn) {
 			EventListenerManager.safeAddEventListener(removeBtn, 'click', () => {
@@ -423,9 +438,9 @@ function assignSelectedMembersToTeam(targetTeamId) {
 		console.log('選択されたメンバーがありません');
 		return;
 	}
-	
+
 	console.log(`選択されたメンバーをチーム${targetTeamId}に割り当てます`);
-		// 選択されたメンバーを元のチームから削除し、新しいチームに追加
+	// 選択されたメンバーを元のチームから削除し、新しいチームに追加
 	const membersToMove = Array.from(selectedMembers).map(memberKey => {
 		const [memberName, currentTeamId] = memberKey.split('-');
 		return {
@@ -449,22 +464,22 @@ function assignSelectedMembersToTeam(targetTeamId) {
 				}
 			}
 		}
-		
+
 		// 新しいチームに追加
 		const toTeam = appState.teams.find(team => team.id === move.toTeam);
 		if (toTeam && !toTeam.members.includes(move.name)) {
 			toTeam.members.push(move.name);
 		}
 	});
-	
+
 	// 選択をクリア
 	selectedMembers.clear();
-	
+
 	// UIを更新
 	renderTeams();
 	updateMemberSelectionUI();
 	updateMemberPalette();
-	
+
 	console.log('メンバーの移動が完了しました');
 }
 
@@ -497,16 +512,33 @@ function assignSelectedMembersAsAbsent() {
 	console.log('メンバーの欠席処理が完了しました');
 }
 
+// メンバーを未割り当てに移動する関数
+function moveMemberToUnassigned(memberName, teamId) {
+	const team = appState.teams.find(t => t.id === teamId);
+	if (team) {
+		const memberIndex = team.members.indexOf(memberName);
+		if (memberIndex > -1) {
+			team.members.splice(memberIndex, 1);
+			console.log(`メンバー "${memberName}" をチーム${teamId}から未割り当てに移動しました。`);
+			saveTeamMembers(null, null); // チーム状態を保存 (null, null は全体保存を示す)
+			renderTeams(); // チーム表示を更新
+			// 対戦表や順位表も必要に応じて更新
+			createMatchTable();
+			calculateStandings();
+		}
+	}
+}
+
 // 対戦表を作成する関数
 function createMatchTable() {
 	const tableHeader = domCache.tableHeader;
 	const tableBody = domCache.tableBody;
-	
+
 	if (!tableHeader || !tableBody) return;
 
 	// 参加中のチームのみを取得
 	const activeTeams = getActiveTeams();
-		// 参加中のチームが1つ以下の場合は対戦表を表示しない
+	// 参加中のチームが1つ以下の場合は対戦表を表示しない
 	if (activeTeams.length <= 1) {
 		tableHeader.innerHTML = '<th class="empty-cell insufficient-teams-header">参加中のチームが不足しています</th>';
 		tableBody.innerHTML = '<tr><td class="match-table-message warning">対戦表を表示するには、2つ以上のチームが参加している必要があります</td></tr>';
@@ -565,7 +597,7 @@ function createMatchTable() {
 						displayScore = `${match.scoreTeam1}-${match.scoreTeam2}`;
 					} else {
 						displayScore = `${match.scoreTeam2}-${match.scoreTeam1}`;
-					}					cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
+					} cell.innerHTML = `<span class="match-result ${resultClass}">${displayScore}</span>`;
 				} else {
 					cell.textContent = '-';
 				}
@@ -581,7 +613,7 @@ function createMatchTable() {
 	// イベントリスナーを一括で追加（イベント委譲を使用）
 	EventListenerManager.updateEventListener(tableBody, 'click', handleTableClick);
 }
-	// イベント委譲によるテーブルクリック処理
+// イベント委譲によるテーブルクリック処理
 function handleTableClick(event) {
 	const cell = event.target.closest('td.clickable-cell');
 	if (!cell) return;
@@ -589,7 +621,7 @@ function handleTableClick(event) {
 	const rowTeamId = parseInt(cell.dataset.rowTeamId);
 	const colTeamId = parseInt(cell.dataset.colTeamId);
 	const matchId = cell.dataset.matchId;
-	
+
 	// 常に直接スコア入力モーダルを開く
 	// 既存データがある場合は編集モードで開く
 	openScoreModal(rowTeamId, colTeamId, matchId);
@@ -609,25 +641,25 @@ function handleTeamRightClick(event) {
 	const memberItem = event.target.closest('.clickable-member');
 	if (memberItem) {
 		event.preventDefault(); // デフォルトのコンテキストメニューを無効化
-		
+
 		const memberName = memberItem.dataset.member;
 		const teamId = memberItem.dataset.teamId;
-		
+
 		// 欠席メンバーには右クリックメニューを表示しない
 		if (teamId === 'absent') {
 			return;
 		}
-		
+
 		// コンテキストメニューを作成・表示
 		const menu = createMemberContextMenu();
 		menu.dataset.memberName = memberName;
 		menu.dataset.teamId = teamId;
-		
+
 		// マウス位置にメニューを表示
 		menu.style.left = event.pageX + 'px';
 		menu.style.top = event.pageY + 'px';
 		menu.style.display = 'block';
-		
+
 		console.log(`メンバー "${memberName}" を右クリックしました`);
 	}
 }
@@ -637,19 +669,19 @@ function handleUnassignedRightClick(event) {
 	const memberItem = event.target.closest('.clickable-member');
 	if (memberItem) {
 		event.preventDefault(); // デフォルトのコンテキストメニューを無効化
-		
+
 		const memberName = memberItem.dataset.member;
-		
+
 		// 未割り当てメンバー用のコンテキストメニューを作成・表示
 		const menu = createMemberContextMenu();
 		menu.dataset.memberName = memberName;
 		menu.dataset.teamId = 'unassigned';
-		
+
 		// マウス位置にメニューを表示
 		menu.style.left = event.pageX + 'px';
 		menu.style.top = event.pageY + 'px';
 		menu.style.display = 'block';
-		
+
 		console.log(`未割り当てメンバー "${memberName}" を右クリックしました`);
 	}
 }
@@ -670,7 +702,7 @@ function createMemberContextMenu() {
 	if (contextMenu) {
 		contextMenu.remove();
 	}
-	
+
 	contextMenu = document.createElement('div');
 	contextMenu.className = 'member-context-menu';
 	contextMenu.innerHTML = `
@@ -681,12 +713,12 @@ function createMemberContextMenu() {
 			<span>✎</span> チーム編集
 		</div>
 	`;
-		// メニューアイテムのクリックイベント
+	// メニューアイテムのクリックイベント
 	EventListenerManager.safeAddEventListener(contextMenu, 'click', handleContextMenuClick);
-	
+
 	// 外部クリックでメニューを閉じる
 	EventListenerManager.safeAddEventListener(document, 'click', closeContextMenu);
-	
+
 	document.body.appendChild(contextMenu);
 	return contextMenu;
 }
@@ -703,17 +735,17 @@ function closeContextMenu() {
 // コンテキストメニューのクリック処理
 function handleContextMenuClick(event) {
 	event.stopPropagation();
-	
+
 	const action = event.target.closest('.context-menu-item')?.dataset.action;
 	const memberName = contextMenu.dataset.memberName;
 	const teamId = contextMenu.dataset.teamId;
-	
+
 	if (action === 'mark-absent' && memberName) {
 		handleMarkMemberAsAbsent(memberName);
 	} else if (action === 'edit-team' && teamId) {
 		openTeamEditModal(parseInt(teamId));
 	}
-	
+
 	closeContextMenu();
 }
 
@@ -725,10 +757,10 @@ function handleMarkMemberAsAbsent(memberName) {
 	}
 }
 
-export { 
-	renderTeams, 
-	createMatchTable, 
-	handleTeamEditClick, 	handleTableClick,
+export {
+	renderTeams,
+	createMatchTable,
+	handleTeamEditClick, handleTableClick,
 	handleMemberClick,
 	toggleMemberSelection,
 	updateMemberPalette,
