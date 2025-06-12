@@ -1,7 +1,7 @@
 // 対戦表と試合管理関連の機能
 
 import { domCache } from './dom.js';
-import { appState, saveMatchResults, markMemberAsAbsent, returnMemberFromAbsent, getActiveTeams, isTeamActive, toggleTeamParticipation } from './state.js';
+import { appState, saveMatchResults, markMemberAsAbsent, returnMemberFromAbsent, getActiveTeams, isTeamActive, toggleTeamParticipation, saveTeamMembers } from './state.js';
 import { getMatchId, EventListenerManager } from './utils.js';
 import { customConfirm } from './components/customConfirm.js';
 import { openScoreModal } from './components/scoreModal.js';
