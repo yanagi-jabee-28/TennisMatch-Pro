@@ -50,6 +50,15 @@ const formations = {
 			{ id: 4, members: ['宮田 夢', '倉科 純太郎'] },
 			{ id: 5, members: ['栁原 魁人', '平林 智花', '丸山 美音'] }
 		]
+	}, 'formation5': {
+		name: '新編成5',
+		teams: [
+			{ id: 1, members: ['栁原 魁人', '宮田 夢', '田中 稜久'] },
+			{ id: 2, members: ['倉科 純太郎', '笠井 陸'] },
+			{ id: 3, members: ['関 ふみ菜', '丸山 美音'] },
+			{ id: 4, members: ['島津 日向太', 'ルダン'] },
+			{ id: 5, members: ['平林 智花', '伊藤 颯真'] }
+		]
 	}
 };
 
