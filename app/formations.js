@@ -44,11 +44,11 @@ const formations = {
 	}, 'formation4': {
 		name: '新編成4',
 		teams: [
-			{ id: 1, members: ['田中 稜久', '平林 智花'] },
-			{ id: 2, members: ['関 ふみ菜', '島津 日向太'] },
-			{ id: 3, members: ['笠井 陸', 'ルダン'] },
-			{ id: 4, members: ['伊藤 颯真', '丸山 美音'] },
-			{ id: 5, members: ['宮田 夢', '栁原 魁人', '倉科 純太郎'] }
+			{ id: 1, members: ['田中 稜久', '笠井 陸'] },
+			{ id: 2, members: ['関 ふみ菜', 'ルダン'] },
+			{ id: 3, members: ['島津 日向太', '伊藤 颯真'] },
+			{ id: 4, members: ['宮田 夢', '倉科 純太郎'] },
+			{ id: 5, members: ['栁原 魁人', '平林 智花', '丸山 美音'] }
 		]
 	}
 };
