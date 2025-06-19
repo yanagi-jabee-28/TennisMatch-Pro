@@ -32,16 +32,16 @@ const formations = {
 			{ id: 5, members: [] } // 欠席: 田中 稜久, 関 ふみ菜
 		],
 		absentMembers: ['田中 稜久', '関 ふみ菜']
-	},
-	'formation3': {
-		name: '新編成3',
+	}, 'formation3': {
+		name: '既編成3',
 		teams: [
-			{ id: 1, members: ['宮田 夢', '笠井 陸'] },
-			{ id: 2, members: ['倉科 純太郎', '田中 稜久'] },
-			{ id: 3, members: ['ルダン', '関 ふみ菜'] },
-			{ id: 4, members: ['伊藤 颯真', '丸山 美音', '平林 智花'] },
-			{ id: 5, members: ['栁原 魁人', '島津 日向太'] }
-		]
+			{ id: 1, members: ['笠井 陸', '栁原 魁人'] },
+			{ id: 2, members: ['宮田 夢', '平林 智花'] },
+			{ id: 3, members: ['倉科 純太郎', '丸山 美音'] },
+			{ id: 4, members: ['ルダン', '田中 稜久'] },
+			{ id: 5, members: ['伊藤 颯真', '関 ふみ菜'] }
+		],
+		absentMembers: ['島津日向太']
 	}, 'formation4': {
 		name: '新編成4',
 		teams: [
